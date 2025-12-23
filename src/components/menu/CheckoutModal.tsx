@@ -1,48 +1,51 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, MapPin, User, Phone, CreditCard, Banknote, AlertCircle, Loader2, Bell, Check, Home } from 'lucide-react';
+import { X, MapPin, User, Phone, CreditCard, Banknote, AlertCircle, Loader2, Bell, Check, Home, ArrowLeft, FileText } from 'lucide-react';
 import { useRestaurant } from '@/hooks/useRestaurant';
 import { useCart } from '@/hooks/useCart';
 import { useLocation } from '@/hooks/useLocation';
+import { useOrder } from '@/hooks/useOrder';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { OrderPayload } from '@/types/restaurant';
+import { OrderPayload, Order } from '@/types/restaurant';
 
 interface CheckoutModalProps {
   onClose: () => void;
+  onOrderComplete: (order: Order) => void;
 }
 
 type OrderType = 'inPerson' | 'online';
 type CheckoutStep = 'type' | 'details' | 'payment' | 'confirm';
 
-export function CheckoutModal({ onClose }: CheckoutModalProps) {
+export function CheckoutModal({ onClose, onOrderComplete }: CheckoutModalProps) {
   const { restaurant, enabledPaymentMethods, canOrderOnline, canOrderInPerson } = useRestaurant();
   const { items, getTotal, clearCart } = useCart();
-  const { getLocation, checkDistance, getDistanceFromRestaurant, loading: locationLoading, error: locationError } = useLocation();
+  const { getLocation, checkDistance, getDistanceFromRestaurant, loading: locationLoading } = useLocation();
+  const { addOrder } = useOrder();
 
   const [step, setStep] = useState<CheckoutStep>('type');
   const [orderType, setOrderType] = useState<OrderType | null>(null);
-  const [tableNumber, setTableNumber] = useState('');
   const [customerInfo, setCustomerInfo] = useState({ name: '', phone: '', address: '' });
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
+  const [orderNote, setOrderNote] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [locationChecked, setLocationChecked] = useState(false);
   const [isWithinRange, setIsWithinRange] = useState(false);
 
   const total = getTotal();
+  const tableNumber = restaurant.tableNumber;
 
   const handleSelectOrderType = async (type: OrderType) => {
     setOrderType(type);
 
     if (type === 'online') {
       try {
-        const location = await getLocation();
+        await getLocation();
         const withinRange = checkDistance(restaurant.latitude, restaurant.longitude, restaurant.maxDistance);
         setIsWithinRange(withinRange);
-        setLocationChecked(true);
 
         if (!withinRange) {
           const distance = getDistanceFromRestaurant(restaurant.latitude, restaurant.longitude);
@@ -61,10 +64,6 @@ export function CheckoutModal({ onClose }: CheckoutModalProps) {
 
   const handleDetailsSubmit = () => {
     if (orderType === 'inPerson') {
-      if (!tableNumber.trim()) {
-        toast.error('Lütfen masa numaranızı girin');
-        return;
-      }
       // For in-person, skip payment and go to confirm
       setStep('confirm');
     } else {
@@ -81,30 +80,82 @@ export function CheckoutModal({ onClose }: CheckoutModalProps) {
     setStep('confirm');
   };
 
+  const handleBack = () => {
+    if (step === 'details') {
+      setStep('type');
+      setOrderType(null);
+    } else if (step === 'payment') {
+      setStep('details');
+    } else if (step === 'confirm') {
+      if (orderType === 'inPerson') {
+        setStep('details');
+      } else {
+        setStep('payment');
+      }
+    }
+  };
+
   const handleConfirmOrder = async () => {
     setIsSubmitting(true);
+
+    const selectedPayment = enabledPaymentMethods.find(pm => pm.id === selectedPaymentMethod);
 
     const orderPayload: OrderPayload = {
       restaurantId: restaurant.restaurantId,
       orderType: orderType!,
-      items: items.map(item => ({
-        productId: item.product.id,
-        portionId: item.portion.id,
-        quantity: item.quantity,
-        selectedTags: item.selectedTags,
-        note: item.note,
-      })),
+      items: items.map(item => {
+        const portion = item.portion;
+        let unitPrice = portion.price;
+        if (portion.specialPrice !== null) {
+          unitPrice = portion.specialPrice;
+        } else if (portion.campaignPrice !== null) {
+          unitPrice = portion.campaignPrice;
+        }
+        const tagTotal = item.selectedTags.reduce((sum, tag) => sum + (tag.price * tag.quantity), 0);
+        const itemTotal = (unitPrice + tagTotal) * item.quantity;
+
+        return {
+          productId: item.product.id,
+          productName: item.product.name,
+          portionId: item.portion.id,
+          portionName: item.portion.name,
+          unitPrice,
+          quantity: item.quantity,
+          selectedTags: item.selectedTags,
+          itemTotal,
+          note: item.note || '',
+        };
+      }),
       totalAmount: total,
-      ...(orderType === 'inPerson' ? { tableNumber } : { customerInfo, paymentMethodId: selectedPaymentMethod! }),
+      orderNote: orderNote || undefined,
+      createdAt: new Date().toISOString(),
+      ...(orderType === 'inPerson' 
+        ? { tableNumber } 
+        : { 
+            customerInfo, 
+            paymentMethodId: selectedPaymentMethod!, 
+            paymentMethodName: selectedPayment?.name,
+          }
+      ),
     };
 
     try {
       // Send order to API
-      console.log('Sending order to https://api.liwamnenu.com/orders:', orderPayload);
+      console.log('Sending order to https://api.liwamnenu.com/orders:', JSON.stringify(orderPayload, null, 2));
       
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500));
 
+      // Create order with status
+      const order: Order = {
+        ...orderPayload,
+        id: `order-${Date.now()}`,
+        status: 'pending',
+      };
+
+      // Save order
+      addOrder(order);
+      
       // Success!
       toast.success(orderType === 'inPerson' 
         ? 'Siparişiniz alındı! Garson çağırılıyor...' 
@@ -112,13 +163,15 @@ export function CheckoutModal({ onClose }: CheckoutModalProps) {
       );
       
       clearCart();
-      onClose();
+      onOrderComplete(order);
     } catch (error) {
       toast.error('Sipariş oluşturulurken bir hata oluştu.');
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const showBackButton = step !== 'type';
 
   return (
     <AnimatePresence>
@@ -138,7 +191,17 @@ export function CheckoutModal({ onClose }: CheckoutModalProps) {
       >
         {/* Header */}
         <div className="sticky top-0 z-10 flex items-center justify-between px-5 py-4 bg-card border-b border-border">
-          <h2 className="text-xl font-bold">Sipariş Ver</h2>
+          <div className="flex items-center gap-3">
+            {showBackButton && (
+              <button
+                onClick={handleBack}
+                className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+            )}
+            <h2 className="text-xl font-bold">Sipariş Ver</h2>
+          </div>
           <button
             onClick={onClose}
             className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center"
@@ -213,20 +276,20 @@ export function CheckoutModal({ onClose }: CheckoutModalProps) {
               className="space-y-4"
             >
               <h3 className="text-lg font-semibold mb-4">
-                {orderType === 'inPerson' ? 'Masa Bilgisi' : 'Teslimat Bilgileri'}
+                {orderType === 'inPerson' ? 'Sipariş Bilgisi' : 'Teslimat Bilgileri'}
               </h3>
 
               {orderType === 'inPerson' ? (
                 <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="tableNumber">Masa Numarası</Label>
-                    <Input
-                      id="tableNumber"
-                      placeholder="Örn: 5"
-                      value={tableNumber}
-                      onChange={(e) => setTableNumber(e.target.value)}
-                      className="h-14 text-lg rounded-xl mt-2"
-                    />
+                  {/* Show table number from restaurant data */}
+                  <div className="flex items-center gap-4 p-5 bg-secondary rounded-2xl">
+                    <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
+                      <Bell className="w-7 h-7 text-primary" />
+                    </div>
+                    <div className="text-left flex-1">
+                      <p className="text-sm text-muted-foreground">Masa Numarası</p>
+                      <p className="text-2xl font-bold">{tableNumber}</p>
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -272,6 +335,22 @@ export function CheckoutModal({ onClose }: CheckoutModalProps) {
                   </div>
                 </div>
               )}
+
+              {/* Order Note */}
+              <div>
+                <Label htmlFor="orderNote" className="flex items-center gap-2">
+                  <FileText className="w-4 h-4" />
+                  Sipariş Notu (Opsiyonel)
+                </Label>
+                <Textarea
+                  id="orderNote"
+                  placeholder="Siparişinizle ilgili eklemek istediğiniz not..."
+                  value={orderNote}
+                  onChange={(e) => setOrderNote(e.target.value)}
+                  className="mt-2 rounded-xl resize-none"
+                  rows={3}
+                />
+              </div>
 
               <Button
                 onClick={handleDetailsSubmit}
@@ -356,6 +435,14 @@ export function CheckoutModal({ onClose }: CheckoutModalProps) {
                     </div>
                   ))}
                 </div>
+
+                {orderNote && (
+                  <div className="border-t border-border pt-3">
+                    <p className="text-sm text-muted-foreground">
+                      <span className="font-medium">Not:</span> {orderNote}
+                    </p>
+                  </div>
+                )}
 
                 <div className="border-t border-border pt-3 flex justify-between font-bold text-lg">
                   <span>Toplam</span>

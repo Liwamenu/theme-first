@@ -114,6 +114,7 @@ export interface RestaurantData {
   specialPriceName: string;
   googleAnalytics: string;
   licenseIsActive: boolean;
+  tableNumber?: number;
   WorkingHours: WorkingHour[];
   SocialLinks: SocialLinks;
   Products: Product[];
@@ -149,9 +150,13 @@ export interface OrderPayload {
   orderType: 'inPerson' | 'online';
   items: {
     productId: string;
+    productName: string;
     portionId: string;
+    portionName: string;
+    unitPrice: number;
     quantity: number;
     selectedTags: SelectedTagItem[];
+    itemTotal: number;
     note?: string;
   }[];
   customerInfo?: {
@@ -160,6 +165,14 @@ export interface OrderPayload {
     address?: string;
   };
   paymentMethodId?: string;
-  tableNumber?: string;
+  paymentMethodName?: string;
+  tableNumber?: number;
   totalAmount: number;
+  orderNote?: string;
+  createdAt: string;
+}
+
+export interface Order extends OrderPayload {
+  id: string;
+  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';
 }

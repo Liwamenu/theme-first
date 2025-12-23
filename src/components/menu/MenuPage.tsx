@@ -1,25 +1,31 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X } from 'lucide-react';
+import { Search, X, Receipt } from 'lucide-react';
 import { RestaurantHeader } from '@/components/menu/RestaurantHeader';
 import { CategoryTabs } from '@/components/menu/CategoryTabs';
 import { ProductCard } from '@/components/menu/ProductCard';
 import { ProductDetailModal } from '@/components/menu/ProductDetailModal';
 import { CartDrawer, CartButton } from '@/components/menu/CartDrawer';
 import { CheckoutModal } from '@/components/menu/CheckoutModal';
+import { OrderReceipt } from '@/components/menu/OrderReceipt';
+import { Footer } from '@/components/menu/Footer';
 import { useRestaurant } from '@/hooks/useRestaurant';
-import { Product } from '@/types/restaurant';
+import { useOrder } from '@/hooks/useOrder';
+import { Product, Order } from '@/types/restaurant';
 import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
+
+type View = 'menu' | 'order';
 
 export function MenuPage() {
   const { categories, recommendedProducts, isRestaurantActive, isCurrentlyOpen } = useRestaurant();
+  const { currentOrder, orders, setCurrentOrder } = useOrder();
   const [activeCategory, setActiveCategory] = useState<string>(categories[0]?.id || '');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showSearch, setShowSearch] = useState(false);
+  const [currentView, setCurrentView] = useState<View>('menu');
+  const [viewingOrder, setViewingOrder] = useState<Order | null>(null);
   const categoryRefs = useRef<Record<string, HTMLElement | null>>({});
 
   // Handle category scroll sync
@@ -66,6 +72,22 @@ export function MenuPage() {
 
   const canOrder = isRestaurantActive && isCurrentlyOpen;
 
+  const handleOrderComplete = (order: Order) => {
+    setIsCheckoutOpen(false);
+    setViewingOrder(order);
+    setCurrentView('order');
+  };
+
+  const handleBackToMenu = () => {
+    setCurrentView('menu');
+    setViewingOrder(null);
+  };
+
+  // Show order receipt view
+  if (currentView === 'order' && viewingOrder) {
+    return <OrderReceipt order={viewingOrder} onBack={handleBackToMenu} />;
+  }
+
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Restaurant Header */}
@@ -74,21 +96,39 @@ export function MenuPage() {
       {/* Search Bar */}
       <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-lg">
         <div className="container px-4 py-3">
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Yemek ara..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-12 pl-12 pr-12 rounded-full bg-secondary border-0"
-            />
-            {searchQuery && (
+          <div className="flex gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Yemek ara..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-12 pl-12 pr-12 rounded-full bg-secondary border-0"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-4 top-1/2 -translate-y-1/2"
+                >
+                  <X className="w-5 h-5 text-muted-foreground" />
+                </button>
+              )}
+            </div>
+            
+            {/* My Orders Button */}
+            {orders.length > 0 && (
               <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-4 top-1/2 -translate-y-1/2"
+                onClick={() => {
+                  if (orders.length > 0) {
+                    setViewingOrder(orders[0]);
+                    setCurrentView('order');
+                  }
+                }}
+                className="h-12 px-4 rounded-full bg-primary text-primary-foreground flex items-center gap-2 font-medium hover:bg-primary/90 transition-colors"
               >
-                <X className="w-5 h-5 text-muted-foreground" />
+                <Receipt className="w-5 h-5" />
+                <span className="hidden sm:inline">Siparişim</span>
               </button>
             )}
           </div>
@@ -170,6 +210,9 @@ export function MenuPage() {
         )}
       </div>
 
+      {/* Footer */}
+      <Footer />
+
       {/* Cart Button */}
       {canOrder && <CartButton onClick={() => setIsCartOpen(true)} />}
 
@@ -196,7 +239,10 @@ export function MenuPage() {
       {/* Checkout Modal */}
       <AnimatePresence>
         {isCheckoutOpen && (
-          <CheckoutModal onClose={() => setIsCheckoutOpen(false)} />
+          <CheckoutModal 
+            onClose={() => setIsCheckoutOpen(false)} 
+            onOrderComplete={handleOrderComplete}
+          />
         )}
       </AnimatePresence>
     </div>
