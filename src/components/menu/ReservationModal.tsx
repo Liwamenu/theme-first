@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import {
   X,
   Calendar,
@@ -12,7 +13,6 @@ import {
   AlertTriangle,
   Check,
   Edit2,
-  Printer,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,9 +39,9 @@ type Step = "form" | "verify" | "success";
 
 export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
   const { restaurant } = useRestaurant();
+  const navigate = useNavigate();
   const [step, setStep] = useState<Step>("form");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [confirmationCode, setConfirmationCode] = useState("");
   const [formData, setFormData] = useState<ReservationFormData>({
     fullName: "",
     phone: "",
@@ -94,6 +94,38 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
     setStep("form");
   };
 
+  const navigateToReceipt = (code: string) => {
+    const params = new URLSearchParams({
+      restaurantName: restaurant.name,
+      restaurantAddress: restaurant.address,
+      restaurantPhone: restaurant.phoneNumber,
+      fullName: formData.fullName,
+      phone: formData.phone,
+      date: formData.date,
+      time: formData.time,
+      guests: formData.guests.toString(),
+      notes: formData.notes,
+      confirmationCode: code,
+      createdAt: new Date().toLocaleString("tr-TR"),
+    });
+    
+    // Reset modal state
+    setStep("form");
+    setFormData({
+      fullName: "",
+      phone: "",
+      email: "",
+      date: "",
+      time: "",
+      guests: 2,
+      notes: "",
+    });
+    onClose();
+    
+    // Open receipt in new tab
+    window.open(`/reservation-receipt?${params.toString()}`, "_blank");
+  };
+
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
@@ -119,14 +151,13 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
       }
 
       const data = await response.json();
-      setConfirmationCode(data.confirmationCode || `#${Math.floor(1000 + Math.random() * 9000)}`);
-      setStep("success");
-      toast.success("Rezervasyonunuz alındı! Kısa bir sürede sizinle irtibata geçeriz.");
+      const code = data.confirmationCode || `#${Math.floor(1000 + Math.random() * 9000)}`;
+      toast.success("Rezervasyonunuz alındı!");
+      navigateToReceipt(code);
     } catch (error) {
-      setConfirmationCode(`#${Math.floor(1000 + Math.random() * 9000)}`);
-      setStep("success");
-      toast.success("Rezervasyonunuz alındı! Kısa bir sürede sizinle irtibata geçeriz.");
-      // toast.error("Rezervasyon oluşturulurken bir hata oluştu. Lütfen tekrar deneyiniz.");
+      const code = `#${Math.floor(1000 + Math.random() * 9000)}`;
+      toast.success("Rezervasyonunuz alındı!");
+      navigateToReceipt(code);
     } finally {
       setIsSubmitting(false);
     }
@@ -143,7 +174,6 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
       guests: 2,
       notes: "",
     });
-    setConfirmationCode("");
     onClose();
   };
 
@@ -383,99 +413,6 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
                   )}
                 </Button>
               </div>
-            </div>
-          )}
-
-          {/* Success/Receipt Step */}
-          {step === "success" && (
-            <div className="p-4">
-              {/* Receipt Ticket */}
-              <div
-                className="bg-white text-black rounded-lg p-4 shadow-inner border border-border"
-                style={{ fontFamily: "'Courier New', Courier, monospace" }}
-              >
-                {/* Header */}
-                <div className="text-center">
-                  <h3 className="font-bold text-lg">{restaurant.name}</h3>
-                  <p className="text-xs">{restaurant.address}</p>
-                  <p className="text-xs">Tel: {restaurant.phoneNumber}</p>
-                </div>
-
-                <div className="border-t-2 border-b border-black my-3 h-1" />
-
-                <div className="text-center font-bold text-lg">YENİ REZERVASYON</div>
-
-                <div className="border-t border-dashed border-black my-3" />
-
-                {/* Customer Info */}
-                <div className="space-y-1 text-sm">
-                  <div className="flex justify-between">
-                    <span>Müşteri:</span>
-                    <span className="font-bold">{formData.fullName}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Telefon:</span>
-                    <span className="font-bold">{formData.phone}</span>
-                  </div>
-                </div>
-
-                <div className="border-t border-dashed border-black my-3" />
-
-                {/* Reservation Details */}
-                <div className="space-y-1">
-                  <div className="flex justify-between text-base">
-                    <span>TARİH:</span>
-                    <span className="font-bold">{formatDate(formData.date)}</span>
-                  </div>
-                  <div className="flex justify-between text-base">
-                    <span>GÜN:</span>
-                    <span className="font-bold capitalize">{getDayName(formData.date)}</span>
-                  </div>
-                  <div className="flex justify-between text-lg mt-1">
-                    <span>SAAT:</span>
-                    <span className="font-bold">{formData.time}</span>
-                  </div>
-                  <div className="flex justify-between text-lg">
-                    <span>Misafir:</span>
-                    <span className="font-bold">{formData.guests} Kişi</span>
-                  </div>
-                </div>
-
-                <div className="border-t border-dashed border-black my-3" />
-
-                {/* Notes */}
-                <div className="text-sm">
-                  <span>ÖZEL İSTEKLER:</span>
-                  <div className="border-2 border-black p-2 mt-1 font-bold uppercase">{formData.notes || "YOK"}</div>
-                </div>
-
-                <div className="border-t border-dashed border-black my-3" />
-
-                {/* Footer */}
-                <div className="text-xs space-y-1">
-                  <div className="flex justify-between">
-                    <span>Oluşturma:</span>
-                    <span className="font-bold">{new Date().toLocaleString("tr-TR")}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Onay Kodu:</span>
-                    <span className="font-bold">{confirmationCode}</span>
-                  </div>
-                </div>
-
-                <div className="text-center text-xs mt-5">*** Rezervasyonunuz alınmıştır ***</div>
-              </div>
-
-              {/* Print Button */}
-              <Button variant="outline" onClick={() => window.print()} className="w-full h-12 mt-4 gap-2">
-                <Printer className="w-4 h-4" />
-                Yazdır
-              </Button>
-
-              {/* Close Button */}
-              <Button onClick={handleClose} className="w-full h-12 mt-2">
-                Kapat
-              </Button>
             </div>
           )}
         </motion.div>
