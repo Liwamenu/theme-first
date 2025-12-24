@@ -1,25 +1,39 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, MapPin, User, Phone, CreditCard, Banknote, AlertCircle, Loader2, Bell, Check, Home, ArrowLeft, FileText } from 'lucide-react';
-import { useRestaurant } from '@/hooks/useRestaurant';
-import { useCart } from '@/hooks/useCart';
-import { useLocation } from '@/hooks/useLocation';
-import { useOrder } from '@/hooks/useOrder';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
-import { OrderPayload, Order } from '@/types/restaurant';
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  X,
+  MapPin,
+  User,
+  Phone,
+  CreditCard,
+  Banknote,
+  AlertCircle,
+  Loader2,
+  Bell,
+  Check,
+  Home,
+  ArrowLeft,
+  FileText,
+} from "lucide-react";
+import { useRestaurant } from "@/hooks/useRestaurant";
+import { useCart } from "@/hooks/useCart";
+import { useLocation } from "@/hooks/useLocation";
+import { useOrder } from "@/hooks/useOrder";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { OrderPayload, Order } from "@/types/restaurant";
 
 interface CheckoutModalProps {
   onClose: () => void;
   onOrderComplete: (order: Order) => void;
 }
 
-type OrderType = 'inPerson' | 'online';
-type CheckoutStep = 'type' | 'details' | 'payment' | 'confirm';
+type OrderType = "inPerson" | "online";
+type CheckoutStep = "type" | "details" | "payment" | "confirm";
 
 export function CheckoutModal({ onClose, onOrderComplete }: CheckoutModalProps) {
   const { restaurant, enabledPaymentMethods, canOrderOnline, canOrderInPerson } = useRestaurant();
@@ -27,11 +41,11 @@ export function CheckoutModal({ onClose, onOrderComplete }: CheckoutModalProps) 
   const { getLocation, checkDistance, getDistanceFromRestaurant, loading: locationLoading } = useLocation();
   const { addOrder } = useOrder();
 
-  const [step, setStep] = useState<CheckoutStep>('type');
+  const [step, setStep] = useState<CheckoutStep>("type");
   const [orderType, setOrderType] = useState<OrderType | null>(null);
-  const [customerInfo, setCustomerInfo] = useState({ name: '', phone: '', address: '' });
+  const [customerInfo, setCustomerInfo] = useState({ name: "", phone: "", address: "" });
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
-  const [orderNote, setOrderNote] = useState('');
+  const [orderNote, setOrderNote] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isWithinRange, setIsWithinRange] = useState(false);
 
@@ -41,7 +55,7 @@ export function CheckoutModal({ onClose, onOrderComplete }: CheckoutModalProps) 
   const handleSelectOrderType = async (type: OrderType) => {
     setOrderType(type);
 
-    if (type === 'online') {
+    if (type === "online") {
       try {
         await getLocation();
         const withinRange = checkDistance(restaurant.latitude, restaurant.longitude, restaurant.maxDistance);
@@ -49,48 +63,50 @@ export function CheckoutModal({ onClose, onOrderComplete }: CheckoutModalProps) 
 
         if (!withinRange) {
           const distance = getDistanceFromRestaurant(restaurant.latitude, restaurant.longitude);
-          toast.error(`Teslimat alanı dışındasınız. (${distance?.toFixed(1)} km uzaktasınız, max: ${restaurant.maxDistance} km)`);
+          toast.error(
+            `Teslimat alanı dışındasınız. (${distance?.toFixed(1)} km uzaktasınız, max: ${restaurant.maxDistance} km)`,
+          );
           return;
         }
-        setStep('details');
+        setStep("details");
       } catch (error) {
-        toast.error('Konum alınamadı. Online sipariş için konum izni gereklidir.');
+        toast.error("Konum alınamadı. Online sipariş için konum izni gereklidir.");
         return;
       }
     } else {
-      setStep('details');
+      setStep("details");
     }
   };
 
   const handleDetailsSubmit = () => {
-    if (orderType === 'inPerson') {
+    if (orderType === "inPerson") {
       // For in-person, skip payment and go to confirm
-      setStep('confirm');
+      setStep("confirm");
     } else {
       if (!customerInfo.name.trim() || !customerInfo.phone.trim() || !customerInfo.address.trim()) {
-        toast.error('Lütfen tüm bilgileri doldurun');
+        toast.error("Lütfen tüm bilgileri doldurun");
         return;
       }
-      setStep('payment');
+      setStep("payment");
     }
   };
 
   const handlePaymentSelect = (paymentId: string) => {
     setSelectedPaymentMethod(paymentId);
-    setStep('confirm');
+    setStep("confirm");
   };
 
   const handleBack = () => {
-    if (step === 'details') {
-      setStep('type');
+    if (step === "details") {
+      setStep("type");
       setOrderType(null);
-    } else if (step === 'payment') {
-      setStep('details');
-    } else if (step === 'confirm') {
-      if (orderType === 'inPerson') {
-        setStep('details');
+    } else if (step === "payment") {
+      setStep("details");
+    } else if (step === "confirm") {
+      if (orderType === "inPerson") {
+        setStep("details");
       } else {
-        setStep('payment');
+        setStep("payment");
       }
     }
   };
@@ -98,12 +114,12 @@ export function CheckoutModal({ onClose, onOrderComplete }: CheckoutModalProps) 
   const handleConfirmOrder = async () => {
     setIsSubmitting(true);
 
-    const selectedPayment = enabledPaymentMethods.find(pm => pm.id === selectedPaymentMethod);
+    const selectedPayment = enabledPaymentMethods.find((pm) => pm.id === selectedPaymentMethod);
 
     const orderPayload: OrderPayload = {
       restaurantId: restaurant.restaurantId,
       orderType: orderType!,
-      items: items.map(item => {
+      items: items.map((item) => {
         const portion = item.portion;
         let unitPrice = portion.price;
         if (portion.specialPrice !== null) {
@@ -111,7 +127,7 @@ export function CheckoutModal({ onClose, onOrderComplete }: CheckoutModalProps) 
         } else if (portion.campaignPrice !== null) {
           unitPrice = portion.campaignPrice;
         }
-        const tagTotal = item.selectedTags.reduce((sum, tag) => sum + (tag.price * tag.quantity), 0);
+        const tagTotal = item.selectedTags.reduce((sum, tag) => sum + tag.price * tag.quantity, 0);
         const itemTotal = (unitPrice + tagTotal) * item.quantity;
 
         return {
@@ -123,55 +139,53 @@ export function CheckoutModal({ onClose, onOrderComplete }: CheckoutModalProps) 
           quantity: item.quantity,
           selectedTags: item.selectedTags,
           itemTotal,
-          note: item.note || '',
+          note: item.note || "",
         };
       }),
       totalAmount: total,
       orderNote: orderNote || undefined,
       createdAt: new Date().toISOString(),
-      ...(orderType === 'inPerson' 
-        ? { tableNumber } 
-        : { 
-            customerInfo, 
-            paymentMethodId: selectedPaymentMethod!, 
+      ...(orderType === "inPerson"
+        ? { tableNumber }
+        : {
+            customerInfo,
+            paymentMethodId: selectedPaymentMethod!,
             paymentMethodName: selectedPayment?.name,
-          }
-      ),
+          }),
     };
 
     try {
       // Send order to API
-      console.log('Sending order to https://api.liwamnenu.com/orders:', JSON.stringify(orderPayload, null, 2));
-      
+      console.log("Sending order to https://api.liwamnenu.com/orders:", JSON.stringify(orderPayload, null, 2));
+
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // Create order with status
       const order: Order = {
         ...orderPayload,
         id: `order-${Date.now()}`,
-        status: 'pending',
+        status: "pending",
       };
 
       // Save order
       addOrder(order);
-      
+
       // Success!
-      toast.success(orderType === 'inPerson' 
-        ? 'Siparişiniz alındı! Garson çağırılıyor...' 
-        : 'Siparişiniz başarıyla oluşturuldu!'
+      toast.success(
+        orderType === "inPerson" ? "Siparişiniz alındı! Garson çağırılıyor..." : "Siparişiniz başarıyla oluşturuldu!",
       );
-      
+
       clearCart();
       onOrderComplete(order);
     } catch (error) {
-      toast.error('Sipariş oluşturulurken bir hata oluştu.');
+      toast.error("Sipariş oluşturulurken bir hata oluştu.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const showBackButton = step !== 'type';
+  const showBackButton = step !== "type";
 
   return (
     <AnimatePresence>
@@ -183,10 +197,10 @@ export function CheckoutModal({ onClose, onOrderComplete }: CheckoutModalProps) 
         className="fixed inset-0 z-50 bg-foreground/60 backdrop-blur-sm"
       />
       <motion.div
-        initial={{ opacity: 0, y: '100%' }}
+        initial={{ opacity: 0, y: "100%" }}
         animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: '100%' }}
-        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        exit={{ opacity: 0, y: "100%" }}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
         className="fixed inset-x-0 bottom-0 z-50 max-h-[90vh] overflow-y-auto bg-card rounded-t-3xl"
       >
         {/* Header */}
@@ -202,27 +216,20 @@ export function CheckoutModal({ onClose, onOrderComplete }: CheckoutModalProps) 
             )}
             <h2 className="text-xl font-bold">Sipariş Ver</h2>
           </div>
-          <button
-            onClick={onClose}
-            className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center"
-          >
+          <button onClick={onClose} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <div className="p-5">
           {/* Step: Order Type */}
-          {step === 'type' && (
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="space-y-4"
-            >
+          {step === "type" && (
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
               <h3 className="text-lg font-semibold mb-4">Sipariş Türü Seçin</h3>
-              
+
               {canOrderInPerson && (
                 <button
-                  onClick={() => handleSelectOrderType('inPerson')}
+                  onClick={() => handleSelectOrderType("inPerson")}
                   className="w-full flex items-center gap-4 p-5 bg-secondary rounded-2xl hover:bg-secondary/80 transition-colors"
                 >
                   <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -239,7 +246,7 @@ export function CheckoutModal({ onClose, onOrderComplete }: CheckoutModalProps) 
 
               {canOrderOnline && (
                 <button
-                  onClick={() => handleSelectOrderType('online')}
+                  onClick={() => handleSelectOrderType("online")}
                   disabled={locationLoading}
                   className="w-full flex items-center gap-4 p-5 bg-secondary rounded-2xl hover:bg-secondary/80 transition-colors disabled:opacity-50"
                 >
@@ -269,17 +276,13 @@ export function CheckoutModal({ onClose, onOrderComplete }: CheckoutModalProps) 
           )}
 
           {/* Step: Details */}
-          {step === 'details' && (
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="space-y-4"
-            >
+          {step === "details" && (
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
               <h3 className="text-lg font-semibold mb-4">
-                {orderType === 'inPerson' ? 'Sipariş Bilgisi' : 'Teslimat Bilgileri'}
+                {orderType === "inPerson" ? "Sipariş Bilgisi" : "Teslimat Bilgileri"}
               </h3>
 
-              {orderType === 'inPerson' ? (
+              {orderType === "inPerson" ? (
                 <div className="space-y-4">
                   {/* Show table number from restaurant data */}
                   <div className="flex items-center gap-4 p-5 bg-secondary rounded-2xl">
@@ -302,7 +305,7 @@ export function CheckoutModal({ onClose, onOrderComplete }: CheckoutModalProps) 
                         id="name"
                         placeholder="Adınız Soyadınız"
                         value={customerInfo.name}
-                        onChange={(e) => setCustomerInfo(prev => ({ ...prev, name: e.target.value }))}
+                        onChange={(e) => setCustomerInfo((prev) => ({ ...prev, name: e.target.value }))}
                         className="h-14 pl-12 rounded-xl"
                       />
                     </div>
@@ -315,7 +318,7 @@ export function CheckoutModal({ onClose, onOrderComplete }: CheckoutModalProps) 
                         id="phone"
                         placeholder="05XX XXX XX XX"
                         value={customerInfo.phone}
-                        onChange={(e) => setCustomerInfo(prev => ({ ...prev, phone: e.target.value }))}
+                        onChange={(e) => setCustomerInfo((prev) => ({ ...prev, phone: e.target.value }))}
                         className="h-14 pl-12 rounded-xl"
                       />
                     </div>
@@ -328,7 +331,7 @@ export function CheckoutModal({ onClose, onOrderComplete }: CheckoutModalProps) 
                         id="address"
                         placeholder="Açık adresiniz"
                         value={customerInfo.address}
-                        onChange={(e) => setCustomerInfo(prev => ({ ...prev, address: e.target.value }))}
+                        onChange={(e) => setCustomerInfo((prev) => ({ ...prev, address: e.target.value }))}
                         className="w-full min-h-[100px] pl-12 p-4 rounded-xl bg-secondary border-0 resize-none"
                       />
                     </div>
@@ -363,12 +366,8 @@ export function CheckoutModal({ onClose, onOrderComplete }: CheckoutModalProps) 
           )}
 
           {/* Step: Payment */}
-          {step === 'payment' && (
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="space-y-4"
-            >
+          {step === "payment" && (
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
               <h3 className="text-lg font-semibold mb-4">Ödeme Yöntemi</h3>
 
               <div className="space-y-3">
@@ -377,23 +376,21 @@ export function CheckoutModal({ onClose, onOrderComplete }: CheckoutModalProps) 
                     key={method.id}
                     onClick={() => handlePaymentSelect(method.id)}
                     className={cn(
-                      'w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all',
+                      "w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all",
                       selectedPaymentMethod === method.id
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border hover:border-primary/50'
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-primary/50",
                     )}
                   >
                     <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center">
-                      {method.name.includes('Nakit') ? (
+                      {method.name.includes("Nakit") ? (
                         <Banknote className="w-6 h-6 text-primary" />
                       ) : (
                         <CreditCard className="w-6 h-6 text-primary" />
                       )}
                     </div>
                     <span className="font-medium flex-1 text-left">{method.name}</span>
-                    {selectedPaymentMethod === method.id && (
-                      <Check className="w-5 h-5 text-primary" />
-                    )}
+                    {selectedPaymentMethod === method.id && <Check className="w-5 h-5 text-primary" />}
                   </button>
                 ))}
               </div>
@@ -401,18 +398,14 @@ export function CheckoutModal({ onClose, onOrderComplete }: CheckoutModalProps) 
           )}
 
           {/* Step: Confirm */}
-          {step === 'confirm' && (
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="space-y-4"
-            >
+          {step === "confirm" && (
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
               <h3 className="text-lg font-semibold mb-4">Sipariş Özeti</h3>
 
               {/* Order Summary */}
               <div className="bg-secondary rounded-2xl p-4 space-y-3">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  {orderType === 'inPerson' ? (
+                  {orderType === "inPerson" ? (
                     <>
                       <Bell className="w-4 h-4" />
                       <span>Masa {tableNumber} - Masada Sipariş</span>
@@ -428,9 +421,15 @@ export function CheckoutModal({ onClose, onOrderComplete }: CheckoutModalProps) 
                 <div className="border-t border-border pt-3 space-y-2">
                   {items.map((item) => (
                     <div key={item.id} className="flex justify-between text-sm">
-                      <span>{item.quantity}x {item.product.name}</span>
+                      <span>
+                        {item.quantity}x {item.product.name}
+                      </span>
                       <span className="font-medium">
-                        ₺{((item.portion.specialPrice ?? item.portion.campaignPrice ?? item.portion.price) * item.quantity).toFixed(2)}
+                        ₺
+                        {(
+                          (item.portion.specialPrice ?? item.portion.campaignPrice ?? item.portion.price) *
+                          item.quantity
+                        ).toFixed(2)}
                       </span>
                     </div>
                   ))}
@@ -457,10 +456,8 @@ export function CheckoutModal({ onClose, onOrderComplete }: CheckoutModalProps) 
                 size="lg"
                 className="w-full h-14 text-lg font-semibold rounded-2xl shadow-glow"
               >
-                {isSubmitting ? (
-                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                ) : null}
-                {orderType === 'inPerson' ? 'Sipariş Ver & Garson Çağır' : 'Siparişi Onayla'}
+                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
+                {orderType === "inPerson" ? "Sipariş Ver" : "Siparişi Onayla"}
               </Button>
             </motion.div>
           )}
