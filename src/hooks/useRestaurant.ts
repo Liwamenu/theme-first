@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { restaurantData } from '@/data/restaurant';
+import { create } from 'zustand';
+import { restaurantData as initialRestaurantData } from '@/data/restaurant';
 import { RestaurantData, Product, WorkingHour } from '@/types/restaurant';
 
 export interface Category {
@@ -10,8 +11,21 @@ export interface Category {
   products: Product[];
 }
 
+interface RestaurantStore {
+  restaurantData: RestaurantData;
+  setTableNumber: (tableNumber: number) => void;
+}
+
+export const useRestaurantStore = create<RestaurantStore>((set) => ({
+  restaurantData: initialRestaurantData.restaurantData,
+  setTableNumber: (tableNumber: number) => 
+    set((state) => ({
+      restaurantData: { ...state.restaurantData, tableNumber }
+    })),
+}));
+
 export function useRestaurant() {
-  const data = restaurantData.restaurantData;
+  const { restaurantData: data, setTableNumber } = useRestaurantStore();
 
   const isRestaurantActive = useMemo(() => {
     return data.isActive && data.licenseIsActive && !data.hide;
@@ -79,5 +93,6 @@ export function useRestaurant() {
     enabledPaymentMethods,
     canOrderOnline,
     canOrderInPerson,
+    setTableNumber,
   };
 }

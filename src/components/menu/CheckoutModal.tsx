@@ -14,8 +14,9 @@ import {
   Home,
   ArrowLeft,
   FileText,
+  QrCode,
 } from "lucide-react";
-import { useRestaurant } from "@/hooks/useRestaurant";
+import { useRestaurant, useRestaurantStore } from "@/hooks/useRestaurant";
 import { useCart } from "@/hooks/useCart";
 import { useLocation } from "@/hooks/useLocation";
 import { useOrder } from "@/hooks/useOrder";
@@ -26,17 +27,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { OrderPayload, Order } from "@/types/restaurant";
+import { ChangeTableModal } from "@/components/menu/ChangeTableModal";
+import confetti from "canvas-confetti";
 
 interface CheckoutModalProps {
   onClose: () => void;
   onOrderComplete: (order: Order) => void;
+  onShowSoundPermission: () => void;
 }
 
 type OrderType = "inPerson" | "online";
 type CheckoutStep = "type" | "details" | "payment" | "confirm";
 
-export function CheckoutModal({ onClose, onOrderComplete }: CheckoutModalProps) {
-  const { restaurant, enabledPaymentMethods, canOrderOnline, canOrderInPerson } = useRestaurant();
+export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission }: CheckoutModalProps) {
+  const { restaurant, enabledPaymentMethods, canOrderOnline, canOrderInPerson, setTableNumber } = useRestaurant();
   const { items, getTotal, clearCart } = useCart();
   const { getLocation, checkDistance, getDistanceFromRestaurant, loading: locationLoading } = useLocation();
   const { addOrder } = useOrder();
@@ -48,6 +52,7 @@ export function CheckoutModal({ onClose, onOrderComplete }: CheckoutModalProps) 
   const [orderNote, setOrderNote] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isWithinRange, setIsWithinRange] = useState(false);
+  const [isChangeTableOpen, setIsChangeTableOpen] = useState(false);
 
   const total = getTotal();
   const tableNumber = restaurant.tableNumber;
@@ -171,18 +176,31 @@ export function CheckoutModal({ onClose, onOrderComplete }: CheckoutModalProps) 
       // Save order
       addOrder(order);
 
-      // Success!
-      toast.success(
-        orderType === "inPerson" ? "Siparişiniz alındı! Garson çağırılıyor..." : "Siparişiniz başarıyla oluşturuldu!",
-      );
+      // Fire confetti!
+      confetti({
+        particleCount: 150,
+        spread: 100,
+        origin: { y: 0.6 },
+        colors: ['#ff6b35', '#ffa500', '#ffd700', '#32cd32', '#4169e1'],
+      });
 
       clearCart();
+      
+      // Show sound permission modal after a short delay
+      setTimeout(() => {
+        onShowSoundPermission();
+      }, 1000);
+      
       onOrderComplete(order);
     } catch (error) {
       toast.error("Sipariş oluşturulurken bir hata oluştu.");
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleTableChange = (newTableNumber: number) => {
+    setTableNumber(newTableNumber);
   };
 
   const showBackButton = step !== "type";
@@ -293,6 +311,13 @@ export function CheckoutModal({ onClose, onOrderComplete }: CheckoutModalProps) 
                       <p className="text-sm text-muted-foreground">Masa Numarası</p>
                       <p className="text-2xl font-bold">{tableNumber}</p>
                     </div>
+                    <button
+                      onClick={() => setIsChangeTableOpen(true)}
+                      className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-xl hover:bg-primary/20 transition-colors"
+                    >
+                      <QrCode className="w-4 h-4" />
+                      <span className="text-sm font-medium">Değiştir</span>
+                    </button>
                   </div>
                 </div>
               ) : (
@@ -418,27 +443,56 @@ export function CheckoutModal({ onClose, onOrderComplete }: CheckoutModalProps) 
                   )}
                 </div>
 
-                <div className="border-t border-border pt-3 space-y-2">
-                  {items.map((item) => (
-                    <div key={item.id} className="flex justify-between text-sm">
-                      <span>
-                        {item.quantity}x {item.product.name}
-                      </span>
-                      <span className="font-medium">
-                        ₺
-                        {(
-                          (item.portion.specialPrice ?? item.portion.campaignPrice ?? item.portion.price) *
-                          item.quantity
-                        ).toFixed(2)}
-                      </span>
-                    </div>
-                  ))}
+                <div className="border-t border-border pt-3 space-y-3">
+                  {items.map((item) => {
+                    const unitPrice = item.portion.specialPrice ?? item.portion.campaignPrice ?? item.portion.price;
+                    const tagTotal = item.selectedTags.reduce((sum, tag) => sum + tag.price * tag.quantity, 0);
+                    const itemTotal = (unitPrice + tagTotal) * item.quantity;
+                    
+                    return (
+                      <div key={item.id} className="space-y-1">
+                        <div className="flex justify-between text-sm">
+                          <div className="flex-1">
+                            <span className="font-medium">{item.quantity}x {item.product.name}</span>
+                            <span className="text-muted-foreground ml-1">({item.portion.name})</span>
+                          </div>
+                          <span className="font-medium">₺{(unitPrice * item.quantity).toFixed(2)}</span>
+                        </div>
+                        
+                        {/* Order Tags */}
+                        {item.selectedTags.length > 0 && (
+                          <div className="ml-4 space-y-0.5">
+                            {item.selectedTags.map((tag, idx) => (
+                              <div key={idx} className="flex justify-between text-xs text-muted-foreground">
+                                <span>+ {tag.itemName} {tag.quantity > 1 ? `x${tag.quantity}` : ''}</span>
+                                {tag.price > 0 && (
+                                  <span>₺{(tag.price * tag.quantity * item.quantity).toFixed(2)}</span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        
+                        {/* Item Note */}
+                        {item.note && (
+                          <p className="text-xs text-muted-foreground italic ml-4">Not: {item.note}</p>
+                        )}
+                        
+                        {/* Item Total if has tags */}
+                        {item.selectedTags.length > 0 && (
+                          <div className="flex justify-end text-xs text-primary font-medium">
+                            Alt toplam: ₺{itemTotal.toFixed(2)}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
 
                 {orderNote && (
                   <div className="border-t border-border pt-3">
                     <p className="text-sm text-muted-foreground">
-                      <span className="font-medium">Not:</span> {orderNote}
+                      <span className="font-medium">Sipariş Notu:</span> {orderNote}
                     </p>
                   </div>
                 )}
@@ -463,6 +517,14 @@ export function CheckoutModal({ onClose, onOrderComplete }: CheckoutModalProps) 
           )}
         </div>
       </motion.div>
+
+      {/* Change Table Modal */}
+      <ChangeTableModal
+        isOpen={isChangeTableOpen}
+        onClose={() => setIsChangeTableOpen(false)}
+        onTableChange={handleTableChange}
+        currentTable={tableNumber}
+      />
     </AnimatePresence>
   );
 }
