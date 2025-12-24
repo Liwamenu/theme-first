@@ -124,6 +124,7 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
       toast.success("Rezervasyonunuz alındı!");
     } catch (error) {
       setConfirmationCode(`#${Math.floor(1000 + Math.random() * 9000)}`);
+      setStep("success");
       toast.error("Rezervasyon oluşturulurken bir hata oluştu. Lütfen tekrar deneyiniz.");
     } finally {
       setIsSubmitting(false);
