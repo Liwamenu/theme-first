@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingCart, X, Plus, Minus, Trash2 } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
+import { useRestaurant } from '@/hooks/useRestaurant';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -12,6 +13,7 @@ interface CartDrawerProps {
 
 export function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
   const { items, updateQuantity, removeItem, getTotal, clearCart } = useCart();
+  const { formatPrice } = useRestaurant();
 
   const total = getTotal();
 
@@ -114,7 +116,7 @@ export function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
                                   className="px-2 py-0.5 bg-accent text-accent-foreground text-xs rounded-full"
                                 >
                                   {tag.itemName}
-                                  {tag.price > 0 && ` +₺${tag.price}`}
+                                  {tag.price > 0 && ` +${formatPrice(tag.price)}`}
                                 </span>
                               ))}
                             </div>
@@ -139,7 +141,7 @@ export function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
                               </button>
                             </div>
                             <span className="font-bold text-primary">
-                              ₺{itemTotal.toFixed(2)}
+                              {formatPrice(itemTotal)}
                             </span>
                           </div>
                         </div>
@@ -162,7 +164,7 @@ export function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
                   </button>
                   <div className="text-right">
                     <p className="text-sm text-muted-foreground">Toplam</p>
-                    <p className="text-2xl font-bold text-primary">₺{total.toFixed(2)}</p>
+                    <p className="text-2xl font-bold text-primary">{formatPrice(total)}</p>
                   </div>
                 </div>
                 <Button
@@ -183,6 +185,7 @@ export function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
 
 export function CartButton({ onClick }: { onClick: () => void }) {
   const { getItemCount, getTotal } = useCart();
+  const { formatPrice } = useRestaurant();
   const itemCount = getItemCount();
   const total = getTotal();
 
@@ -205,7 +208,7 @@ export function CartButton({ onClick }: { onClick: () => void }) {
         </div>
         <span className="font-semibold">Sepeti Görüntüle</span>
       </div>
-      <span className="text-lg font-bold">₺{total.toFixed(2)}</span>
+      <span className="text-lg font-bold">{formatPrice(total)}</span>
     </motion.button>
   );
 }

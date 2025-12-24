@@ -115,6 +115,7 @@ export interface RestaurantData {
   googleAnalytics: string;
   licenseIsActive: boolean;
   tableNumber?: number;
+  moneySign?: string | null;
   WorkingHours: WorkingHour[];
   SocialLinks: SocialLinks;
   Products: Product[];

@@ -47,8 +47,42 @@ export function useRestaurant() {
     return currentTime >= workingHour.Open && currentTime <= workingHour.Close;
   }, [getCurrentWorkingHour]);
 
+  // Get currently active menu based on day and time
+  const activeMenu = useMemo(() => {
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    // Find active menu plan
+    for (const menu of data.Menus) {
+      for (const plan of menu.plans) {
+        if (plan.days.includes(dayOfWeek)) {
+          if (currentTime >= plan.startTime && currentTime <= plan.endTime) {
+            return menu;
+          }
+        }
+      }
+    }
+    return null;
+  }, [data]);
+
+  // Get allowed category IDs from active menu
+  const allowedCategoryIds = useMemo(() => {
+    if (!activeMenu) {
+      // If no active menu, show all categories
+      return null;
+    }
+    return new Set(activeMenu.categoryIds);
+  }, [activeMenu]);
+
   const categories = useMemo((): Category[] => {
-    const visibleProducts = data.Products.filter(p => !p.hide);
+    let visibleProducts = data.Products.filter(p => !p.hide);
+    
+    // Filter by menu categories if there's an active menu
+    if (allowedCategoryIds) {
+      visibleProducts = visibleProducts.filter(p => allowedCategoryIds.has(p.categoryId));
+    }
+
     const categoryMap = new Map<string, Category>();
 
     visibleProducts.forEach(product => {
@@ -70,11 +104,27 @@ export function useRestaurant() {
     });
 
     return Array.from(categoryMap.values()).sort((a, b) => a.sortOrder - b.sortOrder);
-  }, [data]);
+  }, [data, allowedCategoryIds]);
+
+  // Format price with money sign
+  const formatPrice = (price: number): string => {
+    const formatted = price.toFixed(2);
+    if (data.moneySign) {
+      return `${data.moneySign}${formatted}`;
+    }
+    return formatted;
+  };
 
   const recommendedProducts = useMemo(() => {
-    return data.Products.filter(p => p.recommendation && !p.hide);
-  }, [data]);
+    let products = data.Products.filter(p => p.recommendation && !p.hide);
+    
+    // Filter by menu categories if there's an active menu
+    if (allowedCategoryIds) {
+      products = products.filter(p => allowedCategoryIds.has(p.categoryId));
+    }
+    
+    return products;
+  }, [data, allowedCategoryIds]);
 
   const enabledPaymentMethods = useMemo(() => {
     return data.PaymentMethods.filter(pm => pm.enabled);
@@ -94,5 +144,7 @@ export function useRestaurant() {
     canOrderOnline,
     canOrderInPerson,
     setTableNumber,
+    formatPrice,
+    activeMenu,
   };
 }

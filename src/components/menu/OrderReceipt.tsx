@@ -23,7 +23,7 @@ const statusConfig: Record<Order['status'], { label: string; icon: React.ReactNo
 const statusSteps: Order['status'][] = ['pending', 'confirmed', 'preparing', 'ready', 'delivered'];
 
 export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
-  const { restaurant } = useRestaurant();
+  const { restaurant, formatPrice } = useRestaurant();
   const status = statusConfig[order.status];
   const currentStepIndex = statusSteps.indexOf(order.status);
   const isCancelled = order.status === 'cancelled';
@@ -185,7 +185,7 @@ export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
                       <p className="text-xs text-muted-foreground italic mt-1">Not: {item.note}</p>
                     )}
                   </div>
-                  <span className="font-medium">₺{item.itemTotal.toFixed(2)}</span>
+                  <span className="font-medium">{formatPrice(item.itemTotal)}</span>
                 </div>
               ))}
             </div>
@@ -213,7 +213,7 @@ export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
           <div className="p-6 bg-primary/5">
             <div className="flex items-center justify-between">
               <span className="text-xl font-bold">Toplam</span>
-              <span className="text-2xl font-bold text-primary">₺{order.totalAmount.toFixed(2)}</span>
+              <span className="text-2xl font-bold text-primary">{formatPrice(order.totalAmount)}</span>
             </div>
           </div>
 

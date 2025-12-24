@@ -14,7 +14,7 @@ interface ProductDetailModalProps {
 }
 
 export function ProductDetailModal({ product, onClose }: ProductDetailModalProps) {
-  const { restaurant } = useRestaurant();
+  const { restaurant, formatPrice } = useRestaurant();
   const { addItem } = useCart();
   const [selectedPortion, setSelectedPortion] = useState<Portion>(product.portions[0]);
   const [quantity, setQuantity] = useState(1);
@@ -150,11 +150,11 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
             {/* Price */}
             <div className="flex items-baseline gap-2">
               <span className="text-2xl font-bold text-primary">
-                ₺{displayPrice.toFixed(2)}
+                {formatPrice(displayPrice)}
               </span>
               {originalPrice && (
                 <span className="text-lg text-muted-foreground line-through">
-                  ₺{originalPrice.toFixed(2)}
+                  {formatPrice(originalPrice)}
                 </span>
               )}
             </div>
@@ -179,7 +179,7 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
                         : 'bg-secondary text-secondary-foreground'
                     )}
                   >
-                    {portion.name} - ₺{getDisplayPrice(portion).toFixed(2)}
+                    {portion.name} - {formatPrice(getDisplayPrice(portion))}
                   </button>
                 ))}
               </div>
@@ -229,7 +229,7 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
                     </div>
                     {item.price > 0 && (
                       <span className="text-sm text-muted-foreground">
-                        +₺{item.price.toFixed(2)}
+                        +{formatPrice(item.price)}
                       </span>
                     )}
                   </button>
@@ -264,7 +264,7 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
             size="lg"
             className="w-full h-14 text-lg font-semibold rounded-2xl shadow-glow"
           >
-            Sepete Ekle - ₺{totalPrice.toFixed(2)}
+            Sepete Ekle - {formatPrice(totalPrice)}
           </Button>
         </div>
       </motion.div>
