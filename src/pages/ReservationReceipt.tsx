@@ -44,7 +44,7 @@ export default function ReservationReceipt() {
       {/* Print-only receipt */}
       <div
         id="receipt-content"
-        className="bg-white text-black rounded-lg p-6 shadow-lg border border-border w-full max-w-sm print:shadow-none print:border-none print:p-0 print:max-w-none print:w-[80mm]"
+        className="bg-white text-black p-6 shadow-lg border border-border w-full max-w-sm print:shadow-none print:border-none print:p-0 print:max-w-none print:w-[80mm]"
         style={{ fontFamily: "'Courier New', Courier, monospace" }}
       >
         {/* Header */}
