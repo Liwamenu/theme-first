@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, QrCode, Loader2, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, QrCode, Loader2, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface ChangeTableModalProps {
   isOpen: boolean;
@@ -24,15 +24,15 @@ export function ChangeTableModal({ isOpen, onClose, onTableChange, currentTable 
 
   const handleScanQR = () => {
     setIsScanning(true);
-    
+
     // In a real implementation, this would open a QR scanner
     // For demo purposes, we'll simulate scanning by reading URL params
     // The QR code format: https://${tenant}.liwamenu.com?restaurantId=${id}&tableNumber=${num}
-    
+
     // Check current URL for tableNumber param (simulating QR scan result)
     const urlParams = new URLSearchParams(window.location.search);
-    const tableFromUrl = urlParams.get('tableNumber');
-    
+    const tableFromUrl = urlParams.get("tableNumber");
+
     // Simulate scanning delay
     setTimeout(() => {
       if (tableFromUrl) {
@@ -43,9 +43,9 @@ export function ChangeTableModal({ isOpen, onClose, onTableChange, currentTable 
           return;
         }
       }
-      
+
       // Demo: Show instruction to user
-      toast.info('QR kodu tarayarak masa numarasını değiştirebilirsiniz. URL\'ye ?tableNumber=X ekleyin.');
+      toast.info("QR kodu tarayarak masa numarasını değiştirebilirsiniz. URL'ye ?tableNumber=X ekleyin.");
       setIsScanning(false);
     }, 1500);
   };
@@ -73,7 +73,7 @@ export function ChangeTableModal({ isOpen, onClose, onTableChange, currentTable 
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed left-4 right-4 top-1/2 -translate-y-1/2 z-50 max-w-md mx-auto"
+            className="fixed left-4 right-4 top-1/6 -translate-y-1/2 z-50 max-w-md mx-auto"
           >
             <div className="bg-card rounded-3xl overflow-hidden shadow-elegant">
               {/* Header */}
@@ -123,9 +123,7 @@ export function ChangeTableModal({ isOpen, onClose, onTableChange, currentTable 
                       ) : (
                         <>
                           <QrCode className="w-16 h-16 text-muted-foreground" />
-                          <p className="text-muted-foreground text-center px-4">
-                            Yeni masanızdaki QR kodu tarayın
-                          </p>
+                          <p className="text-muted-foreground text-center px-4">Yeni masanızdaki QR kodu tarayın</p>
                         </>
                       )}
                     </div>
@@ -156,9 +154,7 @@ export function ChangeTableModal({ isOpen, onClose, onTableChange, currentTable 
                       <div className="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center">
                         <Check className="w-8 h-8 text-white" />
                       </div>
-                      <p className="text-green-600 dark:text-green-400 font-medium">
-                        Masa {scannedTable} bulundu!
-                      </p>
+                      <p className="text-green-600 dark:text-green-400 font-medium">Masa {scannedTable} bulundu!</p>
                     </div>
 
                     <div className="flex gap-3">
