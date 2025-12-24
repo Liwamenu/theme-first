@@ -114,9 +114,9 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
         }),
       });
 
-      // if (!response.ok) {
-      //   throw new Error("Rezervasyon oluşturulamadı");
-      // }
+      if (!response.ok) {
+        throw new Error("Rezervasyon oluşturulamadı");
+      }
 
       const data = await response.json();
       setConfirmationCode(data.confirmationCode || `#${Math.floor(1000 + Math.random() * 9000)}`);
