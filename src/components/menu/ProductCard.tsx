@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Star, Plus } from 'lucide-react';
 import { Product, Portion } from '@/types/restaurant';
+import { useRestaurant } from '@/hooks/useRestaurant';
 import { cn } from '@/lib/utils';
 
 interface ProductCardProps {
@@ -30,6 +31,7 @@ function getPriceDisplay(portion: Portion, isSpecialPriceActive: boolean = true)
 }
 
 export function ProductCard({ product, onSelect }: ProductCardProps) {
+  const { formatPrice } = useRestaurant();
   const firstPortion = product.portions[0];
   const { displayPrice, originalPrice, priceType } = getPriceDisplay(firstPortion);
   const hasMultiplePortions = product.portions.length > 1;
@@ -86,11 +88,11 @@ export function ProductCard({ product, onSelect }: ProductCardProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-baseline gap-2">
             <span className="text-xl font-bold text-primary">
-              ₺{displayPrice.toFixed(2)}
+              {formatPrice(displayPrice)}
             </span>
             {originalPrice && (
               <span className="text-sm text-muted-foreground line-through">
-                ₺{originalPrice.toFixed(2)}
+                {formatPrice(originalPrice)}
               </span>
             )}
           </div>

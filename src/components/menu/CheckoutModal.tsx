@@ -40,7 +40,7 @@ type OrderType = "inPerson" | "online";
 type CheckoutStep = "type" | "details" | "payment" | "confirm";
 
 export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission }: CheckoutModalProps) {
-  const { restaurant, enabledPaymentMethods, canOrderOnline, canOrderInPerson, setTableNumber } = useRestaurant();
+  const { restaurant, enabledPaymentMethods, canOrderOnline, canOrderInPerson, setTableNumber, formatPrice } = useRestaurant();
   const { items, getTotal, clearCart } = useCart();
   const { getLocation, checkDistance, getDistanceFromRestaurant, loading: locationLoading } = useLocation();
   const { addOrder } = useOrder();
@@ -456,7 +456,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                             <span className="font-medium">{item.quantity}x {item.product.name}</span>
                             <span className="text-muted-foreground ml-1">({item.portion.name})</span>
                           </div>
-                          <span className="font-medium">₺{(unitPrice * item.quantity).toFixed(2)}</span>
+                          <span className="font-medium">{formatPrice(unitPrice * item.quantity)}</span>
                         </div>
                         
                         {/* Order Tags */}
@@ -466,7 +466,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                               <div key={idx} className="flex justify-between text-xs text-muted-foreground">
                                 <span>+ {tag.itemName} {tag.quantity > 1 ? `x${tag.quantity}` : ''}</span>
                                 {tag.price > 0 && (
-                                  <span>₺{(tag.price * tag.quantity * item.quantity).toFixed(2)}</span>
+                                  <span>{formatPrice(tag.price * tag.quantity * item.quantity)}</span>
                                 )}
                               </div>
                             ))}
@@ -481,7 +481,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                         {/* Item Total if has tags */}
                         {item.selectedTags.length > 0 && (
                           <div className="flex justify-end text-xs text-primary font-medium">
-                            Alt toplam: ₺{itemTotal.toFixed(2)}
+                            Alt toplam: {formatPrice(itemTotal)}
                           </div>
                         )}
                       </div>
@@ -499,7 +499,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
 
                 <div className="border-t border-border pt-3 flex justify-between font-bold text-lg">
                   <span>Toplam</span>
-                  <span className="text-primary">₺{total.toFixed(2)}</span>
+                  <span className="text-primary">{formatPrice(total)}</span>
                 </div>
               </div>
 
