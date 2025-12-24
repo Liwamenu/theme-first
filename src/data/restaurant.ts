@@ -33,7 +33,7 @@ export const restaurantData: FullRestaurantInfo = {
     googleAnalytics: "",
     licenseIsActive: true,
     tableNumber: 5,
-    moneySign: "₺",
+    moneySign: "$",
     WorkingHours: [
       { Day: 1, IsClosed: false, Open: "08:00", Close: "23:00" },
       { Day: 2, IsClosed: false, Open: "08:00", Close: "23:00" },
