@@ -155,9 +155,9 @@ export function ChangeTableModal({ isOpen, onClose, onTableChange, currentTable 
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed left-4 right-4 top-1/2 -translate-y-1/2 z-50 max-w-md mx-auto"
+            className="fixed left-4 right-4 top-4 bottom-4 z-50 max-w-md mx-auto flex items-center"
           >
-            <div className="bg-card rounded-3xl overflow-hidden shadow-elegant">
+            <div className="bg-card rounded-3xl overflow-hidden shadow-elegant max-h-full overflow-y-auto w-full">
               {/* Header */}
               <div className="flex items-center justify-between px-5 py-4 border-b border-border">
                 <div className="flex items-center gap-3">
