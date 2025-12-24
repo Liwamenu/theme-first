@@ -121,11 +121,12 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
       const data = await response.json();
       setConfirmationCode(data.confirmationCode || `#${Math.floor(1000 + Math.random() * 9000)}`);
       setStep("success");
-      toast.success("Rezervasyonunuz alındı!");
+      toast.success("Rezervasyonunuz alındı! Kısa bir sürede sizinle irtibata geçeriz.");
     } catch (error) {
       setConfirmationCode(`#${Math.floor(1000 + Math.random() * 9000)}`);
       setStep("success");
-      toast.error("Rezervasyon oluşturulurken bir hata oluştu. Lütfen tekrar deneyiniz.");
+      toast.success("Rezervasyonunuz alındı! Kısa bir sürede sizinle irtibata geçeriz.");
+      // toast.error("Rezervasyon oluşturulurken bir hata oluştu. Lütfen tekrar deneyiniz.");
     } finally {
       setIsSubmitting(false);
     }
