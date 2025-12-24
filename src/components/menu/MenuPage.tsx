@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, Receipt } from "lucide-react";
+import { Search, X, Bell } from "lucide-react";
 import { RestaurantHeader } from "@/components/menu/RestaurantHeader";
 import { CategoryTabs } from "@/components/menu/CategoryTabs";
 import { ProductCard } from "@/components/menu/ProductCard";
@@ -10,6 +10,7 @@ import { CheckoutModal } from "@/components/menu/CheckoutModal";
 import { OrderReceipt } from "@/components/menu/OrderReceipt";
 import { Footer } from "@/components/menu/Footer";
 import { SoundPermissionModal } from "@/components/menu/SoundPermissionModal";
+import { CallWaiterModal } from "@/components/menu/CallWaiterModal";
 import { useRestaurant } from "@/hooks/useRestaurant";
 import { useOrder } from "@/hooks/useOrder";
 import { Product, Order } from "@/types/restaurant";
@@ -28,6 +29,7 @@ export function MenuPage() {
   const [currentView, setCurrentView] = useState<View>("menu");
   const [viewingOrder, setViewingOrder] = useState<Order | null>(null);
   const [showSoundPermission, setShowSoundPermission] = useState(false);
+  const [showCallWaiter, setShowCallWaiter] = useState(false);
   const categoryRefs = useRef<Record<string, HTMLElement | null>>({});
 
   // Handle category scroll sync
@@ -236,6 +238,21 @@ export function MenuPage() {
           setShowSoundPermission(false);
         }}
       />
+
+      {/* Call Waiter Modal */}
+      <CallWaiterModal
+        isOpen={showCallWaiter}
+        onClose={() => setShowCallWaiter(false)}
+      />
+
+      {/* Floating Call Waiter Button */}
+      <button
+        onClick={() => setShowCallWaiter(true)}
+        className="fixed bottom-24 right-4 z-40 w-14 h-14 rounded-full bg-amber-500 text-white shadow-lg flex items-center justify-center hover:bg-amber-600 transition-colors"
+        aria-label="Garson Çağır"
+      >
+        <Bell className="w-6 h-6" />
+      </button>
     </div>
   );
 }
