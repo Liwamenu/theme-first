@@ -1,30 +1,30 @@
-import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, Receipt } from 'lucide-react';
-import { RestaurantHeader } from '@/components/menu/RestaurantHeader';
-import { CategoryTabs } from '@/components/menu/CategoryTabs';
-import { ProductCard } from '@/components/menu/ProductCard';
-import { ProductDetailModal } from '@/components/menu/ProductDetailModal';
-import { CartDrawer, CartButton } from '@/components/menu/CartDrawer';
-import { CheckoutModal } from '@/components/menu/CheckoutModal';
-import { OrderReceipt } from '@/components/menu/OrderReceipt';
-import { Footer } from '@/components/menu/Footer';
-import { useRestaurant } from '@/hooks/useRestaurant';
-import { useOrder } from '@/hooks/useOrder';
-import { Product, Order } from '@/types/restaurant';
-import { Input } from '@/components/ui/input';
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Search, X, Receipt } from "lucide-react";
+import { RestaurantHeader } from "@/components/menu/RestaurantHeader";
+import { CategoryTabs } from "@/components/menu/CategoryTabs";
+import { ProductCard } from "@/components/menu/ProductCard";
+import { ProductDetailModal } from "@/components/menu/ProductDetailModal";
+import { CartDrawer, CartButton } from "@/components/menu/CartDrawer";
+import { CheckoutModal } from "@/components/menu/CheckoutModal";
+import { OrderReceipt } from "@/components/menu/OrderReceipt";
+import { Footer } from "@/components/menu/Footer";
+import { useRestaurant } from "@/hooks/useRestaurant";
+import { useOrder } from "@/hooks/useOrder";
+import { Product, Order } from "@/types/restaurant";
+import { Input } from "@/components/ui/input";
 
-type View = 'menu' | 'order';
+type View = "menu" | "order";
 
 export function MenuPage() {
   const { categories, recommendedProducts, isRestaurantActive, isCurrentlyOpen } = useRestaurant();
   const { currentOrder, orders, setCurrentOrder } = useOrder();
-  const [activeCategory, setActiveCategory] = useState<string>(categories[0]?.id || '');
+  const [activeCategory, setActiveCategory] = useState<string>(categories[0]?.id || "");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [currentView, setCurrentView] = useState<View>('menu');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentView, setCurrentView] = useState<View>("menu");
   const [viewingOrder, setViewingOrder] = useState<Order | null>(null);
   const categoryRefs = useRef<Record<string, HTMLElement | null>>({});
 
@@ -32,7 +32,7 @@ export function MenuPage() {
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY + 200;
-      
+
       for (const category of categories) {
         const element = categoryRefs.current[category.id];
         if (element) {
@@ -45,8 +45,8 @@ export function MenuPage() {
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [categories]);
 
   const scrollToCategory = (categoryId: string) => {
@@ -54,20 +54,23 @@ export function MenuPage() {
     if (element) {
       const offset = 140; // Account for sticky header
       const elementPosition = element.offsetTop - offset;
-      window.scrollTo({ top: elementPosition, behavior: 'smooth' });
+      window.scrollTo({ top: elementPosition, behavior: "smooth" });
     }
     setActiveCategory(categoryId);
   };
 
   // Filter products by search
   const filteredCategories = searchQuery
-    ? categories.map(cat => ({
-        ...cat,
-        products: cat.products.filter(p =>
-          p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.description.toLowerCase().includes(searchQuery.toLowerCase())
-        ),
-      })).filter(cat => cat.products.length > 0)
+    ? categories
+        .map((cat) => ({
+          ...cat,
+          products: cat.products.filter(
+            (p) =>
+              p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              p.description.toLowerCase().includes(searchQuery.toLowerCase()),
+          ),
+        }))
+        .filter((cat) => cat.products.length > 0)
     : categories;
 
   const canOrder = isRestaurantActive && isCurrentlyOpen;
@@ -75,16 +78,16 @@ export function MenuPage() {
   const handleOrderComplete = (order: Order) => {
     setIsCheckoutOpen(false);
     setViewingOrder(order);
-    setCurrentView('order');
+    setCurrentView("order");
   };
 
   const handleBackToMenu = () => {
-    setCurrentView('menu');
+    setCurrentView("menu");
     setViewingOrder(null);
   };
 
   // Show order receipt view
-  if (currentView === 'order' && viewingOrder) {
+  if (currentView === "order" && viewingOrder) {
     return <OrderReceipt order={viewingOrder} onBack={handleBackToMenu} />;
   }
 
@@ -107,28 +110,25 @@ export function MenuPage() {
                 className="h-12 pl-12 pr-12 rounded-full bg-secondary border-0"
               />
               {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-4 top-1/2 -translate-y-1/2"
-                >
+                <button onClick={() => setSearchQuery("")} className="absolute right-4 top-1/2 -translate-y-1/2">
                   <X className="w-5 h-5 text-muted-foreground" />
                 </button>
               )}
             </div>
-            
+
             {/* My Orders Button */}
             {orders.length > 0 && (
               <button
                 onClick={() => {
                   if (orders.length > 0) {
                     setViewingOrder(orders[0]);
-                    setCurrentView('order');
+                    setCurrentView("order");
                   }
                 }}
                 className="h-12 px-4 rounded-full bg-primary text-primary-foreground flex items-center gap-2 font-medium hover:bg-primary/90 transition-colors"
               >
                 <Receipt className="w-5 h-5" />
-                <span className="hidden sm:inline">Siparişim</span>
+                <span className="sm:inline">Siparişim</span>
               </button>
             )}
           </div>
@@ -136,11 +136,7 @@ export function MenuPage() {
 
         {/* Category Tabs */}
         {!searchQuery && (
-          <CategoryTabs
-            categories={categories}
-            activeCategory={activeCategory}
-            onCategoryChange={scrollToCategory}
-          />
+          <CategoryTabs categories={categories} activeCategory={activeCategory} onCategoryChange={scrollToCategory} />
         )}
       </div>
 
@@ -157,11 +153,7 @@ export function MenuPage() {
                 className="flex-shrink-0 w-40 cursor-pointer"
               >
                 <div className="relative aspect-square rounded-2xl overflow-hidden mb-2">
-                  <img
-                    src={product.imageURL}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={product.imageURL} alt={product.name} className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-foreground/40 to-transparent" />
                   <span className="absolute bottom-2 left-2 right-2 text-primary-foreground text-sm font-semibold line-clamp-1">
                     {product.name}
@@ -176,25 +168,15 @@ export function MenuPage() {
       {/* Menu Categories */}
       <div className="container px-4 pb-8">
         {filteredCategories.map((category) => (
-          <section
-            key={category.id}
-            ref={(el) => (categoryRefs.current[category.id] = el)}
-            className="mb-8"
-          >
+          <section key={category.id} ref={(el) => (categoryRefs.current[category.id] = el)} className="mb-8">
             <h2 className="font-display text-xl font-bold mb-4 flex items-center gap-2">
               {category.name}
-              <span className="text-sm font-normal text-muted-foreground">
-                ({category.products.length})
-              </span>
+              <span className="text-sm font-normal text-muted-foreground">({category.products.length})</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <AnimatePresence mode="popLayout">
                 {category.products.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    onSelect={setSelectedProduct}
-                  />
+                  <ProductCard key={product.id} product={product} onSelect={setSelectedProduct} />
                 ))}
               </AnimatePresence>
             </div>
@@ -203,9 +185,7 @@ export function MenuPage() {
 
         {filteredCategories.length === 0 && searchQuery && (
           <div className="text-center py-12">
-            <p className="text-lg text-muted-foreground">
-              "{searchQuery}" için sonuç bulunamadı
-            </p>
+            <p className="text-lg text-muted-foreground">"{searchQuery}" için sonuç bulunamadı</p>
           </div>
         )}
       </div>
@@ -218,12 +198,7 @@ export function MenuPage() {
 
       {/* Product Detail Modal */}
       <AnimatePresence>
-        {selectedProduct && (
-          <ProductDetailModal
-            product={selectedProduct}
-            onClose={() => setSelectedProduct(null)}
-          />
-        )}
+        {selectedProduct && <ProductDetailModal product={selectedProduct} onClose={() => setSelectedProduct(null)} />}
       </AnimatePresence>
 
       {/* Cart Drawer */}
@@ -239,10 +214,7 @@ export function MenuPage() {
       {/* Checkout Modal */}
       <AnimatePresence>
         {isCheckoutOpen && (
-          <CheckoutModal 
-            onClose={() => setIsCheckoutOpen(false)} 
-            onOrderComplete={handleOrderComplete}
-          />
+          <CheckoutModal onClose={() => setIsCheckoutOpen(false)} onOrderComplete={handleOrderComplete} />
         )}
       </AnimatePresence>
     </div>
