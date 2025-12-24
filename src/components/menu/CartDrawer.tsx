@@ -1,9 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingCart, X, Plus, Minus, Trash2 } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { useRestaurant } from '@/hooks/useRestaurant';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -12,6 +12,7 @@ interface CartDrawerProps {
 }
 
 export function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
+  const { t } = useTranslation();
   const { items, updateQuantity, removeItem, getTotal, clearCart } = useCart();
   const { formatPrice } = useRestaurant();
 
@@ -39,7 +40,7 @@ export function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
             <div className="flex items-center justify-between px-5 py-4 border-b border-border">
               <div className="flex items-center gap-3">
                 <ShoppingCart className="w-6 h-6 text-primary" />
-                <h2 className="text-xl font-bold">Sepetim</h2>
+                <h2 className="text-xl font-bold">{t('cart.title')}</h2>
                 <span className="px-2 py-0.5 bg-primary text-primary-foreground text-sm rounded-full">
                   {items.length}
                 </span>
@@ -57,9 +58,9 @@ export function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
               {items.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center py-12">
                   <ShoppingCart className="w-16 h-16 text-muted-foreground/30 mb-4" />
-                  <p className="text-lg text-muted-foreground">Sepetiniz boş</p>
+                  <p className="text-lg text-muted-foreground">{t('cart.empty')}</p>
                   <p className="text-sm text-muted-foreground/70">
-                    Lezzetli yemeklerimizi keşfedin!
+                    {t('cart.emptySubtitle')}
                   </p>
                 </div>
               ) : (
@@ -160,10 +161,10 @@ export function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
                     onClick={clearCart}
                     className="text-sm text-muted-foreground hover:text-destructive transition-colors"
                   >
-                    Sepeti Temizle
+                    {t('cart.clearCart')}
                   </button>
                   <div className="text-right">
-                    <p className="text-sm text-muted-foreground">Toplam</p>
+                    <p className="text-sm text-muted-foreground">{t('common.total')}</p>
                     <p className="text-2xl font-bold text-primary">{formatPrice(total)}</p>
                   </div>
                 </div>
@@ -172,7 +173,7 @@ export function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
                   size="lg"
                   className="w-full h-14 text-lg font-semibold rounded-2xl shadow-glow"
                 >
-                  Siparişi Tamamla
+                  {t('cart.checkout')}
                 </Button>
               </div>
             )}
@@ -184,6 +185,7 @@ export function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
 }
 
 export function CartButton({ onClick }: { onClick: () => void }) {
+  const { t } = useTranslation();
   const { getItemCount, getTotal } = useCart();
   const { formatPrice } = useRestaurant();
   const itemCount = getItemCount();
@@ -206,7 +208,7 @@ export function CartButton({ onClick }: { onClick: () => void }) {
             {itemCount}
           </span>
         </div>
-        <span className="font-semibold">Sepeti Görüntüle</span>
+        <span className="font-semibold">{t('cart.viewCart')}</span>
       </div>
       <span className="text-lg font-bold">{formatPrice(total)}</span>
     </motion.button>

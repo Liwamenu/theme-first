@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Plus, Minus, Check, AlertCircle } from 'lucide-react';
+import { X, Plus, Minus, Check } from 'lucide-react';
 import { Product, Portion, OrderTag, OrderTagItem, SelectedTagItem } from '@/types/restaurant';
 import { useCart } from '@/hooks/useCart';
 import { useRestaurant } from '@/hooks/useRestaurant';
@@ -14,6 +15,7 @@ interface ProductDetailModalProps {
 }
 
 export function ProductDetailModal({ product, onClose }: ProductDetailModalProps) {
+  const { t } = useTranslation();
   const { restaurant, formatPrice } = useRestaurant();
   const { addItem } = useCart();
   const [selectedPortion, setSelectedPortion] = useState<Portion>(product.portions[0]);
@@ -72,7 +74,7 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
 
       // Multi select - check max
       if (currentTagItems.length >= tag.maxSelected) {
-        toast.error(`En fazla ${tag.maxSelected} seçim yapabilirsiniz`);
+        toast.error(t('product.maxSelectionError', { max: tag.maxSelected }));
         return prev;
       }
 
@@ -89,7 +91,7 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
     for (const tag of selectedPortion.orderTags) {
       const selectedCount = (selectedTags[tag.id] || []).length;
       if (tag.minSelected > 0 && selectedCount < tag.minSelected) {
-        toast.error(`"${tag.name}" için en az ${tag.minSelected} seçim yapmalısınız`);
+        toast.error(t('product.minSelectionError', { name: tag.name, min: tag.minSelected }));
         return false;
       }
     }
@@ -101,7 +103,7 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
 
     const allSelectedTags = Object.values(selectedTags).flat();
     addItem(product, selectedPortion, allSelectedTags, quantity);
-    toast.success(`${product.name} sepete eklendi!`);
+    toast.success(t('product.addedToCart', { name: product.name }));
     onClose();
   };
 
@@ -163,7 +165,7 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
           {/* Portion Selection */}
           {product.portions.length > 1 && (
             <div className="mb-4">
-              <h3 className="font-semibold text-foreground mb-3">Porsiyon Seçimi</h3>
+              <h3 className="font-semibold text-foreground mb-3">{t('product.portionSelect')}</h3>
               <div className="flex flex-wrap gap-2">
                 {product.portions.map((portion) => (
                   <button
@@ -193,12 +195,12 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
                 <h3 className="font-semibold text-foreground">{tag.name}</h3>
                 {tag.minSelected > 0 && (
                   <span className="px-2 py-0.5 bg-destructive/10 text-destructive text-xs rounded-full">
-                    Zorunlu
+                    {t('common.required')}
                   </span>
                 )}
                 {tag.maxSelected > 1 && (
                   <span className="text-xs text-muted-foreground">
-                    (En fazla {tag.maxSelected})
+                    ({t('product.maxSelection', { max: tag.maxSelected })})
                   </span>
                 )}
               </div>
@@ -240,7 +242,7 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
 
           {/* Quantity */}
           <div className="flex items-center justify-between py-4 border-t border-border">
-            <span className="font-semibold">Adet</span>
+            <span className="font-semibold">{t('product.quantity')}</span>
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -264,7 +266,7 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
             size="lg"
             className="w-full h-14 text-lg font-semibold rounded-2xl shadow-glow"
           >
-            Sepete Ekle - {formatPrice(totalPrice)}
+            {t('product.addToCart')} - {formatPrice(totalPrice)}
           </Button>
         </div>
       </motion.div>

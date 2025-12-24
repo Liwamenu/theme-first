@@ -1,6 +1,6 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 import {
   X,
   Calendar,
@@ -35,11 +35,11 @@ interface ReservationFormData {
   notes: string;
 }
 
-type Step = "form" | "verify" | "success";
+type Step = "form" | "verify";
 
 export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
+  const { t, i18n } = useTranslation();
   const { restaurant } = useRestaurant();
-  const navigate = useNavigate();
   const [step, setStep] = useState<Step>("form");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<ReservationFormData>({
@@ -58,27 +58,27 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
 
   const validateForm = (): boolean => {
     if (!formData.fullName.trim()) {
-      toast.error("Lütfen adınızı giriniz");
+      toast.error(t("validation.enterName"));
       return false;
     }
     if (!formData.phone.trim()) {
-      toast.error("Lütfen telefon numaranızı giriniz");
+      toast.error(t("validation.enterPhone"));
       return false;
     }
     if (!formData.email.trim() || !formData.email.includes("@")) {
-      toast.error("Lütfen geçerli bir e-posta adresi giriniz");
+      toast.error(t("validation.enterValidEmail"));
       return false;
     }
     if (!formData.date) {
-      toast.error("Lütfen tarih seçiniz");
+      toast.error(t("validation.selectDate"));
       return false;
     }
     if (!formData.time) {
-      toast.error("Lütfen saat seçiniz");
+      toast.error(t("validation.selectTime"));
       return false;
     }
     if (formData.guests < 1) {
-      toast.error("Lütfen kişi sayısını giriniz");
+      toast.error(t("validation.enterGuests"));
       return false;
     }
     return true;
@@ -106,10 +106,10 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
       guests: formData.guests.toString(),
       notes: formData.notes,
       confirmationCode: code,
-      createdAt: new Date().toLocaleString("tr-TR"),
+      createdAt: new Date().toLocaleString(i18n.language === 'en' ? 'en-US' : 'tr-TR'),
+      lang: i18n.language,
     });
     
-    // Reset modal state
     setStep("form");
     setFormData({
       fullName: "",
@@ -122,7 +122,6 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
     });
     onClose();
     
-    // Open receipt in new tab
     window.open(`/reservation-receipt?${params.toString()}`, "_blank");
   };
 
@@ -147,16 +146,16 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
       });
 
       if (!response.ok) {
-        throw new Error("Rezervasyon oluşturulamadı");
+        throw new Error(t("reservation.error"));
       }
 
       const data = await response.json();
       const code = data.confirmationCode || `#${Math.floor(1000 + Math.random() * 9000)}`;
-      toast.success("Rezervasyonunuz alındı!");
+      toast.success(t("reservation.success"));
       navigateToReceipt(code);
     } catch (error) {
       const code = `#${Math.floor(1000 + Math.random() * 9000)}`;
-      toast.success("Rezervasyonunuz alındı!");
+      toast.success(t("reservation.success"));
       navigateToReceipt(code);
     } finally {
       setIsSubmitting(false);
@@ -180,13 +179,13 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
   const formatDate = (dateStr: string): string => {
     if (!dateStr) return "";
     const date = new Date(dateStr);
-    return date.toLocaleDateString("tr-TR", { day: "2-digit", month: "2-digit", year: "numeric" });
+    return date.toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'tr-TR', { day: "2-digit", month: "2-digit", year: "numeric" });
   };
 
   const getDayName = (dateStr: string): string => {
     if (!dateStr) return "";
     const date = new Date(dateStr);
-    return date.toLocaleDateString("tr-TR", { weekday: "long" });
+    return date.toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'tr-TR', { weekday: "long" });
   };
 
   const getMinDate = () => {
@@ -215,9 +214,8 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
           {/* Header */}
           <div className="sticky top-0 bg-card z-10 flex items-center justify-between p-4 border-b border-border">
             <h2 className="text-lg font-semibold">
-              {step === "form" && "Rezervasyon Yap"}
-              {step === "verify" && "Bilgilerinizi Doğrulayın"}
-              {step === "success" && "Rezervasyon Fişi"}
+              {step === "form" && t("reservation.title")}
+              {step === "verify" && t("reservation.verifyTitle")}
             </h2>
             <button onClick={handleClose} className="p-2 hover:bg-muted rounded-full transition-colors">
               <X className="w-5 h-5" />
@@ -227,61 +225,57 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
           {/* Form Step */}
           {step === "form" && (
             <div className="p-4 space-y-4">
-              {/* Full Name */}
               <div className="space-y-2">
                 <label className="text-sm font-medium flex items-center gap-2">
                   <User className="w-4 h-4 text-muted-foreground" />
-                  Ad Soyad
+                  {t("reservation.fullName")}
                 </label>
                 <Input
                   type="text"
-                  placeholder="Ahmet Yılmaz"
+                  placeholder={t("reservation.fullNamePlaceholder")}
                   value={formData.fullName}
                   onChange={(e) => handleInputChange("fullName", e.target.value)}
                   className="h-12"
                 />
               </div>
 
-              {/* Phone */}
               <div className="space-y-2">
                 <label className="text-sm font-medium flex items-center gap-2">
                   <Phone className="w-4 h-4 text-muted-foreground" />
-                  Telefon Numarası
+                  {t("reservation.phone")}
                 </label>
                 <Input
                   type="tel"
-                  placeholder="0555 123 45 67"
+                  placeholder={t("reservation.phonePlaceholder")}
                   value={formData.phone}
                   onChange={(e) => handleInputChange("phone", e.target.value)}
                   className="h-12"
                 />
               </div>
 
-              {/* Email */}
               <div className="space-y-2">
                 <label className="text-sm font-medium flex items-center gap-2">
                   <Mail className="w-4 h-4 text-muted-foreground" />
-                  E-posta Adresi
+                  {t("reservation.email")}
                 </label>
                 <Input
                   type="email"
-                  placeholder="ornek@email.com"
+                  placeholder={t("reservation.emailPlaceholder")}
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   className="h-12"
                 />
                 <p className="text-xs text-amber-600 flex items-center gap-1">
                   <AlertTriangle className="w-3 h-3" />
-                  Sizinle bu e-posta üzerinden iletişime geçilecektir. Doğru girdiğinizden emin olun.
+                  {t("reservation.emailWarning")}
                 </p>
               </div>
 
-              {/* Date & Time Row */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <label className="text-sm font-medium flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-muted-foreground" />
-                    Tarih
+                    {t("reservation.date")}
                   </label>
                   <Input
                     type="date"
@@ -294,7 +288,7 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
                 <div className="space-y-2">
                   <label className="text-sm font-medium flex items-center gap-2">
                     <Clock className="w-4 h-4 text-muted-foreground" />
-                    Saat
+                    {t("reservation.time")}
                   </label>
                   <Input
                     type="time"
@@ -305,11 +299,10 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
                 </div>
               </div>
 
-              {/* Guests */}
               <div className="space-y-2">
                 <label className="text-sm font-medium flex items-center gap-2">
                   <Users className="w-4 h-4 text-muted-foreground" />
-                  Kişi Sayısı
+                  {t("reservation.guests")}
                 </label>
                 <Input
                   type="number"
@@ -321,23 +314,21 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
                 />
               </div>
 
-              {/* Notes */}
               <div className="space-y-2">
                 <label className="text-sm font-medium flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-muted-foreground" />
-                  Özel Not (İsteğe Bağlı)
+                  {t("reservation.notes")} ({t("common.optional")})
                 </label>
                 <Textarea
-                  placeholder="Cam kenarı masa, doğum günü pastası vb."
+                  placeholder={t("reservation.notesPlaceholder")}
                   value={formData.notes}
                   onChange={(e) => handleInputChange("notes", e.target.value)}
                   rows={3}
                 />
               </div>
 
-              {/* Continue Button */}
               <Button onClick={handleContinue} className="w-full h-12 text-base font-medium">
-                Devam Et
+                {t("common.continue")}
               </Button>
             </div>
           )}
@@ -345,70 +336,67 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
           {/* Verify Step */}
           {step === "verify" && (
             <div className="p-4 space-y-4">
-              {/* Warning Banner */}
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
                 <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-amber-800">E-posta Adresinizi Kontrol Edin</p>
+                  <p className="text-sm font-medium text-amber-800">{t("reservation.verifyEmailTitle")}</p>
                   <p className="text-xs text-amber-700 mt-1">
-                    Rezervasyon onayı ve hatırlatmalar bu adrese gönderilecektir.
+                    {t("reservation.verifyEmailDesc")}
                   </p>
                 </div>
               </div>
 
-              {/* Summary */}
               <div className="bg-muted/50 rounded-xl p-4 space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Ad Soyad:</span>
+                  <span className="text-muted-foreground">{t("reservation.fullName")}:</span>
                   <span className="font-medium">{formData.fullName}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Telefon:</span>
+                  <span className="text-muted-foreground">{t("reservation.phone")}:</span>
                   <span className="font-medium">{formData.phone}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">E-posta:</span>
+                  <span className="text-muted-foreground">{t("reservation.email")}:</span>
                   <span className="font-medium text-primary">{formData.email}</span>
                 </div>
                 <div className="border-t border-border pt-3" />
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Tarih:</span>
+                  <span className="text-muted-foreground">{t("reservation.date")}:</span>
                   <span className="font-medium">
                     {formatDate(formData.date)} ({getDayName(formData.date)})
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Saat:</span>
+                  <span className="text-muted-foreground">{t("reservation.time")}:</span>
                   <span className="font-medium">{formData.time}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Kişi Sayısı:</span>
-                  <span className="font-medium">{formData.guests} Kişi</span>
+                  <span className="text-muted-foreground">{t("reservation.guests")}:</span>
+                  <span className="font-medium">{formData.guests} {t("common.guests")}</span>
                 </div>
                 {formData.notes && (
                   <>
                     <div className="border-t border-border pt-3" />
                     <div>
-                      <span className="text-muted-foreground">Özel Not:</span>
+                      <span className="text-muted-foreground">{t("reservation.notes")}:</span>
                       <p className="font-medium mt-1">{formData.notes}</p>
                     </div>
                   </>
                 )}
               </div>
 
-              {/* Action Buttons */}
               <div className="flex gap-3">
                 <Button variant="outline" onClick={handleEdit} className="flex-1 h-12 gap-2">
                   <Edit2 className="w-4 h-4" />
-                  Düzenle
+                  {t("common.edit")}
                 </Button>
                 <Button onClick={handleSubmit} disabled={isSubmitting} className="flex-1 h-12 gap-2">
                   {isSubmitting ? (
-                    <span className="animate-pulse">Gönderiliyor...</span>
+                    <span className="animate-pulse">{t("reservation.submitting")}</span>
                   ) : (
                     <>
                       <Check className="w-4 h-4" />
-                      Onayla
+                      {t("common.confirm")}
                     </>
                   )}
                 </Button>
