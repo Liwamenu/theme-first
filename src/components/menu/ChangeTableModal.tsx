@@ -73,7 +73,7 @@ export function ChangeTableModal({ isOpen, onClose, onTableChange, currentTable 
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed left-4 right-4 top-1/6 -translate-y-1/2 z-50 max-w-md mx-auto"
+            className="fixed left-4 right-4 top-[16%] -translate-y-1/2 z-50 max-w-md mx-auto"
           >
             <div className="bg-card rounded-3xl overflow-hidden shadow-elegant">
               {/* Header */}
