@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, QrCode, Loader2, Check } from "lucide-react";
+import { X, QrCode, Loader2, Check, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { Html5Qrcode } from "html5-qrcode";
 
 interface ChangeTableModalProps {
   isOpen: boolean;
@@ -14,40 +15,113 @@ interface ChangeTableModalProps {
 export function ChangeTableModal({ isOpen, onClose, onTableChange, currentTable }: ChangeTableModalProps) {
   const [isScanning, setIsScanning] = useState(false);
   const [scannedTable, setScannedTable] = useState<number | null>(null);
+  const [scannerError, setScannerError] = useState<string | null>(null);
+  const scannerRef = useRef<Html5Qrcode | null>(null);
+  const scannerContainerId = "qr-reader";
 
   useEffect(() => {
     if (!isOpen) {
+      stopScanner();
       setIsScanning(false);
       setScannedTable(null);
+      setScannerError(null);
     }
   }, [isOpen]);
 
-  const handleScanQR = () => {
-    setIsScanning(true);
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stopScanner();
+    };
+  }, []);
 
-    // In a real implementation, this would open a QR scanner
-    // For demo purposes, we'll simulate scanning by reading URL params
-    // The QR code format: https://${tenant}.liwamenu.com?restaurantId=${id}&tableNumber=${num}
+  const stopScanner = async () => {
+    if (scannerRef.current) {
+      try {
+        const state = scannerRef.current.getState();
+        if (state === 2) { // SCANNING state
+          await scannerRef.current.stop();
+        }
+        scannerRef.current.clear();
+      } catch (err) {
+        console.log("Error stopping scanner:", err);
+      }
+      scannerRef.current = null;
+    }
+  };
 
-    // Check current URL for tableNumber param (simulating QR scan result)
-    const urlParams = new URLSearchParams(window.location.search);
-    const tableFromUrl = urlParams.get("tableNumber");
-
-    // Simulate scanning delay
-    setTimeout(() => {
-      if (tableFromUrl) {
-        const tableNum = parseInt(tableFromUrl, 10);
+  const extractTableNumber = (url: string): number | null => {
+    try {
+      // Try to parse as URL first
+      const urlObj = new URL(url);
+      const tableParam = urlObj.searchParams.get("tableNumber");
+      if (tableParam) {
+        const tableNum = parseInt(tableParam, 10);
         if (!isNaN(tableNum) && tableNum > 0) {
-          setScannedTable(tableNum);
-          setIsScanning(false);
-          return;
+          return tableNum;
         }
       }
+    } catch {
+      // If not a valid URL, try to find tableNumber pattern directly
+      const match = url.match(/tableNumber=(\d+)/);
+      if (match) {
+        const tableNum = parseInt(match[1], 10);
+        if (!isNaN(tableNum) && tableNum > 0) {
+          return tableNum;
+        }
+      }
+    }
+    return null;
+  };
 
-      // Demo: Show instruction to user
-      toast.info("QR kodu tarayarak masa numarasını değiştirebilirsiniz. URL'ye ?tableNumber=X ekleyin.");
+  const handleStartScanner = async () => {
+    setIsScanning(true);
+    setScannerError(null);
+
+    // Wait for DOM to update
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    try {
+      scannerRef.current = new Html5Qrcode(scannerContainerId);
+      
+      await scannerRef.current.start(
+        { facingMode: "environment" },
+        {
+          fps: 10,
+          qrbox: { width: 250, height: 250 },
+        },
+        (decodedText) => {
+          // Successfully scanned
+          const tableNum = extractTableNumber(decodedText);
+          
+          if (tableNum) {
+            setScannedTable(tableNum);
+            stopScanner();
+            setIsScanning(false);
+          } else {
+            toast.error("Geçersiz QR kod. Lütfen restoran QR kodunu tarayın.");
+          }
+        },
+        () => {
+          // QR code not found - this is called frequently, ignore
+        }
+      );
+    } catch (err) {
+      console.error("Scanner error:", err);
       setIsScanning(false);
-    }, 1500);
+      
+      if (err instanceof Error) {
+        if (err.message.includes("Permission")) {
+          setScannerError("Kamera izni gerekli. Lütfen kamera erişimine izin verin.");
+        } else if (err.message.includes("NotFoundError") || err.message.includes("No camera")) {
+          setScannerError("Kamera bulunamadı. Lütfen kameralı bir cihaz kullanın.");
+        } else {
+          setScannerError("Kamera açılamadı. Lütfen tekrar deneyin.");
+        }
+      } else {
+        setScannerError("Kamera açılamadı. Lütfen tekrar deneyin.");
+      }
+    }
   };
 
   const handleConfirmTable = () => {
@@ -55,7 +129,15 @@ export function ChangeTableModal({ isOpen, onClose, onTableChange, currentTable 
       onTableChange(scannedTable);
       toast.success(`Masa ${scannedTable} olarak değiştirildi!`);
       onClose();
+    } else if (scannedTable === currentTable) {
+      toast.info("Zaten bu masadasınız.");
+      onClose();
     }
+  };
+
+  const handleClose = () => {
+    stopScanner();
+    onClose();
   };
 
   return (
@@ -66,14 +148,14 @@ export function ChangeTableModal({ isOpen, onClose, onTableChange, currentTable 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={handleClose}
             className="fixed inset-0 z-50 bg-foreground/60 backdrop-blur-sm"
           />
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed left-4 right-4 top-[16%] -translate-y-1/2 z-50 max-w-md mx-auto"
+            className="fixed left-4 right-4 top-1/2 -translate-y-1/2 z-50 max-w-md mx-auto"
           >
             <div className="bg-card rounded-3xl overflow-hidden shadow-elegant">
               {/* Header */}
@@ -85,7 +167,7 @@ export function ChangeTableModal({ isOpen, onClose, onTableChange, currentTable 
                   <h2 className="text-lg font-bold">Masa Değiştir</h2>
                 </div>
                 <button
-                  onClick={onClose}
+                  onClick={handleClose}
                   className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center"
                 >
                   <X className="w-5 h-5" />
@@ -114,34 +196,41 @@ export function ChangeTableModal({ isOpen, onClose, onTableChange, currentTable 
                 {!scannedTable ? (
                   <>
                     {/* QR Scanner Area */}
-                    <div className="aspect-square bg-secondary rounded-2xl flex flex-col items-center justify-center gap-4 border-2 border-dashed border-border">
+                    <div className="relative aspect-square bg-secondary rounded-2xl overflow-hidden border-2 border-dashed border-border">
                       {isScanning ? (
-                        <>
-                          <Loader2 className="w-12 h-12 text-primary animate-spin" />
-                          <p className="text-muted-foreground">QR kod taranıyor...</p>
-                        </>
+                        <div id={scannerContainerId} className="w-full h-full" />
                       ) : (
-                        <>
-                          <QrCode className="w-16 h-16 text-muted-foreground" />
-                          <p className="text-muted-foreground text-center px-4">Yeni masanızdaki QR kodu tarayın</p>
-                        </>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+                          {scannerError ? (
+                            <>
+                              <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center">
+                                <X className="w-8 h-8 text-destructive" />
+                              </div>
+                              <p className="text-destructive text-center px-4 text-sm">{scannerError}</p>
+                            </>
+                          ) : (
+                            <>
+                              <QrCode className="w-16 h-16 text-muted-foreground" />
+                              <p className="text-muted-foreground text-center px-4">Yeni masanızdaki QR kodu tarayın</p>
+                            </>
+                          )}
+                        </div>
                       )}
                     </div>
 
                     <Button
-                      onClick={handleScanQR}
-                      disabled={isScanning}
+                      onClick={isScanning ? () => { stopScanner(); setIsScanning(false); } : handleStartScanner}
                       size="lg"
                       className="w-full h-14 text-lg font-semibold rounded-2xl"
                     >
                       {isScanning ? (
                         <>
-                          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                          Taranıyor...
+                          <X className="w-5 h-5 mr-2" />
+                          İptal
                         </>
                       ) : (
                         <>
-                          <QrCode className="w-5 h-5 mr-2" />
+                          <Camera className="w-5 h-5 mr-2" />
                           QR Kod Tara
                         </>
                       )}
@@ -159,7 +248,7 @@ export function ChangeTableModal({ isOpen, onClose, onTableChange, currentTable 
 
                     <div className="flex gap-3">
                       <Button
-                        onClick={() => setScannedTable(null)}
+                        onClick={() => { setScannedTable(null); setScannerError(null); }}
                         variant="outline"
                         size="lg"
                         className="flex-1 h-14 text-lg font-semibold rounded-2xl"
