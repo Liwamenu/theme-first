@@ -9,6 +9,7 @@ import { CartDrawer, CartButton } from "@/components/menu/CartDrawer";
 import { CheckoutModal } from "@/components/menu/CheckoutModal";
 import { OrderReceipt } from "@/components/menu/OrderReceipt";
 import { Footer } from "@/components/menu/Footer";
+import { SoundPermissionModal } from "@/components/menu/SoundPermissionModal";
 import { useRestaurant } from "@/hooks/useRestaurant";
 import { useOrder } from "@/hooks/useOrder";
 import { Product, Order } from "@/types/restaurant";
@@ -26,6 +27,7 @@ export function MenuPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentView, setCurrentView] = useState<View>("menu");
   const [viewingOrder, setViewingOrder] = useState<Order | null>(null);
+  const [showSoundPermission, setShowSoundPermission] = useState(false);
   const categoryRefs = useRef<Record<string, HTMLElement | null>>({});
 
   // Handle category scroll sync
@@ -214,9 +216,26 @@ export function MenuPage() {
       {/* Checkout Modal */}
       <AnimatePresence>
         {isCheckoutOpen && (
-          <CheckoutModal onClose={() => setIsCheckoutOpen(false)} onOrderComplete={handleOrderComplete} />
+          <CheckoutModal 
+            onClose={() => setIsCheckoutOpen(false)} 
+            onOrderComplete={handleOrderComplete}
+            onShowSoundPermission={() => setShowSoundPermission(true)}
+          />
         )}
       </AnimatePresence>
+
+      {/* Sound Permission Modal */}
+      <SoundPermissionModal
+        isOpen={showSoundPermission}
+        onAllow={() => {
+          localStorage.setItem('soundPermission', 'allowed');
+          setShowSoundPermission(false);
+        }}
+        onDeny={() => {
+          localStorage.setItem('soundPermission', 'denied');
+          setShowSoundPermission(false);
+        }}
+      />
     </div>
   );
 }
