@@ -248,10 +248,11 @@ export function MenuPage() {
       {/* Floating Call Waiter Button */}
       <button
         onClick={() => setShowCallWaiter(true)}
-        className="fixed bottom-24 right-4 z-40 w-14 h-14 rounded-full bg-amber-500 text-white shadow-lg flex items-center justify-center hover:bg-amber-600 transition-colors"
+        className="fixed bottom-24 right-4 z-40 h-10 px-3 rounded-full bg-amber-500 text-white shadow-md flex items-center gap-2 hover:bg-amber-600 transition-colors text-sm font-medium"
         aria-label="Garson Çağır"
       >
-        <Bell className="w-6 h-6" />
+        <Bell className="w-4 h-4" />
+        <span>Garson Çağır</span>
       </button>
     </div>
   );
