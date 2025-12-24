@@ -1068,7 +1068,7 @@ export const restaurantData: FullRestaurantInfo = {
           "cat-003-izgaralar",
           "cat-004-fast-food",
           "cat-005-tatlilar",
-          "cat-006-icecekler",
+          //"cat-006-icecekler",
         ],
       },
     ],
