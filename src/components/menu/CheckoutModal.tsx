@@ -16,6 +16,7 @@ import {
   FileText,
   QrCode,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useRestaurant, useRestaurantStore } from "@/hooks/useRestaurant";
 import { useCart } from "@/hooks/useCart";
 import { useLocation } from "@/hooks/useLocation";
@@ -40,6 +41,7 @@ type OrderType = "inPerson" | "online";
 type CheckoutStep = "type" | "details" | "payment" | "confirm";
 
 export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission }: CheckoutModalProps) {
+  const { t } = useTranslation();
   const { restaurant, enabledPaymentMethods, canOrderOnline, canOrderInPerson, setTableNumber, formatPrice } = useRestaurant();
   const { items, getTotal, clearCart } = useCart();
   const { getLocation, checkDistance, getDistanceFromRestaurant, loading: locationLoading } = useLocation();
@@ -69,13 +71,13 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
         if (!withinRange) {
           const distance = getDistanceFromRestaurant(restaurant.latitude, restaurant.longitude);
           toast.error(
-            `Teslimat alanı dışındasınız. (${distance?.toFixed(1)} km uzaktasınız, max: ${restaurant.maxDistance} km)`,
+            t('order.outOfRange', { distance: distance?.toFixed(1), max: restaurant.maxDistance })
           );
           return;
         }
         setStep("details");
       } catch (error) {
-        toast.error("Konum alınamadı. Online sipariş için konum izni gereklidir.");
+        toast.error(t('order.locationError'));
         return;
       }
     } else {
@@ -89,7 +91,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
       setStep("confirm");
     } else {
       if (!customerInfo.name.trim() || !customerInfo.phone.trim() || !customerInfo.address.trim()) {
-        toast.error("Lütfen tüm bilgileri doldurun");
+        toast.error(t('order.fillAllFields'));
         return;
       }
       setStep("payment");
@@ -193,7 +195,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
       
       onOrderComplete(order);
     } catch (error) {
-      toast.error("Sipariş oluşturulurken bir hata oluştu.");
+      toast.error(t('order.orderError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -232,7 +234,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                 <ArrowLeft className="w-5 h-5" />
               </button>
             )}
-            <h2 className="text-xl font-bold">Sipariş Ver</h2>
+            <h2 className="text-xl font-bold">{t('order.placeOrder')}</h2>
           </div>
           <button onClick={onClose} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
             <X className="w-5 h-5" />
@@ -243,7 +245,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
           {/* Step: Order Type */}
           {step === "type" && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
-              <h3 className="text-lg font-semibold mb-4">Sipariş Türü Seçin</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('order.selectType')}</h3>
 
               {canOrderInPerson && (
                 <button
@@ -254,9 +256,9 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                     <Bell className="w-7 h-7 text-primary" />
                   </div>
                   <div className="text-left flex-1">
-                    <h4 className="font-semibold text-lg">Masada Sipariş</h4>
+                    <h4 className="font-semibold text-lg">{t('order.inPerson')}</h4>
                     <p className="text-sm text-muted-foreground">
-                      Siparişinizi masanızda teslim alın ve garson çağırın
+                      {t('order.inPersonDesc')}
                     </p>
                   </div>
                 </button>
@@ -276,9 +278,9 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                     )}
                   </div>
                   <div className="text-left flex-1">
-                    <h4 className="font-semibold text-lg">Online Sipariş</h4>
+                    <h4 className="font-semibold text-lg">{t('order.online')}</h4>
                     <p className="text-sm text-muted-foreground">
-                      Adresinize teslim ({restaurant.maxDistance} km içinde)
+                      {t('order.onlineDesc', { distance: restaurant.maxDistance })}
                     </p>
                   </div>
                 </button>
@@ -287,7 +289,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
               {!canOrderInPerson && !canOrderOnline && (
                 <div className="flex items-center gap-3 p-4 bg-destructive/10 text-destructive rounded-xl">
                   <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                  <p className="text-sm">Şu an sipariş alınmıyor. Lütfen daha sonra tekrar deneyin.</p>
+                  <p className="text-sm">{t('order.noOrdersAvailable')}</p>
                 </div>
               )}
             </motion.div>
@@ -297,7 +299,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
           {step === "details" && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
               <h3 className="text-lg font-semibold mb-4">
-                {orderType === "inPerson" ? "Sipariş Bilgisi" : "Teslimat Bilgileri"}
+                {orderType === "inPerson" ? t('order.orderInfo') : t('order.deliveryInfo')}
               </h3>
 
               {orderType === "inPerson" ? (
@@ -308,7 +310,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                       <Bell className="w-7 h-7 text-primary" />
                     </div>
                     <div className="text-left flex-1">
-                      <p className="text-sm text-muted-foreground">Masa Numarası</p>
+                      <p className="text-sm text-muted-foreground">{t('order.tableNumber')}</p>
                       <p className="text-2xl font-bold">{tableNumber}</p>
                     </div>
                     <button
@@ -316,19 +318,19 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                       className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-xl hover:bg-primary/20 transition-colors"
                     >
                       <QrCode className="w-4 h-4" />
-                      <span className="text-sm font-medium">Değiştir</span>
+                      <span className="text-sm font-medium">{t('order.change')}</span>
                     </button>
                   </div>
                 </div>
               ) : (
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="name">Ad Soyad</Label>
+                    <Label htmlFor="name">{t('order.fullName')}</Label>
                     <div className="relative mt-2">
                       <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                       <Input
                         id="name"
-                        placeholder="Adınız Soyadınız"
+                        placeholder={t('order.fullNamePlaceholder')}
                         value={customerInfo.name}
                         onChange={(e) => setCustomerInfo((prev) => ({ ...prev, name: e.target.value }))}
                         className="h-14 pl-12 rounded-xl"
@@ -336,12 +338,12 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                     </div>
                   </div>
                   <div>
-                    <Label htmlFor="phone">Telefon</Label>
+                    <Label htmlFor="phone">{t('order.phone')}</Label>
                     <div className="relative mt-2">
                       <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                       <Input
                         id="phone"
-                        placeholder="05XX XXX XX XX"
+                        placeholder={t('order.phonePlaceholder')}
                         value={customerInfo.phone}
                         onChange={(e) => setCustomerInfo((prev) => ({ ...prev, phone: e.target.value }))}
                         className="h-14 pl-12 rounded-xl"
@@ -349,12 +351,12 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                     </div>
                   </div>
                   <div>
-                    <Label htmlFor="address">Teslimat Adresi</Label>
+                    <Label htmlFor="address">{t('order.deliveryAddress')}</Label>
                     <div className="relative mt-2">
                       <MapPin className="absolute left-4 top-4 w-5 h-5 text-muted-foreground" />
                       <textarea
                         id="address"
-                        placeholder="Açık adresiniz"
+                        placeholder={t('order.addressPlaceholder')}
                         value={customerInfo.address}
                         onChange={(e) => setCustomerInfo((prev) => ({ ...prev, address: e.target.value }))}
                         className="w-full min-h-[100px] pl-12 p-4 rounded-xl bg-secondary border-0 resize-none"
@@ -368,11 +370,11 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
               <div>
                 <Label htmlFor="orderNote" className="flex items-center gap-2">
                   <FileText className="w-4 h-4" />
-                  Sipariş Notu (Opsiyonel)
+                  {t('order.orderNote')} ({t('common.optional')})
                 </Label>
                 <Textarea
                   id="orderNote"
-                  placeholder="Siparişinizle ilgili eklemek istediğiniz not..."
+                  placeholder={t('order.orderNotePlaceholder')}
                   value={orderNote}
                   onChange={(e) => setOrderNote(e.target.value)}
                   className="mt-2 rounded-xl resize-none"
@@ -383,9 +385,9 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
               <Button
                 onClick={handleDetailsSubmit}
                 size="lg"
-                className="w-full h-14 text-lg font-semibold rounded-2xl mt-4"
+                className="w-full h-14 text-base font-semibold rounded-2xl mt-4"
               >
-                Devam Et
+                {t('common.continue')}
               </Button>
             </motion.div>
           )}
@@ -393,7 +395,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
           {/* Step: Payment */}
           {step === "payment" && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
-              <h3 className="text-lg font-semibold mb-4">Ödeme Yöntemi</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('order.paymentMethod')}</h3>
 
               <div className="space-y-3">
                 {enabledPaymentMethods.map((method) => (
@@ -425,7 +427,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
           {/* Step: Confirm */}
           {step === "confirm" && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
-              <h3 className="text-lg font-semibold mb-4">Sipariş Özeti</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('order.orderSummary')}</h3>
 
               {/* Order Summary */}
               <div className="bg-secondary rounded-2xl p-4 space-y-3">
@@ -433,12 +435,12 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                   {orderType === "inPerson" ? (
                     <>
                       <Bell className="w-4 h-4" />
-                      <span>Masa {tableNumber} - Masada Sipariş</span>
+                      <span>{t('common.table')} {tableNumber} - {t('order.tableOrder')}</span>
                     </>
                   ) : (
                     <>
                       <Home className="w-4 h-4" />
-                      <span>Online Teslimat</span>
+                      <span>{t('order.onlineDelivery')}</span>
                     </>
                   )}
                 </div>
@@ -475,7 +477,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                         
                         {/* Item Note */}
                         {item.note && (
-                          <p className="text-xs text-muted-foreground italic ml-4">Not: {item.note}</p>
+                          <p className="text-xs text-muted-foreground italic ml-4">{t('orderReceipt.note')}: {item.note}</p>
                         )}
                         
                         {/* Item Total if has tags */}
@@ -492,13 +494,13 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                 {orderNote && (
                   <div className="border-t border-border pt-3">
                     <p className="text-sm text-muted-foreground">
-                      <span className="font-medium">Sipariş Notu:</span> {orderNote}
+                      <span className="font-medium">{t('orderReceipt.orderNote')}:</span> {orderNote}
                     </p>
                   </div>
                 )}
 
                 <div className="border-t border-border pt-3 flex justify-between font-bold text-lg">
-                  <span>Toplam</span>
+                  <span>{t('common.total')}</span>
                   <span className="text-primary">{formatPrice(total)}</span>
                 </div>
               </div>
@@ -508,10 +510,10 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                 onClick={handleConfirmOrder}
                 disabled={isSubmitting}
                 size="lg"
-                className="w-full h-14 text-lg font-semibold rounded-2xl shadow-glow"
+                className="w-full h-14 text-base font-semibold rounded-2xl shadow-glow"
               >
                 {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
-                {orderType === "inPerson" ? "Sipariş Ver" : "Siparişi Onayla"}
+                {t('order.confirmOrder')}
               </Button>
             </motion.div>
           )}

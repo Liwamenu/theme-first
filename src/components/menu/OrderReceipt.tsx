@@ -1,32 +1,37 @@
 import { motion } from 'framer-motion';
 import { ArrowLeft, Clock, CheckCircle2, ChefHat, Package, Truck, XCircle, Bell, Home, Receipt, MapPin, Phone, User } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Order } from '@/types/restaurant';
 import { useRestaurant } from '@/hooks/useRestaurant';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { tr } from 'date-fns/locale';
+import { tr, enUS } from 'date-fns/locale';
+import i18n from '@/lib/i18n';
 
 interface OrderReceiptProps {
   order: Order;
   onBack: () => void;
 }
 
-const statusConfig: Record<Order['status'], { label: string; icon: React.ReactNode; color: string }> = {
-  pending: { label: 'Onay Bekleniyor', icon: <Clock className="w-5 h-5" />, color: 'text-amber-500' },
-  confirmed: { label: 'Onaylandı', icon: <CheckCircle2 className="w-5 h-5" />, color: 'text-primary' },
-  preparing: { label: 'Hazırlanıyor', icon: <ChefHat className="w-5 h-5" />, color: 'text-blue-500' },
-  ready: { label: 'Hazır', icon: <Package className="w-5 h-5" />, color: 'text-green-500' },
-  delivered: { label: 'Teslim Edildi', icon: <Truck className="w-5 h-5" />, color: 'text-green-600' },
-  cancelled: { label: 'İptal Edildi', icon: <XCircle className="w-5 h-5" />, color: 'text-destructive' },
-};
+const getStatusConfig = (t: (key: string) => string): Record<Order['status'], { label: string; icon: React.ReactNode; color: string }> => ({
+  pending: { label: t('status.pending'), icon: <Clock className="w-5 h-5" />, color: 'text-amber-500' },
+  confirmed: { label: t('status.confirmed'), icon: <CheckCircle2 className="w-5 h-5" />, color: 'text-primary' },
+  preparing: { label: t('status.preparing'), icon: <ChefHat className="w-5 h-5" />, color: 'text-blue-500' },
+  ready: { label: t('status.ready'), icon: <Package className="w-5 h-5" />, color: 'text-green-500' },
+  delivered: { label: t('status.delivered'), icon: <Truck className="w-5 h-5" />, color: 'text-green-600' },
+  cancelled: { label: t('status.cancelled'), icon: <XCircle className="w-5 h-5" />, color: 'text-destructive' },
+});
 
 const statusSteps: Order['status'][] = ['pending', 'confirmed', 'preparing', 'ready', 'delivered'];
 
 export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
+  const { t } = useTranslation();
   const { restaurant, formatPrice } = useRestaurant();
+  const statusConfig = getStatusConfig(t);
   const status = statusConfig[order.status];
   const currentStepIndex = statusSteps.indexOf(order.status);
   const isCancelled = order.status === 'cancelled';
+  const dateLocale = i18n.language === 'tr' ? tr : enUS;
 
   return (
     <motion.div
@@ -43,7 +48,7 @@ export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="font-display text-xl font-bold">Sipariş Detayı</h1>
+          <h1 className="font-display text-xl font-bold">{t('orderReceipt.title')}</h1>
         </div>
       </div>
 
@@ -63,27 +68,27 @@ export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
           {/* Order Info */}
           <div className="p-6 border-b border-dashed border-border">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-muted-foreground text-sm">Sipariş No</span>
+              <span className="text-muted-foreground text-sm">{t('orderReceipt.orderNo')}</span>
               <span className="font-mono font-semibold">#{order.id.slice(-8).toUpperCase()}</span>
             </div>
             <div className="flex items-center justify-between mb-4">
-              <span className="text-muted-foreground text-sm">Tarih</span>
+              <span className="text-muted-foreground text-sm">{t('orderReceipt.date')}</span>
               <span className="font-medium">
-                {format(new Date(order.createdAt), 'dd MMM yyyy, HH:mm', { locale: tr })}
+                {format(new Date(order.createdAt), 'dd MMM yyyy, HH:mm', { locale: dateLocale })}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground text-sm">Sipariş Türü</span>
+              <span className="text-muted-foreground text-sm">{t('orderReceipt.orderType')}</span>
               <div className="flex items-center gap-2">
                 {order.orderType === 'inPerson' ? (
                   <>
                     <Bell className="w-4 h-4 text-primary" />
-                    <span className="font-medium">Masa {order.tableNumber}</span>
+                    <span className="font-medium">{t('common.table')} {order.tableNumber}</span>
                   </>
                 ) : (
                   <>
                     <Home className="w-4 h-4 text-primary" />
-                    <span className="font-medium">Online Teslimat</span>
+                    <span className="font-medium">{t('order.onlineDelivery')}</span>
                   </>
                 )}
               </div>
@@ -92,12 +97,12 @@ export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
 
           {/* Order Status */}
           <div className="p-6 border-b border-dashed border-border">
-            <h3 className="font-semibold mb-4">Sipariş Durumu</h3>
+            <h3 className="font-semibold mb-4">{t('orderReceipt.orderStatus')}</h3>
             
             {isCancelled ? (
               <div className="flex items-center gap-3 p-4 bg-destructive/10 rounded-xl">
                 <XCircle className="w-6 h-6 text-destructive" />
-                <span className="font-medium text-destructive">Sipariş İptal Edildi</span>
+                <span className="font-medium text-destructive">{t('orderReceipt.orderCancelled')}</span>
               </div>
             ) : (
               <div className="flex items-center justify-between">
@@ -142,7 +147,7 @@ export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
           {/* Customer Info (for online orders) */}
           {order.orderType === 'online' && order.customerInfo && (
             <div className="p-6 border-b border-dashed border-border">
-              <h3 className="font-semibold mb-4">Teslimat Bilgileri</h3>
+              <h3 className="font-semibold mb-4">{t('orderReceipt.deliveryDetails')}</h3>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
                   <User className="w-5 h-5 text-muted-foreground" />
@@ -164,7 +169,7 @@ export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
 
           {/* Order Items */}
           <div className="p-6 border-b border-dashed border-border">
-            <h3 className="font-semibold mb-4">Sipariş Detayları</h3>
+            <h3 className="font-semibold mb-4">{t('orderReceipt.orderDetails')}</h3>
             <div className="space-y-4">
               {order.items.map((item, index) => (
                 <div key={index} className="flex justify-between">
@@ -182,7 +187,7 @@ export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
                       </div>
                     )}
                     {item.note && (
-                      <p className="text-xs text-muted-foreground italic mt-1">Not: {item.note}</p>
+                      <p className="text-xs text-muted-foreground italic mt-1">{t('orderReceipt.note')}: {item.note}</p>
                     )}
                   </div>
                   <span className="font-medium">{formatPrice(item.itemTotal)}</span>
@@ -194,7 +199,7 @@ export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
           {/* Order Note */}
           {order.orderNote && (
             <div className="p-6 border-b border-dashed border-border">
-              <h3 className="font-semibold mb-2">Sipariş Notu</h3>
+              <h3 className="font-semibold mb-2">{t('orderReceipt.orderNote')}</h3>
               <p className="text-muted-foreground">{order.orderNote}</p>
             </div>
           )}
@@ -203,7 +208,7 @@ export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
           {order.paymentMethodName && (
             <div className="p-6 border-b border-dashed border-border">
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Ödeme Yöntemi</span>
+                <span className="text-muted-foreground">{t('orderReceipt.paymentMethod')}</span>
                 <span className="font-medium">{order.paymentMethodName}</span>
               </div>
             </div>
@@ -212,7 +217,7 @@ export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
           {/* Total */}
           <div className="p-6 bg-primary/5">
             <div className="flex items-center justify-between">
-              <span className="text-xl font-bold">Toplam</span>
+              <span className="text-xl font-bold">{t('common.total')}</span>
               <span className="text-2xl font-bold text-primary">{formatPrice(order.totalAmount)}</span>
             </div>
           </div>
