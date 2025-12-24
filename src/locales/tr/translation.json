@@ -158,6 +158,12 @@
     "closed": "Kapalı",
     "allRightsReserved": "Tüm hakları saklıdır."
   },
+  "header": {
+    "notServing": "Restoran Şu An Hizmet Vermiyor",
+    "open": "Açık",
+    "closed": "Kapalı",
+    "opensAt": "{{time}}'da açılacak"
+  },
   "sound": {
     "title": "Bildirim Sesi",
     "description": "Sipariş durumunuz değiştiğinde sesli bildirim almak ister misiniz?",
