@@ -24,7 +24,7 @@ export const restaurantData: FullRestaurantInfo = {
     hide: false,
     themeId: 1,
     maxDistance: 500,
-    menuLang: "TR",
+    menuLang: "EN",
     tableOrderDiscountRate: 0,
     onlineOrderDiscountRate: 0,
     tenant: "popeyes",
