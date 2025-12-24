@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, Bell } from "lucide-react";
+import { Search, X, Bell, CalendarPlus } from "lucide-react";
 import { RestaurantHeader } from "@/components/menu/RestaurantHeader";
 import { CategoryTabs } from "@/components/menu/CategoryTabs";
 import { ProductCard } from "@/components/menu/ProductCard";
@@ -11,6 +11,7 @@ import { OrderReceipt } from "@/components/menu/OrderReceipt";
 import { Footer } from "@/components/menu/Footer";
 import { SoundPermissionModal } from "@/components/menu/SoundPermissionModal";
 import { CallWaiterModal } from "@/components/menu/CallWaiterModal";
+import { ReservationModal } from "@/components/menu/ReservationModal";
 import { useRestaurant } from "@/hooks/useRestaurant";
 import { useOrder } from "@/hooks/useOrder";
 import { Product, Order } from "@/types/restaurant";
@@ -30,6 +31,7 @@ export function MenuPage() {
   const [viewingOrder, setViewingOrder] = useState<Order | null>(null);
   const [showSoundPermission, setShowSoundPermission] = useState(false);
   const [showCallWaiter, setShowCallWaiter] = useState(false);
+  const [showReservation, setShowReservation] = useState(false);
   const categoryRefs = useRef<Record<string, HTMLElement | null>>({});
 
   // Handle category scroll sync
@@ -245,15 +247,34 @@ export function MenuPage() {
         onClose={() => setShowCallWaiter(false)}
       />
 
-      {/* Floating Call Waiter Button */}
-      <button
-        onClick={() => setShowCallWaiter(true)}
-        className="fixed bottom-24 right-4 z-40 h-10 px-3 rounded-full bg-amber-500 text-white shadow-md flex items-center gap-2 hover:bg-amber-600 transition-colors text-sm font-medium"
-        aria-label="Garson Çağır"
-      >
-        <Bell className="w-4 h-4" />
-        <span>Garson Çağır</span>
-      </button>
+      {/* Reservation Modal */}
+      <ReservationModal
+        isOpen={showReservation}
+        onClose={() => setShowReservation(false)}
+      />
+
+      {/* Floating Action Buttons */}
+      <div className="fixed bottom-24 right-4 z-40 flex flex-col gap-2">
+        {/* Reservation Button */}
+        <button
+          onClick={() => setShowReservation(true)}
+          className="h-10 px-3 rounded-full bg-primary text-primary-foreground shadow-md flex items-center gap-2 hover:bg-primary/90 transition-colors text-sm font-medium"
+          aria-label="Rezervasyon Yap"
+        >
+          <CalendarPlus className="w-4 h-4" />
+          <span>Rezervasyon</span>
+        </button>
+
+        {/* Call Waiter Button */}
+        <button
+          onClick={() => setShowCallWaiter(true)}
+          className="h-10 px-3 rounded-full bg-amber-500 text-white shadow-md flex items-center gap-2 hover:bg-amber-600 transition-colors text-sm font-medium"
+          aria-label="Garson Çağır"
+        >
+          <Bell className="w-4 h-4" />
+          <span>Garson Çağır</span>
+        </button>
+      </div>
     </div>
   );
 }
