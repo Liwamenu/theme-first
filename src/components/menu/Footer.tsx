@@ -1,9 +1,11 @@
+import { useTranslation } from 'react-i18next';
 import { Facebook, Instagram, Youtube, MessageCircle } from 'lucide-react';
 import { useRestaurant } from '@/hooks/useRestaurant';
 
-const dayNames = ['', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
+const dayKeys = ['', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
 export function Footer() {
+  const { t } = useTranslation();
   const { restaurant } = useRestaurant();
   const { SocialLinks, WorkingHours } = restaurant;
 
@@ -20,7 +22,7 @@ export function Footer() {
         {/* Social Links */}
         {socialLinks.length > 0 && (
           <div className="mb-8">
-            <h3 className="font-semibold text-center mb-4">Bizi Takip Edin</h3>
+            <h3 className="font-semibold text-center mb-4">{t('footer.followUs')}</h3>
             <div className="flex justify-center gap-4">
               {socialLinks.map((link, index) => (
                 <a
@@ -40,16 +42,16 @@ export function Footer() {
 
         {/* Working Hours */}
         <div className="max-w-md mx-auto">
-          <h3 className="font-semibold text-center mb-4">Çalışma Saatleri</h3>
+          <h3 className="font-semibold text-center mb-4">{t('footer.workingHours')}</h3>
           <div className="bg-secondary rounded-2xl p-4 space-y-2">
             {WorkingHours.map((wh) => (
               <div
                 key={wh.Day}
                 className="flex items-center justify-between text-sm"
               >
-                <span className="text-muted-foreground">{dayNames[wh.Day]}</span>
+                <span className="text-muted-foreground">{t(`days.${dayKeys[wh.Day]}`)}</span>
                 {wh.IsClosed ? (
-                  <span className="text-destructive font-medium">Kapalı</span>
+                  <span className="text-destructive font-medium">{t('footer.closed')}</span>
                 ) : (
                   <span className="font-medium">{wh.Open} - {wh.Close}</span>
                 )}
@@ -67,7 +69,7 @@ export function Footer() {
 
         {/* Copyright */}
         <div className="mt-8 pt-6 border-t border-border text-center text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} {restaurant.name}. Tüm hakları saklıdır.</p>
+          <p>© {new Date().getFullYear()} {restaurant.name}. {t('footer.allRightsReserved')}</p>
         </div>
       </div>
     </footer>

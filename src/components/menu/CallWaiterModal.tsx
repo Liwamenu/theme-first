@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Bell, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,7 @@ interface CallWaiterModalProps {
 }
 
 export function CallWaiterModal({ isOpen, onClose }: CallWaiterModalProps) {
+  const { t } = useTranslation();
   const { restaurant } = useRestaurant();
   const [reason, setReason] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,11 +34,11 @@ export function CallWaiterModal({ isOpen, onClose }: CallWaiterModalProps) {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      toast.success('Garson çağrıldı! Kısa süre içinde masanıza gelecek.');
+      toast.success(t('waiter.success'));
       setReason('');
       onClose();
     } catch (error) {
-      toast.error('Garson çağrılırken bir hata oluştu.');
+      toast.error(t('waiter.error'));
     } finally {
       setIsSubmitting(false);
     }
@@ -66,7 +68,7 @@ export function CallWaiterModal({ isOpen, onClose }: CallWaiterModalProps) {
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                     <Bell className="w-5 h-5 text-primary" />
                   </div>
-                  <h2 className="text-lg font-bold">Garson Çağır</h2>
+                  <h2 className="text-lg font-bold">{t('waiter.title')}</h2>
                 </div>
                 <button
                   onClick={onClose}
@@ -83,17 +85,17 @@ export function CallWaiterModal({ isOpen, onClose }: CallWaiterModalProps) {
                     <Bell className="w-6 h-6 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm text-muted-foreground">Masa Numarası</p>
+                    <p className="text-sm text-muted-foreground">{t('waiter.tableNumber')}</p>
                     <p className="text-xl font-bold">{restaurant.tableNumber}</p>
                   </div>
                 </div>
 
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Neden (Opsiyonel)
+                    {t('waiter.reason')} ({t('common.optional')})
                   </label>
                   <Textarea
-                    placeholder="Örn: Hesap istiyorum, Menü istiyorum..."
+                    placeholder={t('waiter.reasonPlaceholder')}
                     value={reason}
                     onChange={(e) => setReason(e.target.value)}
                     className="rounded-xl resize-none"
@@ -110,12 +112,12 @@ export function CallWaiterModal({ isOpen, onClose }: CallWaiterModalProps) {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Çağırılıyor...
+                      {t('waiter.calling')}
                     </>
                   ) : (
                     <>
                       <Bell className="w-5 h-5 mr-2" />
-                      Garson Çağır
+                      {t('waiter.button')}
                     </>
                   )}
                 </Button>

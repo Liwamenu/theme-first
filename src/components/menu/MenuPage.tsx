@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, Bell, CalendarPlus } from "lucide-react";
 import { RestaurantHeader } from "@/components/menu/RestaurantHeader";
@@ -16,11 +17,13 @@ import { useRestaurant } from "@/hooks/useRestaurant";
 import { useOrder } from "@/hooks/useOrder";
 import { Product, Order } from "@/types/restaurant";
 import { Input } from "@/components/ui/input";
+import { changeLanguage } from "@/lib/i18n";
 
 type View = "menu" | "order";
 
 export function MenuPage() {
-  const { categories, recommendedProducts, isRestaurantActive, isCurrentlyOpen } = useRestaurant();
+  const { t } = useTranslation();
+  const { categories, recommendedProducts, isRestaurantActive, isCurrentlyOpen, restaurant } = useRestaurant();
   const { currentOrder, orders, setCurrentOrder } = useOrder();
   const [activeCategory, setActiveCategory] = useState<string>(categories[0]?.id || "");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -33,6 +36,13 @@ export function MenuPage() {
   const [showCallWaiter, setShowCallWaiter] = useState(false);
   const [showReservation, setShowReservation] = useState(false);
   const categoryRefs = useRef<Record<string, HTMLElement | null>>({});
+
+  // Sync language with restaurant menuLang
+  useEffect(() => {
+    if (restaurant.menuLang) {
+      changeLanguage(restaurant.menuLang);
+    }
+  }, [restaurant.menuLang]);
 
   // Handle category scroll sync
   useEffect(() => {
@@ -110,7 +120,7 @@ export function MenuPage() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <Input
                 type="text"
-                placeholder="Yemek ara..."
+                placeholder={t("menu.searchPlaceholder")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="h-12 pl-12 pr-12 rounded-full bg-secondary border-0"
@@ -133,8 +143,7 @@ export function MenuPage() {
                 }}
                 className="h-12 px-4 rounded-full bg-primary text-primary-foreground flex items-center gap-2 font-medium hover:bg-primary/90 transition-colors"
               >
-                {/* <Receipt className="w-5 h-5" /> */}
-                <span className="sm:inline">Siparişim</span>
+                <span className="sm:inline">{t("menu.myOrder")}</span>
               </button>
             )}
           </div>
@@ -149,7 +158,7 @@ export function MenuPage() {
       {/* Recommended Products */}
       {!searchQuery && recommendedProducts.length > 0 && (
         <section className="container px-4 py-6">
-          <h2 className="font-display text-xl font-bold mb-4">✨ Önerilen Lezzetler</h2>
+          <h2 className="font-display text-xl font-bold mb-4">✨ {t("menu.recommended")}</h2>
           <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-2">
             {recommendedProducts.slice(0, 5).map((product) => (
               <motion.div
@@ -191,7 +200,7 @@ export function MenuPage() {
 
         {filteredCategories.length === 0 && searchQuery && (
           <div className="text-center py-12">
-            <p className="text-lg text-muted-foreground">"{searchQuery}" için sonuç bulunamadı</p>
+            <p className="text-lg text-muted-foreground">{t("menu.noResults", { query: searchQuery })}</p>
           </div>
         )}
       </div>
@@ -259,20 +268,20 @@ export function MenuPage() {
         <button
           onClick={() => setShowReservation(true)}
           className="h-10 px-3 rounded-full bg-primary text-primary-foreground shadow-md flex items-center gap-2 hover:bg-primary/90 transition-colors text-sm font-medium"
-          aria-label="Rezervasyon Yap"
+          aria-label={t("reservation.title")}
         >
           <CalendarPlus className="w-4 h-4" />
-          <span>Rezervasyon</span>
+          <span>{t("reservation.button")}</span>
         </button>
 
         {/* Call Waiter Button */}
         <button
           onClick={() => setShowCallWaiter(true)}
           className="h-10 px-3 rounded-full bg-amber-500 text-white shadow-md flex items-center gap-2 hover:bg-amber-600 transition-colors text-sm font-medium"
-          aria-label="Garson Çağır"
+          aria-label={t("waiter.title")}
         >
           <Bell className="w-4 h-4" />
-          <span>Garson Çağır</span>
+          <span>{t("waiter.button")}</span>
         </button>
       </div>
     </div>
