@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, Receipt, Bell } from "lucide-react";
+import { Search, X, Receipt } from "lucide-react";
 import { RestaurantHeader } from "@/components/menu/RestaurantHeader";
 import { CategoryTabs } from "@/components/menu/CategoryTabs";
 import { ProductCard } from "@/components/menu/ProductCard";
@@ -9,13 +9,10 @@ import { CartDrawer, CartButton } from "@/components/menu/CartDrawer";
 import { CheckoutModal } from "@/components/menu/CheckoutModal";
 import { OrderReceipt } from "@/components/menu/OrderReceipt";
 import { Footer } from "@/components/menu/Footer";
-import { CallWaiterModal } from "@/components/menu/CallWaiterModal";
-import { SoundPermissionModal } from "@/components/menu/SoundPermissionModal";
 import { useRestaurant } from "@/hooks/useRestaurant";
 import { useOrder } from "@/hooks/useOrder";
 import { Product, Order } from "@/types/restaurant";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
 
 type View = "menu" | "order";
 
@@ -26,8 +23,6 @@ export function MenuPage() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [isCallWaiterOpen, setIsCallWaiterOpen] = useState(false);
-  const [isSoundPermissionOpen, setIsSoundPermissionOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentView, setCurrentView] = useState<View>("menu");
   const [viewingOrder, setViewingOrder] = useState<Order | null>(null);
@@ -91,19 +86,6 @@ export function MenuPage() {
     setViewingOrder(null);
   };
 
-  const handleSoundPermissionAllow = () => {
-    setIsSoundPermissionOpen(false);
-    toast.success("Ses bildirimleri açıldı! Sipariş durumunuz değiştiğinde sesli bildirim alacaksınız.");
-    // Here you would actually enable TTS notifications
-    localStorage.setItem('soundPermission', 'granted');
-  };
-
-  const handleSoundPermissionDeny = () => {
-    setIsSoundPermissionOpen(false);
-    toast.info("Ses bildirimleri kapatıldı.");
-    localStorage.setItem('soundPermission', 'denied');
-  };
-
   // Show order receipt view
   if (currentView === "order" && viewingOrder) {
     return <OrderReceipt order={viewingOrder} onBack={handleBackToMenu} />;
@@ -134,15 +116,6 @@ export function MenuPage() {
               )}
             </div>
 
-            {/* Call Waiter Button */}
-            <button
-              onClick={() => setIsCallWaiterOpen(true)}
-              className="h-12 w-12 rounded-full bg-amber-500 text-white flex items-center justify-center hover:bg-amber-600 transition-colors shadow-lg"
-              title="Garson Çağır"
-            >
-              <Bell className="w-5 h-5" />
-            </button>
-
             {/* My Orders Button */}
             {orders.length > 0 && (
               <button
@@ -154,7 +127,7 @@ export function MenuPage() {
                 }}
                 className="h-12 px-4 rounded-full bg-primary text-primary-foreground flex items-center gap-2 font-medium hover:bg-primary/90 transition-colors"
               >
-                <Receipt className="w-5 h-5" />
+                {/* <Receipt className="w-5 h-5" /> */}
                 <span className="sm:inline">Siparişim</span>
               </button>
             )}
@@ -241,26 +214,9 @@ export function MenuPage() {
       {/* Checkout Modal */}
       <AnimatePresence>
         {isCheckoutOpen && (
-          <CheckoutModal 
-            onClose={() => setIsCheckoutOpen(false)} 
-            onOrderComplete={handleOrderComplete}
-            onShowSoundPermission={() => setIsSoundPermissionOpen(true)}
-          />
+          <CheckoutModal onClose={() => setIsCheckoutOpen(false)} onOrderComplete={handleOrderComplete} />
         )}
       </AnimatePresence>
-
-      {/* Call Waiter Modal */}
-      <CallWaiterModal
-        isOpen={isCallWaiterOpen}
-        onClose={() => setIsCallWaiterOpen(false)}
-      />
-
-      {/* Sound Permission Modal */}
-      <SoundPermissionModal
-        isOpen={isSoundPermissionOpen}
-        onAllow={handleSoundPermissionAllow}
-        onDeny={handleSoundPermissionDeny}
-      />
     </div>
   );
 }
