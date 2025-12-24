@@ -1,9 +1,12 @@
 import { motion } from 'framer-motion';
 import { Clock, MapPin, Phone, AlertTriangle } from 'lucide-react';
 import { useRestaurant } from '@/hooks/useRestaurant';
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 export function RestaurantHeader() {
   const { restaurant, isRestaurantActive, isCurrentlyOpen, getCurrentWorkingHour } = useRestaurant();
+  const { t } = useTranslation();
 
   const workingHour = getCurrentWorkingHour;
 
@@ -22,6 +25,11 @@ export function RestaurantHeader() {
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
 
       <div className="relative container px-4 pt-8 pb-6">
+        {/* Language Switcher */}
+        <div className="absolute top-2 right-2 z-10">
+          <LanguageSwitcher />
+        </div>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -54,12 +62,12 @@ export function RestaurantHeader() {
                 className="flex items-center gap-2 px-4 py-2 bg-destructive/10 text-destructive rounded-full text-sm font-medium"
               >
                 <AlertTriangle className="w-4 h-4" />
-                <span>Restoran Şu An Hizmet Vermiyor</span>
+                <span>{t('header.notServing')}</span>
               </motion.div>
             ) : isCurrentlyOpen ? (
               <div className="flex items-center gap-2 px-4 py-2 bg-success/10 text-success rounded-full text-sm font-medium">
                 <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                <span>Açık</span>
+                <span>{t('header.open')}</span>
                 {workingHour && (
                   <span className="text-muted-foreground">
                     • {workingHour.Open} - {workingHour.Close}
@@ -69,9 +77,9 @@ export function RestaurantHeader() {
             ) : (
               <div className="flex items-center gap-2 px-4 py-2 bg-muted text-muted-foreground rounded-full text-sm font-medium">
                 <Clock className="w-4 h-4" />
-                <span>Kapalı</span>
+                <span>{t('header.closed')}</span>
                 {workingHour && !workingHour.IsClosed && (
-                  <span>• {workingHour.Open}'da açılacak</span>
+                  <span>• {t('header.opensAt', { time: workingHour.Open })}</span>
                 )}
               </div>
             )}

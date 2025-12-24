@@ -158,6 +158,12 @@
     "closed": "Closed",
     "allRightsReserved": "All rights reserved."
   },
+  "header": {
+    "notServing": "Restaurant Currently Not Serving",
+    "open": "Open",
+    "closed": "Closed",
+    "opensAt": "Opens at {{time}}"
+  },
   "sound": {
     "title": "Notification Sound",
     "description": "Would you like to receive sound notifications when your order status changes?",
