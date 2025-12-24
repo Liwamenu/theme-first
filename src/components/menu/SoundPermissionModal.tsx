@@ -23,9 +23,9 @@ export function SoundPermissionModal({ isOpen, onAllow, onDeny }: SoundPermissio
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed left-4 right-4 top-1/2 -translate-y-1/2 z-[60] max-w-md mx-auto"
+            className="fixed left-4 right-4 top-4 bottom-4 z-[60] max-w-md mx-auto flex items-center"
           >
-            <div className="bg-card rounded-3xl overflow-hidden shadow-elegant">
+            <div className="bg-card rounded-3xl overflow-hidden shadow-elegant max-h-full overflow-y-auto w-full">
               {/* Icon */}
               <div className="pt-8 pb-4 flex justify-center">
                 <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
