@@ -155,7 +155,7 @@ export interface CartItem {
 
 export interface OrderPayload {
   restaurantId: string;
-  orderType: 'inPerson' | 'online';
+  orderType: "inPerson" | "online";
   items: {
     productId: string;
     productName: string;
@@ -182,5 +182,5 @@ export interface OrderPayload {
 
 export interface Order extends OrderPayload {
   id: string;
-  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';
+  status: "pending" | "confirmed" | "preparing" | "ready" | "delivered" | "cancelled";
 }
