@@ -125,7 +125,6 @@ export interface RestaurantData {
   Products: Product[];
   Menus: Menu[];
   PaymentMethods: PaymentMethod[];
-  deliveryPrice?: number | null;
 }
 
 export interface FullRestaurantInfo {
