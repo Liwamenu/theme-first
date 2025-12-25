@@ -63,17 +63,19 @@ export function Footer() {
             ))}
           </div>
 
-          {/* Reservation Button */}
-          <div className="flex justify-center mt-6">
-            <Button
-              onClick={() => setIsReservationOpen(true)}
-              variant="outline"
-              className="flex items-center gap-2 rounded-full"
-            >
-              <CalendarDays className="w-4 h-4" />
-              <span>{t('reservation.button')}</span>
-            </Button>
-          </div>
+          {/* Reservation Button - Only show if license is active */}
+          {restaurant.isReservationLicenseActive && (
+            <div className="flex justify-center mt-6">
+              <Button
+                onClick={() => setIsReservationOpen(true)}
+                variant="outline"
+                className="flex items-center gap-2 rounded-full"
+              >
+                <CalendarDays className="w-4 h-4" />
+                <span>{t('reservation.button')}</span>
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Restaurant Info */}
