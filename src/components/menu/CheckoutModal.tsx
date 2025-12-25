@@ -45,7 +45,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
   const { restaurant, enabledPaymentMethods, canOrderOnline, canOrderInPerson, setTableNumber, formatPrice } =
     useRestaurant();
   const { items, getTotal, clearCart } = useCart();
-  const { getLocation, checkDistance, getDistanceFromRestaurant, loading: locationLoading } = useLocation();
+  const { getLocation, checkDistanceWithCoords, getDistanceWithCoords, loading: locationLoading } = useLocation();
   const { addOrder } = useOrder();
 
   const [step, setStep] = useState<CheckoutStep>("type");
@@ -83,13 +83,20 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
       }
 
       try {
-        await getLocation();
-        const withinRange = checkDistance(restaurant.latitude, restaurant.longitude, restaurant.maxDistance);
+        const coords = await getLocation();
+        const withinRange = checkDistanceWithCoords(
+          coords.latitude, coords.longitude,
+          restaurant.latitude, restaurant.longitude, 
+          restaurant.maxDistance
+        );
         setIsWithinRange(withinRange);
 
         if (!withinRange) {
-          const distance = getDistanceFromRestaurant(restaurant.latitude, restaurant.longitude);
-          toast.error(t("order.outOfRange", { distance: distance?.toFixed(1), max: restaurant.maxDistance }));
+          const distance = getDistanceWithCoords(
+            coords.latitude, coords.longitude,
+            restaurant.latitude, restaurant.longitude
+          );
+          toast.error(t("order.outOfRange", { distance: distance.toFixed(1), max: restaurant.maxDistance }));
           return;
         }
         setStep("details");
@@ -101,10 +108,14 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
       // Check table order distance if enabled
       if (restaurant.checkTableOrderDistance) {
         try {
-          await getLocation();
+          const coords = await getLocation();
           // Convert maxTableOrderDistanceMeter from meters to kilometers
           const maxDistanceKm = restaurant.maxTableOrderDistanceMeter / 1000;
-          const withinTableRange = checkDistance(restaurant.latitude, restaurant.longitude, maxDistanceKm);
+          const withinTableRange = checkDistanceWithCoords(
+            coords.latitude, coords.longitude,
+            restaurant.latitude, restaurant.longitude,
+            maxDistanceKm
+          );
 
           if (!withinTableRange) {
             toast.error(t("order.tableOrderOutOfRange", { max: restaurant.maxTableOrderDistanceMeter }));

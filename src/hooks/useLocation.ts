@@ -81,6 +81,15 @@ export function useLocation() {
     [state.latitude, state.longitude]
   );
 
+  // Direct distance check using provided coordinates (not state)
+  const checkDistanceWithCoords = useCallback(
+    (userLat: number, userLon: number, restaurantLat: number, restaurantLon: number, maxDistance: number): boolean => {
+      const distance = calculateDistance(userLat, userLon, restaurantLat, restaurantLon);
+      return distance <= maxDistance;
+    },
+    []
+  );
+
   const getDistanceFromRestaurant = useCallback(
     (restaurantLat: number, restaurantLon: number): number | null => {
       if (state.latitude === null || state.longitude === null) return null;
@@ -89,10 +98,20 @@ export function useLocation() {
     [state.latitude, state.longitude]
   );
 
+  // Direct distance calculation using provided coordinates (not state)
+  const getDistanceWithCoords = useCallback(
+    (userLat: number, userLon: number, restaurantLat: number, restaurantLon: number): number => {
+      return calculateDistance(userLat, userLon, restaurantLat, restaurantLon);
+    },
+    []
+  );
+
   return {
     ...state,
     getLocation,
     checkDistance,
+    checkDistanceWithCoords,
     getDistanceFromRestaurant,
+    getDistanceWithCoords,
   };
 }
