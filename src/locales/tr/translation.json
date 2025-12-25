@@ -87,7 +87,14 @@
     "fillAllFields": "Lütfen tüm bilgileri doldurun",
     "outOfRange": "Teslimat alanı dışındasınız. ({{distance}} km uzaktasınız, max: {{max}} km)",
     "locationError": "Konum alınamadı. Online sipariş için konum izni gereklidir.",
-    "noOrdersAvailable": "Şu an sipariş alınmıyor. Mesai saatleri dışında. Lütfen daha sonra tekrar deneyin."
+    "noOrdersAvailable": "Şu an sipariş alınmıyor. Mesai saatleri dışında. Lütfen daha sonra tekrar deneyin.",
+    "subtotal": "Ara Toplam",
+    "discount": "İndirim",
+    "tableDiscount": "Masa İndirimi",
+    "onlineDiscount": "Online İndirimi",
+    "deliveryFee": "Teslimat Ücreti",
+    "minOrderError": "Online siparişler için minimum sipariş tutarı {{min}}.",
+    "cannotAddOutsideHours": "Çalışma saatleri dışında veya restoran aktif değilken ürün ekleyemezsiniz."
   },
   "orderReceipt": {
     "title": "Sipariş Detayı",

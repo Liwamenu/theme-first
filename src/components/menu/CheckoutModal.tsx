@@ -42,7 +42,8 @@ type CheckoutStep = "type" | "details" | "payment" | "confirm";
 
 export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission }: CheckoutModalProps) {
   const { t } = useTranslation();
-  const { restaurant, enabledPaymentMethods, canOrderOnline, canOrderInPerson, setTableNumber, formatPrice } = useRestaurant();
+  const { restaurant, enabledPaymentMethods, canOrderOnline, canOrderInPerson, setTableNumber, formatPrice } =
+    useRestaurant();
   const { items, getTotal, clearCart } = useCart();
   const { getLocation, checkDistance, getDistanceFromRestaurant, loading: locationLoading } = useLocation();
   const { addOrder } = useOrder();
@@ -56,13 +57,31 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
   const [isWithinRange, setIsWithinRange] = useState(false);
   const [isChangeTableOpen, setIsChangeTableOpen] = useState(false);
 
-  const total = getTotal();
+  const subtotal = getTotal();
   const tableNumber = restaurant.tableNumber;
+
+  // Calculate discount and final total
+  const getDiscountRate = () => {
+    if (orderType === 'inPerson') return restaurant.tableOrderDiscountRate;
+    if (orderType === 'online') return restaurant.onlineOrderDiscountRate;
+    return 0;
+  };
+
+  const discountRate = getDiscountRate();
+  const discountAmount = (subtotal * discountRate) / 100;
+  const deliveryFee = orderType === 'online' ? restaurant.deliveryPrice : 0;
+  const total = subtotal - discountAmount + deliveryFee;
 
   const handleSelectOrderType = async (type: OrderType) => {
     setOrderType(type);
 
     if (type === "online") {
+      // Check minimum order amount
+      if (subtotal < restaurant.minOrderAmount) {
+        toast.error(t("order.minOrderError", { min: formatPrice(restaurant.minOrderAmount) }));
+        return;
+      }
+
       try {
         await getLocation();
         const withinRange = checkDistance(restaurant.latitude, restaurant.longitude, restaurant.maxDistance);
@@ -70,14 +89,12 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
 
         if (!withinRange) {
           const distance = getDistanceFromRestaurant(restaurant.latitude, restaurant.longitude);
-          toast.error(
-            t('order.outOfRange', { distance: distance?.toFixed(1), max: restaurant.maxDistance })
-          );
+          toast.error(t("order.outOfRange", { distance: distance?.toFixed(1), max: restaurant.maxDistance }));
           return;
         }
         setStep("details");
       } catch (error) {
-        toast.error(t('order.locationError'));
+        toast.error(t("order.locationError"));
         return;
       }
     } else {
@@ -91,7 +108,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
       setStep("confirm");
     } else {
       if (!customerInfo.name.trim() || !customerInfo.phone.trim() || !customerInfo.address.trim()) {
-        toast.error(t('order.fillAllFields'));
+        toast.error(t("order.fillAllFields"));
         return;
       }
       setStep("payment");
@@ -183,19 +200,19 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
         particleCount: 150,
         spread: 100,
         origin: { y: 0.6 },
-        colors: ['#ff6b35', '#ffa500', '#ffd700', '#32cd32', '#4169e1'],
+        colors: ["#ff6b35", "#ffa500", "#ffd700", "#32cd32", "#4169e1"],
       });
 
       clearCart();
-      
+
       // Show sound permission modal after a short delay
       setTimeout(() => {
         onShowSoundPermission();
       }, 1000);
-      
+
       onOrderComplete(order);
     } catch (error) {
-      toast.error(t('order.orderError'));
+      toast.error(t("order.orderError"));
     } finally {
       setIsSubmitting(false);
     }
@@ -234,7 +251,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                 <ArrowLeft className="w-5 h-5" />
               </button>
             )}
-            <h2 className="text-xl font-bold">{t('order.placeOrder')}</h2>
+            <h2 className="text-xl font-bold">{t("order.placeOrder")}</h2>
           </div>
           <button onClick={onClose} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
             <X className="w-5 h-5" />
@@ -245,7 +262,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
           {/* Step: Order Type */}
           {step === "type" && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
-              <h3 className="text-lg font-semibold mb-4">{t('order.selectType')}</h3>
+              <h3 className="text-lg font-semibold mb-4">{t("order.selectType")}</h3>
 
               {canOrderInPerson && (
                 <button
@@ -256,10 +273,8 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                     <Bell className="w-7 h-7 text-primary" />
                   </div>
                   <div className="text-left flex-1">
-                    <h4 className="font-semibold text-lg">{t('order.inPerson')}</h4>
-                    <p className="text-sm text-muted-foreground">
-                      {t('order.inPersonDesc')}
-                    </p>
+                    <h4 className="font-semibold text-lg">{t("order.inPerson")}</h4>
+                    <p className="text-sm text-muted-foreground">{t("order.inPersonDesc")}</p>
                   </div>
                 </button>
               )}
@@ -278,9 +293,9 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                     )}
                   </div>
                   <div className="text-left flex-1">
-                    <h4 className="font-semibold text-lg">{t('order.online')}</h4>
+                    <h4 className="font-semibold text-lg">{t("order.online")}</h4>
                     <p className="text-sm text-muted-foreground">
-                      {t('order.onlineDesc', { distance: restaurant.maxDistance })}
+                      {t("order.onlineDesc", { distance: restaurant.maxDistance })}
                     </p>
                   </div>
                 </button>
@@ -289,7 +304,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
               {!canOrderInPerson && !canOrderOnline && (
                 <div className="flex items-center gap-3 p-4 bg-destructive/10 text-destructive rounded-xl">
                   <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                  <p className="text-sm">{t('order.noOrdersAvailable')}</p>
+                  <p className="text-sm">{t("order.noOrdersAvailable")}</p>
                 </div>
               )}
             </motion.div>
@@ -299,7 +314,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
           {step === "details" && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
               <h3 className="text-lg font-semibold mb-4">
-                {orderType === "inPerson" ? t('order.orderInfo') : t('order.deliveryInfo')}
+                {orderType === "inPerson" ? t("order.orderInfo") : t("order.deliveryInfo")}
               </h3>
 
               {orderType === "inPerson" ? (
@@ -310,18 +325,17 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                       <Bell className="w-7 h-7 text-primary" />
                     </div>
                     <div className="text-left flex-1">
-                      <p className="text-sm text-muted-foreground">{t('order.tableNumber')}</p>
+                      <p className="text-sm text-muted-foreground">{t("order.tableNumber")}</p>
                       <p className="text-2xl font-bold">{tableNumber}</p>
                     </div>
-
                     <div className="flex flex-col items-end gap-2 text-right">
-                      <span className="text-sm text-primary font-black">{t('order.isTableNumberChange')}</span>
+                      <span className="text-sm text-primary font-black">{t("order.isTableNumberChange")}</span>
                       <button
                         onClick={() => setIsChangeTableOpen(true)}
                         className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-xl hover:bg-primary/20 transition-colors"
-                        >
+                      >
                         <QrCode className="w-4 h-4" />
-                        <span className="text-sm font-medium">{t('order.change')}</span>
+                        <span className="text-sm font-medium">{t("order.change")}</span>
                       </button>
                     </div>
                   </div>
@@ -329,12 +343,12 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
               ) : (
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="name">{t('order.fullName')}</Label>
+                    <Label htmlFor="name">{t("order.fullName")}</Label>
                     <div className="relative mt-2">
                       <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                       <Input
                         id="name"
-                        placeholder={t('order.fullNamePlaceholder')}
+                        placeholder={t("order.fullNamePlaceholder")}
                         value={customerInfo.name}
                         onChange={(e) => setCustomerInfo((prev) => ({ ...prev, name: e.target.value }))}
                         className="h-14 pl-12 rounded-xl"
@@ -342,12 +356,12 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                     </div>
                   </div>
                   <div>
-                    <Label htmlFor="phone">{t('order.phone')}</Label>
+                    <Label htmlFor="phone">{t("order.phone")}</Label>
                     <div className="relative mt-2">
                       <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                       <Input
                         id="phone"
-                        placeholder={t('order.phonePlaceholder')}
+                        placeholder={t("order.phonePlaceholder")}
                         value={customerInfo.phone}
                         onChange={(e) => setCustomerInfo((prev) => ({ ...prev, phone: e.target.value }))}
                         className="h-14 pl-12 rounded-xl"
@@ -355,12 +369,12 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                     </div>
                   </div>
                   <div>
-                    <Label htmlFor="address">{t('order.deliveryAddress')}</Label>
+                    <Label htmlFor="address">{t("order.deliveryAddress")}</Label>
                     <div className="relative mt-2">
                       <MapPin className="absolute left-4 top-4 w-5 h-5 text-muted-foreground" />
                       <textarea
                         id="address"
-                        placeholder={t('order.addressPlaceholder')}
+                        placeholder={t("order.addressPlaceholder")}
                         value={customerInfo.address}
                         onChange={(e) => setCustomerInfo((prev) => ({ ...prev, address: e.target.value }))}
                         className="w-full min-h-[100px] pl-12 p-4 rounded-xl bg-secondary border-0 resize-none"
@@ -374,11 +388,11 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
               <div>
                 <Label htmlFor="orderNote" className="flex items-center gap-2">
                   <FileText className="w-4 h-4" />
-                  {t('order.orderNote')} ({t('common.optional')})
+                  {t("order.orderNote")} ({t("common.optional")})
                 </Label>
                 <Textarea
                   id="orderNote"
-                  placeholder={t('order.orderNotePlaceholder')}
+                  placeholder={t("order.orderNotePlaceholder")}
                   value={orderNote}
                   onChange={(e) => setOrderNote(e.target.value)}
                   className="mt-2 rounded-xl resize-none"
@@ -391,7 +405,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                 size="lg"
                 className="w-full h-14 text-base font-semibold rounded-2xl mt-4"
               >
-                {t('common.continue')}
+                {t("common.continue")}
               </Button>
             </motion.div>
           )}
@@ -399,7 +413,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
           {/* Step: Payment */}
           {step === "payment" && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
-              <h3 className="text-lg font-semibold mb-4">{t('order.paymentMethod')}</h3>
+              <h3 className="text-lg font-semibold mb-4">{t("order.paymentMethod")}</h3>
 
               <div className="space-y-3">
                 {enabledPaymentMethods.map((method) => (
@@ -431,7 +445,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
           {/* Step: Confirm */}
           {step === "confirm" && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
-              <h3 className="text-lg font-semibold mb-4">{t('order.orderSummary')}</h3>
+              <h3 className="text-lg font-semibold mb-4">{t("order.orderSummary")}</h3>
 
               {/* Order Summary */}
               <div className="bg-secondary rounded-2xl p-4 space-y-3">
@@ -439,12 +453,14 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                   {orderType === "inPerson" ? (
                     <>
                       <Bell className="w-4 h-4" />
-                      <span>{t('common.table')} {tableNumber} - {t('order.tableOrder')}</span>
+                      <span>
+                        {t("common.table")} {tableNumber} - {t("order.tableOrder")}
+                      </span>
                     </>
                   ) : (
                     <>
                       <Home className="w-4 h-4" />
-                      <span>{t('order.onlineDelivery')}</span>
+                      <span>{t("order.onlineDelivery")}</span>
                     </>
                   )}
                 </div>
@@ -454,36 +470,40 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                     const unitPrice = item.portion.specialPrice ?? item.portion.campaignPrice ?? item.portion.price;
                     const tagTotal = item.selectedTags.reduce((sum, tag) => sum + tag.price * tag.quantity, 0);
                     const itemTotal = (unitPrice + tagTotal) * item.quantity;
-                    
+
                     return (
                       <div key={item.id} className="space-y-1">
                         <div className="flex justify-between text-sm">
                           <div className="flex-1">
-                            <span className="font-medium">{item.quantity}x {item.product.name}</span>
+                            <span className="font-medium">
+                              {item.quantity}x {item.product.name}
+                            </span>
                             <span className="text-muted-foreground ml-1">({item.portion.name})</span>
                           </div>
                           <span className="font-medium">{formatPrice(unitPrice * item.quantity)}</span>
                         </div>
-                        
+
                         {/* Order Tags */}
                         {item.selectedTags.length > 0 && (
                           <div className="ml-4 space-y-0.5">
                             {item.selectedTags.map((tag, idx) => (
                               <div key={idx} className="flex justify-between text-xs text-muted-foreground">
-                                <span>+ {tag.itemName} {tag.quantity > 1 ? `x${tag.quantity}` : ''}</span>
-                                {tag.price > 0 && (
-                                  <span>{formatPrice(tag.price * tag.quantity * item.quantity)}</span>
-                                )}
+                                <span>
+                                  + {tag.itemName} {tag.quantity > 1 ? `x${tag.quantity}` : ""}
+                                </span>
+                                {tag.price > 0 && <span>{formatPrice(tag.price * tag.quantity * item.quantity)}</span>}
                               </div>
                             ))}
                           </div>
                         )}
-                        
+
                         {/* Item Note */}
                         {item.note && (
-                          <p className="text-xs text-muted-foreground italic ml-4">{t('orderReceipt.note')}: {item.note}</p>
+                          <p className="text-xs text-muted-foreground italic ml-4">
+                            {t("orderReceipt.note")}: {item.note}
+                          </p>
                         )}
-                        
+
                         {/* Item Total if has tags */}
                         {item.selectedTags.length > 0 && (
                           <div className="flex justify-end text-xs text-primary font-medium">
@@ -498,14 +518,42 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                 {orderNote && (
                   <div className="border-t border-border pt-3">
                     <p className="text-sm text-muted-foreground">
-                      <span className="font-medium">{t('orderReceipt.orderNote')}:</span> {orderNote}
+                      <span className="font-medium">{t("orderReceipt.orderNote")}:</span> {orderNote}
                     </p>
                   </div>
                 )}
 
-                <div className="border-t border-border pt-3 flex justify-between font-bold text-lg">
-                  <span>{t('common.total')}</span>
-                  <span className="text-primary">{formatPrice(total)}</span>
+                {/* Price Breakdown */}
+                <div className="border-t border-border pt-3 space-y-2">
+                  {/* Subtotal */}
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">{t("order.subtotal")}</span>
+                    <span>{formatPrice(subtotal)}</span>
+                  </div>
+
+                  {/* Discount */}
+                  {discountRate > 0 && (
+                    <div className="flex justify-between text-sm text-success">
+                      <span>
+                        {orderType === 'inPerson' ? t("order.tableDiscount") : t("order.onlineDiscount")} ({discountRate}%)
+                      </span>
+                      <span>-{formatPrice(discountAmount)}</span>
+                    </div>
+                  )}
+
+                  {/* Delivery Fee */}
+                  {orderType === 'online' && deliveryFee > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">{t("order.deliveryFee")}</span>
+                      <span>{formatPrice(deliveryFee)}</span>
+                    </div>
+                  )}
+
+                  {/* Total */}
+                  <div className="flex justify-between font-bold text-lg pt-2 border-t border-border">
+                    <span>{t("common.total")}</span>
+                    <span className="text-primary">{formatPrice(total)}</span>
+                  </div>
                 </div>
               </div>
 
@@ -517,7 +565,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                 className="w-full h-14 text-base font-semibold rounded-2xl shadow-glow"
               >
                 {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
-                {t('order.confirmOrder')}
+                {t("order.confirmOrder")}
               </Button>
             </motion.div>
           )}

@@ -87,7 +87,14 @@
     "fillAllFields": "Please fill in all fields",
     "outOfRange": "You are outside the delivery area. ({{distance}} km away, max: {{max}} km)",
     "locationError": "Could not get location. Location permission is required for online orders.",
-    "noOrdersAvailable": "Orders are not being accepted at this time. Outside of business hours. Please try again later."
+    "noOrdersAvailable": "Orders are not being accepted at this time. Outside of business hours. Please try again later.",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "tableDiscount": "Table Discount",
+    "onlineDiscount": "Online Discount",
+    "deliveryFee": "Delivery Fee",
+    "minOrderError": "Minimum order amount is {{min}} for online orders.",
+    "cannotAddOutsideHours": "Cannot add items outside working hours or when restaurant is not active."
   },
   "orderReceipt": {
     "title": "Order Details",

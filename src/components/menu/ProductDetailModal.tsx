@@ -16,11 +16,13 @@ interface ProductDetailModalProps {
 
 export function ProductDetailModal({ product, onClose }: ProductDetailModalProps) {
   const { t } = useTranslation();
-  const { restaurant, formatPrice } = useRestaurant();
+  const { restaurant, formatPrice, isRestaurantActive, isCurrentlyOpen } = useRestaurant();
   const { addItem } = useCart();
   const [selectedPortion, setSelectedPortion] = useState<Portion>(product.portions[0]);
   const [quantity, setQuantity] = useState(1);
   const [selectedTags, setSelectedTags] = useState<Record<string, SelectedTagItem[]>>({});
+
+  const canAddToCart = isRestaurantActive && isCurrentlyOpen;
 
   // Get display price
   const getDisplayPrice = (portion: Portion) => {
@@ -99,6 +101,10 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
   };
 
   const handleAddToCart = () => {
+    if (!canAddToCart) {
+      toast.error(t('order.cannotAddOutsideHours'));
+      return;
+    }
     if (!validateTags()) return;
 
     const allSelectedTags = Object.values(selectedTags).flat();
