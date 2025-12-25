@@ -176,6 +176,7 @@
   "validation": {
     "enterName": "Lütfen adınızı giriniz",
     "enterPhone": "Lütfen telefon numaranızı giriniz",
+    "invalidPhone": "Lütfen geçerli bir telefon numarası giriniz",
     "enterValidEmail": "Lütfen geçerli bir e-posta adresi giriniz",
     "selectDate": "Lütfen tarih seçiniz",
     "selectTime": "Lütfen saat seçiniz",
