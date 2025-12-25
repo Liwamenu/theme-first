@@ -24,9 +24,14 @@ export default function ReservationReceipt() {
   const lang = searchParams.get("lang") || "tr";
 
   useEffect(() => {
-    changeLanguage(lang);
+    if (lang && i18n.language !== lang) {
+      changeLanguage(lang);
+    }
+  }, [lang, i18n.language]);
+
+  useEffect(() => {
     document.title = t("reservation.receiptTitle");
-  }, [lang, t]);
+  }, [t]);
 
   const formatDate = (dateStr: string): string => {
     if (!dateStr) return "";
