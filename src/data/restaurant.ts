@@ -35,6 +35,7 @@ export const restaurantData: FullRestaurantInfo = {
     licenseIsActive: true,
     tableNumber: 5,
     moneySign: "$",
+    deliveryPrice: 15,
     WorkingHours: [
       { Day: 1, IsClosed: false, Open: "08:00", Close: "23:00" },
       { Day: 2, IsClosed: false, Open: "08:00", Close: "23:00" },

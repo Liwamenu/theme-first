@@ -313,13 +313,17 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                       <p className="text-sm text-muted-foreground">{t('order.tableNumber')}</p>
                       <p className="text-2xl font-bold">{tableNumber}</p>
                     </div>
-                    <button
-                      onClick={() => setIsChangeTableOpen(true)}
-                      className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-xl hover:bg-primary/20 transition-colors"
-                    >
-                      <QrCode className="w-4 h-4" />
-                      <span className="text-sm font-medium">{t('order.change')}</span>
-                    </button>
+
+                    <div className="flex flex-col items-end gap-2 text-right">
+                      <span className="text-sm text-primary font-black">{t('order.isTableNumberChange')}</span>
+                      <button
+                        onClick={() => setIsChangeTableOpen(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-xl hover:bg-primary/20 transition-colors"
+                        >
+                        <QrCode className="w-4 h-4" />
+                        <span className="text-sm font-medium">{t('order.change')}</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               ) : (
