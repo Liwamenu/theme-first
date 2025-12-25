@@ -93,6 +93,7 @@
     "tableDiscount": "Masa İndirimi",
     "onlineDiscount": "Online İndirimi",
     "deliveryFee": "Teslimat Ücreti",
+    "minOrderError": "Online siparişler için minimum sipariş tutarı {{min}}.",
     "cannotAddOutsideHours": "Çalışma saatleri dışında veya restoran aktif değilken ürün ekleyemezsiniz."
   },
   "orderReceipt": {

@@ -76,6 +76,12 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
     setOrderType(type);
 
     if (type === "online") {
+      // Check minimum order amount
+      if (subtotal < restaurant.minOrderAmount) {
+        toast.error(t("order.minOrderError", { min: formatPrice(restaurant.minOrderAmount) }));
+        return;
+      }
+
       try {
         await getLocation();
         const withinRange = checkDistance(restaurant.latitude, restaurant.longitude, restaurant.maxDistance);
