@@ -3,6 +3,7 @@ import { Star, Plus } from "lucide-react";
 import { Product, Portion } from "@/types/restaurant";
 import { useRestaurant } from "@/hooks/useRestaurant";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface ProductCardProps {
   product: Product;
@@ -33,6 +34,7 @@ function getPriceDisplay(portion: Portion, isSpecialPriceActive: boolean) {
 }
 
 export function ProductCard({ product, onSelect, isSpecialPriceActive, specialPriceName }: ProductCardProps) {
+  const { t } = useTranslation();
   const { formatPrice } = useRestaurant();
   const firstPortion = product.portions[0];
   const { displayPrice, originalPrice, priceType } = getPriceDisplay(firstPortion, isSpecialPriceActive);
@@ -53,7 +55,7 @@ export function ProductCard({ product, onSelect, isSpecialPriceActive, specialPr
       {product.recommendation && (
         <div className="absolute top-3 left-3 z-10 flex items-center gap-1 px-2.5 py-1 bg-primary text-primary-foreground rounded-full text-xs font-medium shadow-md">
           <Star className="w-3 h-3 fill-current" />
-          <span>{t("productCard.recommended")}</span>
+          <span>Önerilen</span>
         </div>
       )}
 
@@ -65,7 +67,7 @@ export function ProductCard({ product, onSelect, isSpecialPriceActive, specialPr
             priceType === "campaign" ? "bg-campaign text-campaign-foreground" : "bg-special text-special-foreground",
           )}
         >
-          {priceType === "special" ? specialPriceName : t("productCard.campaign")}
+          {priceType === "special" ? specialPriceName : "Kampanya"}
         </div>
       )}
 
