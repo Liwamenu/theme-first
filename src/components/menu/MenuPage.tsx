@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 type View = "menu" | "order";
 
 export function MenuPage() {
-  const { categories, recommendedProducts, isRestaurantActive, isCurrentlyOpen } = useRestaurant();
+  const { categories, recommendedProducts, isRestaurantActive, isCurrentlyOpen, restaurant } = useRestaurant();
   const { currentOrder, orders, setCurrentOrder } = useOrder();
   const [activeCategory, setActiveCategory] = useState<string>(categories[0]?.id || "");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
