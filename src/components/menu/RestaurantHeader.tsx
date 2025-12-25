@@ -87,16 +87,18 @@ export function RestaurantHeader() {
             )}
           </div>
 
-          {/* Reservation Button */}
-          <Button
-            onClick={() => setIsReservationOpen(true)}
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-2 rounded-full my-2"
-          >
-            <CalendarDays className="w-4 h-4" />
-            <span>{t("reservation.button")}</span>
-          </Button>
+          {/* Reservation Button - Only show if license is active */}
+          {restaurant.isReservationLicenseActive && (
+            <Button
+              onClick={() => setIsReservationOpen(true)}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2 rounded-full my-2"
+            >
+              <CalendarDays className="w-4 h-4" />
+              <span>{t("reservation.button")}</span>
+            </Button>
+          )}
 
           {/* Info Row */}
           <div className="flex flex-wrap gap-4 justify-center text-sm text-muted-foreground">
