@@ -73,6 +73,7 @@ export const restaurantData: FullRestaurantInfo = {
         subCategoryName: "Klasik",
         subCategoryImage: "",
         subCategorySortOrder: 1,
+        isNoteAllowed: true,
         portions: [
           {
             id: "por-001-mercimek-normal",
@@ -170,6 +171,7 @@ export const restaurantData: FullRestaurantInfo = {
         subCategoryName: "Ev Yemekleri",
         subCategoryImage: "",
         subCategorySortOrder: 1,
+        isNoteAllowed: true,
         portions: [
           {
             id: "por-004-karniyarik-standart",
@@ -267,6 +269,7 @@ export const restaurantData: FullRestaurantInfo = {
         subCategoryName: "Kebaplar",
         subCategoryImage: "",
         subCategorySortOrder: 2,
+        isNoteAllowed: true,
         portions: [
           {
             id: "por-006-iskender-yarim",
