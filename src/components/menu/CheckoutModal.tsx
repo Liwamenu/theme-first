@@ -310,7 +310,11 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                   className="w-full flex items-center gap-4 p-5 bg-secondary rounded-2xl hover:bg-secondary/80 transition-colors"
                 >
                   <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Bell className="w-7 h-7 text-primary" />
+                    {locationLoading && orderType === "inPerson" ? (
+                      <Loader2 className="w-7 h-7 text-primary animate-spin" />
+                    ) : (
+                      <Bell className="w-7 h-7 text-primary" />
+                    )}
                   </div>
                   <div className="text-left flex-1">
                     <h4 className="font-semibold text-lg">{t("order.inPerson")}</h4>
@@ -326,7 +330,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                   className="w-full flex items-center gap-4 p-5 bg-secondary rounded-2xl hover:bg-secondary/80 transition-colors disabled:opacity-50"
                 >
                   <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
-                    {locationLoading ? (
+                    {locationLoading && orderType === "online" ? (
                       <Loader2 className="w-7 h-7 text-primary animate-spin" />
                     ) : (
                       <Home className="w-7 h-7 text-primary" />
