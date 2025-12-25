@@ -15,7 +15,8 @@ export const restaurantData: FullRestaurantInfo = {
     address:
       "Ondokuz Mayıs KYK Öğrenci Yurdu, Gençlik Bulvarı, Kumcağız Mahallesi, 19 Mayıs, Samsun, Black Sea Region, Turkey",
     isActive: true,
-    imageAbsoluteUrl: "http://localhost:5210/images/restaurants/538ba1a1-bf0d-47eb-9b88-054856703452.jpg",
+    imageAbsoluteUrl:
+      "http://localhost:5210/images/restaurants/538ba1a1-bf0d-47eb-9b88-054856703452.jpg",
     defaultLang: "TR",
     slogan1: "Lezzetin Adı",
     slogan2: "Popeyes",
@@ -24,7 +25,7 @@ export const restaurantData: FullRestaurantInfo = {
     hide: false,
     themeId: 1,
     maxDistance: 500,
-    menuLang: "TR",
+    menuLang: "EN",
     tableOrderDiscountRate: 0,
     onlineOrderDiscountRate: 0,
     tenant: "popeyes",
@@ -54,14 +55,17 @@ export const restaurantData: FullRestaurantInfo = {
       {
         id: "prd-001-mercimek",
         sortOrder: 10,
-        imageURL: "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&h=300&fit=crop",
+        imageURL:
+          "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&h=300&fit=crop",
         name: "Mercimek Çorbası",
-        description: "Kırmızı mercimek, soğan ve tereyağı ile hazırlanan klasik çorba.",
+        description:
+          "Kırmızı mercimek, soğan ve tereyağı ile hazırlanan klasik çorba.",
         recommendation: true,
         hide: false,
         categoryId: "cat-001-corbalar",
         categoryName: "Çorbalar",
-        categoryImage: "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400",
+        categoryImage:
+          "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400",
         categorySortOrder: 1,
         subCategoryId: "sub-001-corba-klasik",
         subCategoryName: "Klasik",
@@ -82,14 +86,17 @@ export const restaurantData: FullRestaurantInfo = {
       {
         id: "prd-002-ezogelin",
         sortOrder: 20,
-        imageURL: "https://images.unsplash.com/photo-1603105037880-880cd4edfb0d?w=400&h=300&fit=crop",
+        imageURL:
+          "https://images.unsplash.com/photo-1603105037880-880cd4edfb0d?w=400&h=300&fit=crop",
         name: "Ezogelin Çorbası",
-        description: "Bulgur, mercimek ve domatesle yapılan, limonla servis edilen çorba.",
+        description:
+          "Bulgur, mercimek ve domatesle yapılan, limonla servis edilen çorba.",
         recommendation: false,
         hide: false,
         categoryId: "cat-001-corbalar",
         categoryName: "Çorbalar",
-        categoryImage: "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400",
+        categoryImage:
+          "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400",
         categorySortOrder: 1,
         subCategoryId: null,
         subCategoryName: null,
@@ -151,14 +158,17 @@ export const restaurantData: FullRestaurantInfo = {
       {
         id: "prd-004-karniyarik",
         sortOrder: 10,
-        imageURL: "https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7?w=400&h=300&fit=crop",
+        imageURL:
+          "https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7?w=400&h=300&fit=crop",
         name: "Karnıyarık",
-        description: "Kıymalı harçla doldurulmuş patlıcan, pilav ile servis edilir.",
+        description:
+          "Kıymalı harçla doldurulmuş patlıcan, pilav ile servis edilir.",
         recommendation: true,
         hide: false,
         categoryId: "cat-002-ana-yemekler",
         categoryName: "Ana Yemekler",
-        categoryImage: "https://images.unsplash.com/photo-1574484284002-952d92456975?w=400",
+        categoryImage:
+          "https://images.unsplash.com/photo-1574484284002-952d92456975?w=400",
         categorySortOrder: 2,
         subCategoryId: "sub-003-ana-evyemek",
         subCategoryName: "Ev Yemekleri",
@@ -220,14 +230,16 @@ export const restaurantData: FullRestaurantInfo = {
       {
         id: "prd-005-kuru-fasulye",
         sortOrder: 20,
-        imageURL: "https://images.unsplash.com/photo-1574484284002-952d92456975?w=400&h=300&fit=crop",
+        imageURL:
+          "https://images.unsplash.com/photo-1574484284002-952d92456975?w=400&h=300&fit=crop",
         name: "Kuru Fasulye",
         description: "Etli kuru fasulye, pilav ve turşu ile servis edilir.",
         recommendation: false,
         hide: false,
         categoryId: "cat-002-ana-yemekler",
         categoryName: "Ana Yemekler",
-        categoryImage: "https://images.unsplash.com/photo-1574484284002-952d92456975?w=400",
+        categoryImage:
+          "https://images.unsplash.com/photo-1574484284002-952d92456975?w=400",
         categorySortOrder: 2,
         subCategoryId: "sub-003-ana-evyemek",
         subCategoryName: "Ev Yemekleri",
@@ -248,14 +260,17 @@ export const restaurantData: FullRestaurantInfo = {
       {
         id: "prd-006-iskender",
         sortOrder: 30,
-        imageURL: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=400&h=300&fit=crop",
+        imageURL:
+          "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=400&h=300&fit=crop",
         name: "İskender Kebap",
-        description: "Yoğurt, tereyağı ve domates sos ile servis edilen döner kebap.",
+        description:
+          "Yoğurt, tereyağı ve domates sos ile servis edilen döner kebap.",
         recommendation: true,
         hide: false,
         categoryId: "cat-002-ana-yemekler",
         categoryName: "Ana Yemekler",
-        categoryImage: "https://images.unsplash.com/photo-1574484284002-952d92456975?w=400",
+        categoryImage:
+          "https://images.unsplash.com/photo-1574484284002-952d92456975?w=400",
         categorySortOrder: 2,
         subCategoryId: "sub-004-ana-kebaplar",
         subCategoryName: "Kebaplar",
@@ -357,14 +372,17 @@ export const restaurantData: FullRestaurantInfo = {
       {
         id: "prd-007-adana",
         sortOrder: 10,
-        imageURL: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&h=300&fit=crop",
+        imageURL:
+          "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&h=300&fit=crop",
         name: "Adana Kebap",
-        description: "Zırhla çekilmiş acılı kebap, köz biber ve soğan ile servis edilir.",
+        description:
+          "Zırhla çekilmiş acılı kebap, köz biber ve soğan ile servis edilir.",
         recommendation: true,
         hide: false,
         categoryId: "cat-003-izgaralar",
         categoryName: "Izgaralar",
-        categoryImage: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400",
+        categoryImage:
+          "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400",
         categorySortOrder: 3,
         subCategoryId: "sub-005-izgara-et",
         subCategoryName: "Et Izgara",
@@ -455,14 +473,17 @@ export const restaurantData: FullRestaurantInfo = {
       {
         id: "prd-008-urfa",
         sortOrder: 20,
-        imageURL: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&fit=crop",
+        imageURL:
+          "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&fit=crop",
         name: "Urfa Kebap",
-        description: "Acısız kebap, közlenmiş biber ve soğan ile servis edilir.",
+        description:
+          "Acısız kebap, közlenmiş biber ve soğan ile servis edilir.",
         recommendation: false,
         hide: false,
         categoryId: "cat-003-izgaralar",
         categoryName: "Izgaralar",
-        categoryImage: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400",
+        categoryImage:
+          "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400",
         categorySortOrder: 3,
         subCategoryId: "sub-005-izgara-et",
         subCategoryName: "Et Izgara",
@@ -483,14 +504,17 @@ export const restaurantData: FullRestaurantInfo = {
       {
         id: "prd-009-kofte",
         sortOrder: 30,
-        imageURL: "https://images.unsplash.com/photo-1529042410759-befb1204b468?w=400&h=300&fit=crop",
+        imageURL:
+          "https://images.unsplash.com/photo-1529042410759-befb1204b468?w=400&h=300&fit=crop",
         name: "Izgara Köfte",
-        description: "Günlük hazırlanan dana köfte, pilav ve salata ile servis edilir.",
+        description:
+          "Günlük hazırlanan dana köfte, pilav ve salata ile servis edilir.",
         recommendation: false,
         hide: false,
         categoryId: "cat-003-izgaralar",
         categoryName: "Izgaralar",
-        categoryImage: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400",
+        categoryImage:
+          "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400",
         categorySortOrder: 3,
         subCategoryId: null,
         subCategoryName: null,
@@ -542,14 +566,17 @@ export const restaurantData: FullRestaurantInfo = {
       {
         id: "prd-010-tavuksis",
         sortOrder: 40,
-        imageURL: "https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=400&h=300&fit=crop",
+        imageURL:
+          "https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=400&h=300&fit=crop",
         name: "Tavuk Şiş",
-        description: "Marine edilmiş tavuk şiş, pilav ve salata ile servis edilir.",
+        description:
+          "Marine edilmiş tavuk şiş, pilav ve salata ile servis edilir.",
         recommendation: true,
         hide: false,
         categoryId: "cat-003-izgaralar",
         categoryName: "Izgaralar",
-        categoryImage: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400",
+        categoryImage:
+          "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400",
         categorySortOrder: 3,
         subCategoryId: "sub-006-izgara-tavuk",
         subCategoryName: "Tavuk Izgara",
@@ -570,14 +597,16 @@ export const restaurantData: FullRestaurantInfo = {
       {
         id: "prd-011-hamburger",
         sortOrder: 10,
-        imageURL: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop",
+        imageURL:
+          "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop",
         name: "Klasik Hamburger",
         description: "Dana köfte, marul, domates ve özel burger sos ile.",
         recommendation: false,
         hide: false,
         categoryId: "cat-004-fast-food",
         categoryName: "Fast Food",
-        categoryImage: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400",
+        categoryImage:
+          "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400",
         categorySortOrder: 4,
         subCategoryId: "sub-007-fast-burger",
         subCategoryName: "Burger",
@@ -669,14 +698,16 @@ export const restaurantData: FullRestaurantInfo = {
       {
         id: "prd-012-cheeseburger",
         sortOrder: 20,
-        imageURL: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=400&h=300&fit=crop",
+        imageURL:
+          "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=400&h=300&fit=crop",
         name: "Cheeseburger",
         description: "Dana köfte, cheddar peyniri ve burger sos ile.",
         recommendation: true,
         hide: false,
         categoryId: "cat-004-fast-food",
         categoryName: "Fast Food",
-        categoryImage: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400",
+        categoryImage:
+          "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400",
         categorySortOrder: 4,
         subCategoryId: "sub-007-fast-burger",
         subCategoryName: "Burger",
@@ -768,14 +799,16 @@ export const restaurantData: FullRestaurantInfo = {
       {
         id: "prd-013-margarita",
         sortOrder: 30,
-        imageURL: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&h=300&fit=crop",
+        imageURL:
+          "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&h=300&fit=crop",
         name: "Margarita Pizza",
         description: "Mozzarella peyniri ve domates sos ile klasik pizza.",
         recommendation: false,
         hide: false,
         categoryId: "cat-004-fast-food",
         categoryName: "Fast Food",
-        categoryImage: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400",
+        categoryImage:
+          "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400",
         categorySortOrder: 4,
         subCategoryId: "sub-008-fast-pizza",
         subCategoryName: "Pizza",
@@ -836,14 +869,16 @@ export const restaurantData: FullRestaurantInfo = {
       {
         id: "prd-014-kunefe",
         sortOrder: 10,
-        imageURL: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop",
+        imageURL:
+          "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop",
         name: "Künefe",
         description: "Hatay usulü sıcak künefe, dondurma opsiyonludur.",
         recommendation: true,
         hide: false,
         categoryId: "cat-005-tatlilar",
         categoryName: "Tatlılar",
-        categoryImage: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400",
+        categoryImage:
+          "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400",
         categorySortOrder: 5,
         subCategoryId: "sub-009-tatli-serbetli",
         subCategoryName: "Şerbetli",
@@ -885,14 +920,16 @@ export const restaurantData: FullRestaurantInfo = {
       {
         id: "prd-015-firin-sutlac",
         sortOrder: 20,
-        imageURL: "https://images.unsplash.com/photo-1586985289688-ca3cf47d3e6e?w=400&h=300&fit=crop",
+        imageURL:
+          "https://images.unsplash.com/photo-1586985289688-ca3cf47d3e6e?w=400&h=300&fit=crop",
         name: "Fırın Sütlaç",
         description: "Fırında kızartılmış sütlaç, tarçın ile servis edilir.",
         recommendation: false,
         hide: false,
         categoryId: "cat-005-tatlilar",
         categoryName: "Tatlılar",
-        categoryImage: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400",
+        categoryImage:
+          "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400",
         categorySortOrder: 5,
         subCategoryId: "sub-010-tatli-sutlu",
         subCategoryName: "Sütlü",
@@ -913,14 +950,16 @@ export const restaurantData: FullRestaurantInfo = {
       {
         id: "prd-016-ayran",
         sortOrder: 10,
-        imageURL: "https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=400&h=300&fit=crop",
+        imageURL:
+          "https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=400&h=300&fit=crop",
         name: "Ayran",
         description: "Soğuk, taze ayran.",
         recommendation: false,
         hide: false,
         categoryId: "cat-006-icecekler",
         categoryName: "İçecekler",
-        categoryImage: "https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=400",
+        categoryImage:
+          "https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=400",
         categorySortOrder: 6,
         subCategoryId: "sub-011-icecek-soguk",
         subCategoryName: "Soğuk",
@@ -941,14 +980,16 @@ export const restaurantData: FullRestaurantInfo = {
       {
         id: "prd-017-cay",
         sortOrder: 20,
-        imageURL: "https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?w=400&h=300&fit=crop",
+        imageURL:
+          "https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?w=400&h=300&fit=crop",
         name: "Çay",
         description: "Demlik çayı, ince belli bardakta servis edilir.",
         recommendation: true,
         hide: false,
         categoryId: "cat-006-icecekler",
         categoryName: "İçecekler",
-        categoryImage: "https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=400",
+        categoryImage:
+          "https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=400",
         categorySortOrder: 6,
         subCategoryId: "sub-012-icecek-sicak",
         subCategoryName: "Sıcak",
@@ -1000,14 +1041,16 @@ export const restaurantData: FullRestaurantInfo = {
       {
         id: "prd-018-cola",
         sortOrder: 30,
-        imageURL: "https://images.unsplash.com/photo-1629203851122-3726ecdf080e?w=400&h=300&fit=crop",
+        imageURL:
+          "https://images.unsplash.com/photo-1629203851122-3726ecdf080e?w=400&h=300&fit=crop",
         name: "Kola",
         description: "Soğuk kola (kutu).",
         recommendation: false,
         hide: false,
         categoryId: "cat-006-icecekler",
         categoryName: "İçecekler",
-        categoryImage: "https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=400",
+        categoryImage:
+          "https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=400",
         categorySortOrder: 6,
         subCategoryId: null,
         subCategoryName: null,
@@ -1032,8 +1075,18 @@ export const restaurantData: FullRestaurantInfo = {
         restaurantId: "538ba1a1-bf0d-47eb-9b88-054856703452",
         name: "Sabah Menüsü",
         plans: [
-          { id: "plan-1-1", days: [1, 2, 3, 4, 5], startTime: "07:00", endTime: "11:00" },
-          { id: "plan-1-2", days: [6, 7], startTime: "08:00", endTime: "12:00" },
+          {
+            id: "plan-1-1",
+            days: [1, 2, 3, 4, 5],
+            startTime: "07:00",
+            endTime: "11:00",
+          },
+          {
+            id: "plan-1-2",
+            days: [6, 7],
+            startTime: "08:00",
+            endTime: "12:00",
+          },
         ],
         categoryIds: [
           "cat-001-corbalar",
@@ -1048,7 +1101,14 @@ export const restaurantData: FullRestaurantInfo = {
         id: 2,
         restaurantId: "538ba1a1-bf0d-47eb-9b88-054856703452",
         name: "Öğle Menüsü",
-        plans: [{ id: "plan-2-1", days: [1, 2, 3, 4, 5], startTime: "11:30", endTime: "15:00" }],
+        plans: [
+          {
+            id: "plan-2-1",
+            days: [1, 2, 3, 4, 5],
+            startTime: "11:30",
+            endTime: "15:00",
+          },
+        ],
         categoryIds: [
           "cat-001-corbalar",
           "cat-002-ana-yemekler",
@@ -1062,7 +1122,14 @@ export const restaurantData: FullRestaurantInfo = {
         id: 3,
         restaurantId: "538ba1a1-bf0d-47eb-9b88-054856703452",
         name: "Akşam Menüsü",
-        plans: [{ id: "plan-3-1", days: [1, 2, 3, 4, 5, 6, 7], startTime: "17:00", endTime: "23:00" }],
+        plans: [
+          {
+            id: "plan-3-1",
+            days: [1, 2, 3, 4, 5, 6, 7],
+            startTime: "17:00",
+            endTime: "23:00",
+          },
+        ],
         categoryIds: [
           "cat-001-corbalar",
           "cat-002-ana-yemekler",

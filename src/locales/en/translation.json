@@ -42,6 +42,11 @@
     "viewCart": "View Cart",
     "checkout": "Checkout"
   },
+    "productCard": {
+    "recommended": "Recommended",
+    "campaign": "Campaign",
+    "portion": "Portion"
+  },
   "product": {
     "addToCart": "Add to Cart",
     "addedToCart": "{{name}} added to cart!",
