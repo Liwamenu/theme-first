@@ -122,7 +122,7 @@
   "waiter": {
     "title": "Garson Çağır",
     "button": "Garson Çağır",
-    "tableNumber": "Masa Numarası",
+    "tableNumber": "Masa",
     "reason": "Neden",
     "reasonPlaceholder": "Örn: Hesap istiyorum, Menü istiyorum...",
     "calling": "Çağırılıyor...",

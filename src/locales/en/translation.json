@@ -122,7 +122,7 @@
   "waiter": {
     "title": "Call Waiter",
     "button": "Call Waiter",
-    "tableNumber": "Table Number",
+    "tableNumber": "Table",
     "reason": "Reason",
     "reasonPlaceholder": "E.g.: Need the bill, Need menu...",
     "calling": "Calling...",

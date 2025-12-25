@@ -30,6 +30,8 @@ import { toast } from "sonner";
 import { OrderPayload, Order } from "@/types/restaurant";
 import { ChangeTableModal } from "@/components/menu/ChangeTableModal";
 import confetti from "canvas-confetti";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 interface CheckoutModalProps {
   onClose: () => void;
@@ -139,6 +141,9 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
         toast.error(t("order.fillAllFields"));
         return;
       }
+      if (!isValidPhoneNumber(customerInfo.phone)) {
+       toast.error(t("validation.invalidPhone"));
+       return false;
       setStep("payment");
     }
   };
@@ -387,12 +392,12 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                     <Label htmlFor="phone">{t("order.phone")}</Label>
                     <div className="relative mt-2">
                       <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                      <Input
-                        id="phone"
-                        placeholder={t("order.phonePlaceholder")}
+                      <PhoneInput
+                        international
+                        defaultCountry="TR"
                         value={customerInfo.phone}
-                        onChange={(e) => setCustomerInfo((prev) => ({ ...prev, phone: e.target.value }))}
-                        className="h-14 pl-12 rounded-xl"
+                        onChange={(value) => setCustomerInfo((prev) => ({ ...prev, phone: value }))}
+                        className="phone-input-container"
                       />
                     </div>
                   </div>
@@ -609,4 +614,4 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
       />
     </AnimatePresence>
   );
-}
+}}
