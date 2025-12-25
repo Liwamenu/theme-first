@@ -48,6 +48,17 @@ export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
   const currentStepIndex = statusSteps.indexOf(order.status);
   const isCancelled = order.status === "cancelled";
   const dateLocale = i18n.language === "tr" ? tr : enUS;
+  const subtotal = order.totalAmount;
+
+  // Calculate discount and final total
+  const getDiscountRate = () => {
+    if (order.orderType === "inPerson") return restaurant.tableOrderDiscountRate;
+    if (order.orderType === "online") return restaurant.onlineOrderDiscountRate;
+    return 0;
+  };
+
+  const discountRate = getDiscountRate();
+  const discountAmount = (subtotal * discountRate) / 100;
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="min-h-screen bg-background">
@@ -246,8 +257,21 @@ export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
             </div>
           )}
 
+          {/* Discount */}
+          {discountRate > 0 && (
+            <div className="px-6 py-2 text-base border-b border-dashed border-border">
+              <div className="flex items-center justify-between">
+                <span className="font-bold">
+                  {order.orderType === "inPerson" ? t("order.tableDiscount") : t("order.onlineDiscount")} (
+                  {discountRate}%)
+                </span>
+                <span className="font-bold text-success">-{formatPrice(discountAmount)}</span>
+              </div>
+            </div>
+          )}
+
           {/* Total */}
-          <div className="p-6 bg-primary/5">
+          <div className="p-6 py-3 bg-primary/5">
             <div className="flex items-center justify-between">
               <span className="text-xl font-bold">{t("common.total")}</span>
               <span className="text-2xl font-bold text-primary">{formatPrice(order.totalAmount)}</span>
