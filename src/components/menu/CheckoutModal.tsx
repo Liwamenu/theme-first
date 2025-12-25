@@ -150,8 +150,8 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
       if (!isValidPhoneNumber(customerInfo.phone)) {
         toast.error(t("validation.invalidPhone"));
         return false;
-        setStep("payment");
       }
+      setStep("payment");
     }
   };
 
