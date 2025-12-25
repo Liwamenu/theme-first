@@ -17,7 +17,10 @@
     "guest": "Guest",
     "guests": "Guests",
     "table": "Table",
-    "none": "NONE"
+    "none": "NONE",
+    "remove": "Remove",
+    "selectDate": "Select date",
+    "selectTime": "Select time"
   },
   "days": {
     "monday": "Monday",
@@ -39,6 +42,10 @@
     "empty": "Your cart is empty",
     "emptySubtitle": "Discover our delicious dishes!",
     "clearCart": "Clear Cart",
+    "clearCartTitle": "Clear Cart?",
+    "clearCartDescription": "Are you sure you want to remove all items from your cart?",
+    "removeItemTitle": "Remove Item?",
+    "removeItemDescription": "Are you sure you want to remove this item from your cart?",
     "viewCart": "View Cart",
     "checkout": "Checkout"
   },
@@ -54,7 +61,9 @@
     "quantity": "Qty",
     "maxSelection": "Max {{max}}",
     "maxSelectionError": "You can select maximum {{max}} items",
-    "minSelectionError": "Please select at least {{min}} for \"{{name}}\""
+    "minSelectionError": "Please select at least {{min}} for \"{{name}}\"",
+    "note": "Product Note",
+    "notePlaceholder": "Add any special requests for this item..."
   },
   "order": {
     "placeOrder": "Place Order",

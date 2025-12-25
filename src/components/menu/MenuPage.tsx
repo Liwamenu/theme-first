@@ -83,7 +83,7 @@ export function MenuPage() {
 
   const canOrder = isRestaurantActive && isCurrentlyOpen;
 
-  const handleOrderComplete = (order: Order) => {
+  const handleOrderComplete = (order: Order, orderType: 'inPerson' | 'online') => {
     setIsCheckoutOpen(false);
     setViewingOrder(order);
     setCurrentView("order");
@@ -222,6 +222,10 @@ export function MenuPage() {
         onCheckout={() => {
           setIsCartOpen(false);
           setIsCheckoutOpen(true);
+        }}
+        onCallWaiter={() => {
+          setIsCartOpen(false);
+          setShowCallWaiter(true);
         }}
       />
 

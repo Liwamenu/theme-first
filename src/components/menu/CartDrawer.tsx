@@ -1,203 +1,296 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingCart, X, Plus, Minus, Trash2 } from 'lucide-react';
+import { ShoppingCart, X, Plus, Minus, Trash2, Bell } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { useRestaurant } from '@/hooks/useRestaurant';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface CartDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   onCheckout: () => void;
+  onCallWaiter?: () => void;
 }
 
-export function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
+export function CartDrawer({ isOpen, onClose, onCheckout, onCallWaiter }: CartDrawerProps) {
   const { t } = useTranslation();
   const { items, updateQuantity, removeItem, getTotal, clearCart } = useCart();
-  const { formatPrice, restaurant } = useRestaurant();
+  const { formatPrice, restaurant, canOrderOnline, canOrderInPerson } = useRestaurant();
+  const [itemToRemove, setItemToRemove] = useState<string | null>(null);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   const total = getTotal();
   const minOrderAmount = restaurant.minOrderAmount;
   const remaining = minOrderAmount - total;
   const progress = Math.min((total / minOrderAmount) * 100, 100);
 
+  const canOrder = canOrderOnline || canOrderInPerson;
+
+  const handleRemoveItem = (itemId: string) => {
+    setItemToRemove(itemId);
+  };
+
+  const confirmRemoveItem = () => {
+    if (itemToRemove) {
+      removeItem(itemToRemove);
+      setItemToRemove(null);
+    }
+  };
+
+  const handleClearCart = () => {
+    setShowClearConfirm(true);
+  };
+
+  const confirmClearCart = () => {
+    clearCart();
+    setShowClearConfirm(false);
+  };
+
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 z-50 bg-foreground/60 backdrop-blur-sm"
-          />
-          <motion.div
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-card shadow-2xl flex flex-col"
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-              <div className="flex items-center gap-3">
-                <ShoppingCart className="w-6 h-6 text-primary" />
-                <h2 className="text-xl font-bold">{t('cart.title')}</h2>
-                <span className="px-2 py-0.5 bg-primary text-primary-foreground text-sm rounded-full">
-                  {items.length}
-                </span>
-              </div>
-              <button
-                onClick={onClose}
-                className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Cart Items */}
-            <div className="flex-1 overflow-y-auto p-5 space-y-4">
-              {items.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full text-center py-12">
-                  <ShoppingCart className="w-16 h-16 text-muted-foreground/30 mb-4" />
-                  <p className="text-lg text-muted-foreground">{t('cart.empty')}</p>
-                  <p className="text-sm text-muted-foreground/70">
-                    {t('cart.emptySubtitle')}
-                  </p>
+    <>
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={onClose}
+              className="fixed inset-0 z-50 bg-foreground/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-card shadow-2xl flex flex-col"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+                <div className="flex items-center gap-3">
+                  <ShoppingCart className="w-6 h-6 text-primary" />
+                  <h2 className="text-xl font-bold">{t('cart.title')}</h2>
+                  <span className="px-2 py-0.5 bg-primary text-primary-foreground text-sm rounded-full">
+                    {items.length}
+                  </span>
                 </div>
-              ) : (
-                <AnimatePresence mode="popLayout">
-                  {items.map((item) => {
-                    const portion = item.portion;
-                    let price = portion.price;
-                    if (portion.specialPrice !== null) {
-                      price = portion.specialPrice;
-                    } else if (portion.campaignPrice !== null) {
-                      price = portion.campaignPrice;
-                    }
-                    const tagTotal = item.selectedTags.reduce((sum, tag) => sum + (tag.price * tag.quantity), 0);
-                    const itemTotal = (price + tagTotal) * item.quantity;
-
-                    return (
-                      <motion.div
-                        key={item.id}
-                        layout
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        className="flex gap-4 bg-secondary/50 rounded-2xl p-3"
-                      >
-                        <img
-                          src={item.product.imageURL}
-                          alt={item.product.name}
-                          className="w-20 h-20 rounded-xl object-cover"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-2">
-                            <div>
-                              <h4 className="font-semibold text-sm line-clamp-1">
-                                {item.product.name}
-                              </h4>
-                              <p className="text-xs text-muted-foreground">
-                                {item.portion.name}
-                              </p>
-                            </div>
-                            <button
-                              onClick={() => removeItem(item.id)}
-                              className="p-1.5 text-muted-foreground hover:text-destructive transition-colors"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-
-                          {/* Selected Tags */}
-                          {item.selectedTags.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mt-1">
-                              {item.selectedTags.map((tag) => (
-                                <span
-                                  key={tag.itemId}
-                                  className="px-2 py-0.5 bg-accent text-accent-foreground text-xs rounded-full"
-                                >
-                                  {tag.itemName}
-                                  {tag.price > 0 && ` +${formatPrice(tag.price)}`}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-
-                          <div className="flex items-center justify-between mt-2">
-                            <div className="flex items-center gap-2">
-                              <button
-                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                className="w-7 h-7 rounded-full bg-card flex items-center justify-center"
-                              >
-                                <Minus className="w-4 h-4" />
-                              </button>
-                              <span className="w-6 text-center font-semibold">
-                                {item.quantity}
-                              </span>
-                              <button
-                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center"
-                              >
-                                <Plus className="w-4 h-4" />
-                              </button>
-                            </div>
-                            <span className="font-bold text-primary">
-                              {formatPrice(itemTotal)}
-                            </span>
-                          </div>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </AnimatePresence>
-              )}
-            </div>
-
-            {/* Footer */}
-            {items.length > 0 && (
-              <div className="p-5 border-t border-border space-y-4">
-                {/* Minimum Order Progress for Online Orders */}
-                {remaining > 0 && (
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">
-                        {t('order.minOrderProgress', { remaining: formatPrice(remaining) })}
-                      </span>
-                      <span className="text-muted-foreground">{formatPrice(minOrderAmount)}</span>
-                    </div>
-                    <Progress value={progress} className="h-2" />
-                  </div>
-                )}
-                
-                <div className="flex items-center justify-between">
-                  <button
-                    onClick={clearCart}
-                    className="text-sm text-muted-foreground hover:text-destructive transition-colors"
-                  >
-                    {t('cart.clearCart')}
-                  </button>
-                  <div className="text-right">
-                    <p className="text-sm text-muted-foreground">{t('common.total')}</p>
-                    <p className="text-2xl font-bold text-primary">{formatPrice(total)}</p>
-                  </div>
-                </div>
-                <Button
-                  onClick={onCheckout}
-                  size="lg"
-                  className="w-full h-14 text-lg font-semibold rounded-2xl shadow-glow"
+                <button
+                  onClick={onClose}
+                  className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center"
                 >
-                  {t('cart.checkout')}
-                </Button>
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-            )}
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+
+              {/* Cart Items */}
+              <div className="flex-1 overflow-y-auto p-5 space-y-4">
+                {items.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-center py-12">
+                    <ShoppingCart className="w-16 h-16 text-muted-foreground/30 mb-4" />
+                    <p className="text-lg text-muted-foreground">{t('cart.empty')}</p>
+                    <p className="text-sm text-muted-foreground/70">
+                      {t('cart.emptySubtitle')}
+                    </p>
+                  </div>
+                ) : (
+                  <AnimatePresence mode="popLayout">
+                    {items.map((item) => {
+                      const portion = item.portion;
+                      let price = portion.price;
+                      if (portion.specialPrice !== null) {
+                        price = portion.specialPrice;
+                      } else if (portion.campaignPrice !== null) {
+                        price = portion.campaignPrice;
+                      }
+                      const tagTotal = item.selectedTags.reduce((sum, tag) => sum + (tag.price * tag.quantity), 0);
+                      const itemTotal = (price + tagTotal) * item.quantity;
+
+                      return (
+                        <motion.div
+                          key={item.id}
+                          layout
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -20 }}
+                          className="flex gap-4 bg-secondary/50 rounded-2xl p-3"
+                        >
+                          <img
+                            src={item.product.imageURL}
+                            alt={item.product.name}
+                            className="w-20 h-20 rounded-xl object-cover"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <h4 className="font-semibold text-sm line-clamp-1">
+                                  {item.product.name}
+                                </h4>
+                                <p className="text-xs text-muted-foreground">
+                                  {item.portion.name}
+                                </p>
+                              </div>
+                              <button
+                                onClick={() => handleRemoveItem(item.id)}
+                                className="p-1.5 text-muted-foreground hover:text-destructive transition-colors"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+
+                            {/* Selected Tags */}
+                            {item.selectedTags.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {item.selectedTags.map((tag) => (
+                                  <span
+                                    key={tag.itemId}
+                                    className="px-2 py-0.5 bg-accent text-accent-foreground text-xs rounded-full"
+                                  >
+                                    {tag.itemName}
+                                    {tag.price > 0 && ` +${formatPrice(tag.price)}`}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* Product Note */}
+                            {item.note && (
+                              <p className="text-xs text-muted-foreground mt-1 italic">
+                                📝 {item.note}
+                              </p>
+                            )}
+
+                            <div className="flex items-center justify-between mt-2">
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                  className="w-7 h-7 rounded-full bg-card flex items-center justify-center"
+                                >
+                                  <Minus className="w-4 h-4" />
+                                </button>
+                                <span className="w-6 text-center font-semibold">
+                                  {item.quantity}
+                                </span>
+                                <button
+                                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                  className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center"
+                                >
+                                  <Plus className="w-4 h-4" />
+                                </button>
+                              </div>
+                              <span className="font-bold text-primary">
+                                {formatPrice(itemTotal)}
+                              </span>
+                            </div>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </AnimatePresence>
+                )}
+              </div>
+
+              {/* Footer */}
+              {items.length > 0 && (
+                <div className="p-5 border-t border-border space-y-4">
+                  {/* Minimum Order Progress for Online Orders */}
+                  {remaining > 0 && (
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">
+                          {t('order.minOrderProgress', { remaining: formatPrice(remaining) })}
+                        </span>
+                        <span className="text-muted-foreground">{formatPrice(minOrderAmount)}</span>
+                      </div>
+                      <Progress value={progress} className="h-2" />
+                    </div>
+                  )}
+                  
+                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={handleClearCart}
+                      className="text-sm text-muted-foreground hover:text-destructive transition-colors"
+                    >
+                      {t('cart.clearCart')}
+                    </button>
+                    <div className="text-right">
+                      <p className="text-sm text-muted-foreground">{t('common.total')}</p>
+                      <p className="text-2xl font-bold text-primary">{formatPrice(total)}</p>
+                    </div>
+                  </div>
+
+                  {canOrder ? (
+                    <Button
+                      onClick={onCheckout}
+                      size="lg"
+                      className="w-full h-14 text-lg font-semibold rounded-2xl shadow-glow"
+                    >
+                      {t('cart.checkout')}
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={onCallWaiter}
+                      size="lg"
+                      className="w-full h-14 text-lg font-semibold rounded-2xl bg-amber-500 hover:bg-amber-600"
+                    >
+                      <Bell className="w-5 h-5 mr-2" />
+                      {t('waiter.button')}
+                    </Button>
+                  )}
+                </div>
+              )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Remove Item Confirmation */}
+      <AlertDialog open={!!itemToRemove} onOpenChange={() => setItemToRemove(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('cart.removeItemTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('cart.removeItemDescription')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmRemoveItem} className="bg-destructive hover:bg-destructive/90">
+              {t('common.remove')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Clear Cart Confirmation */}
+      <AlertDialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('cart.clearCartTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('cart.clearCartDescription')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmClearCart} className="bg-destructive hover:bg-destructive/90">
+              {t('cart.clearCart')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
 
