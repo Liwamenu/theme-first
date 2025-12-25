@@ -35,7 +35,7 @@ import "react-phone-number-input/style.css";
 
 interface CheckoutModalProps {
   onClose: () => void;
-  onOrderComplete: (order: Order) => void;
+  onOrderComplete: (order: Order, orderType: 'inPerson' | 'online') => void;
   onShowSoundPermission: () => void;
 }
 
@@ -245,12 +245,14 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
 
       clearCart();
 
-      // Show sound permission modal after a short delay
-      setTimeout(() => {
-        onShowSoundPermission();
-      }, 1000);
+      // Show sound permission modal after a short delay (only for online orders)
+      if (orderType === 'online') {
+        setTimeout(() => {
+          onShowSoundPermission();
+        }, 1000);
+      }
 
-      onOrderComplete(order);
+      onOrderComplete(order, orderType!);
     } catch (error) {
       toast.error(t("order.orderError"));
     } finally {
@@ -310,11 +312,11 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                   className="w-full flex items-center gap-4 p-5 bg-secondary rounded-2xl hover:bg-secondary/80 transition-colors"
                 >
                   <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
-                  {!locationLoading && orderType === "inPerson" ? (
+                    {locationLoading && orderType === "inPerson" ? (
                       <Loader2 className="w-7 h-7 text-primary animate-spin" />
                     ) : (
                       <Bell className="w-7 h-7 text-primary" />
-                  )}
+                    )}
                   </div>
                   <div className="text-left flex-1">
                     <h4 className="font-semibold text-lg">{t("order.inPerson")}</h4>
@@ -330,7 +332,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                   className="w-full flex items-center gap-4 p-5 bg-secondary rounded-2xl hover:bg-secondary/80 transition-colors disabled:opacity-50"
                 >
                   <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
-                    {!locationLoading && orderType === "online" ? (
+                    {locationLoading && orderType === "online" ? (
                       <Loader2 className="w-7 h-7 text-primary animate-spin" />
                     ) : (
                       <Home className="w-7 h-7 text-primary" />
