@@ -193,7 +193,7 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-100 bg-background/80 backdrop-blur-sm flex items-start justify-center p-4 overflow-y-auto"
+        className="fixed inset-0 z-[100] bg-background/80 backdrop-blur-sm flex items-start justify-center p-4 overflow-y-auto"
         onClick={handleClose}
       >
         <motion.div
