@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Calendar, Clock, Users, User, Phone, Mail, MessageSquare, AlertTriangle, Check, Edit2 } from "lucide-react";
+import { X, Calendar, Clock, Users, User, Phone, Mail, MessageSquare, AlertTriangle, Check, Edit2, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useRestaurant } from "@/hooks/useRestaurant";
 import { toast } from "sonner";
+import { API_URLS, COUNTRY_CODES, isTurkishPhone, CountryCode } from "@/lib/api";
 
 interface ReservationModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ interface ReservationModalProps {
 
 interface ReservationFormData {
   fullName: string;
+  countryCode: string;
   phone: string;
   email: string;
   date: string;
@@ -23,15 +25,19 @@ interface ReservationFormData {
   notes: string;
 }
 
-type Step = "form" | "verify";
+type Step = "form" | "verify" | "code";
 
 export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
   const { t, i18n } = useTranslation();
   const { restaurant } = useRestaurant();
   const [step, setStep] = useState<Step>("form");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSendingCode, setIsSendingCode] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const [formData, setFormData] = useState<ReservationFormData>({
     fullName: "",
+    countryCode: "TR",
     phone: "",
     email: "",
     date: "",
@@ -40,8 +46,16 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
     notes: "",
   });
 
+  const selectedCountry = COUNTRY_CODES.find(c => c.code === formData.countryCode) || COUNTRY_CODES[0];
+  const isTurkish = isTurkishPhone(formData.countryCode);
+
   const handleInputChange = (field: keyof ReservationFormData, value: string | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleCountrySelect = (country: CountryCode) => {
+    setFormData((prev) => ({ ...prev, countryCode: country.code }));
+    setShowCountryDropdown(false);
   };
 
   const validateForm = (): boolean => {
@@ -82,13 +96,44 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
     setStep("form");
   };
 
+  const handleSendCode = async () => {
+    setIsSendingCode(true);
+    try {
+      const fullPhone = `${selectedCountry.dialCode}${formData.phone}`;
+      const apiUrl = isTurkish ? API_URLS.sendReservationCodeSMS : API_URLS.sendReservationCodeEmail;
+      
+      // Simulate API call for testing
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      
+      // Uncomment when API is ready:
+      // const response = await fetch(apiUrl, {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({
+      //     restaurantId: restaurant.restaurantId,
+      //     phone: fullPhone,
+      //     email: formData.email,
+      //   }),
+      // });
+      // if (!response.ok) throw new Error("Failed to send code");
+
+      toast.success(t(isTurkish ? "reservation.codeSentSMS" : "reservation.codeSentEmail"));
+      setStep("code");
+    } catch (error) {
+      toast.error(t("reservation.codeSendError"));
+    } finally {
+      setIsSendingCode(false);
+    }
+  };
+
   const navigateToReceipt = (code: string) => {
+    const fullPhone = `${selectedCountry.dialCode}${formData.phone}`;
     const params = new URLSearchParams({
       restaurantName: restaurant.name,
       restaurantAddress: restaurant.address,
       restaurantPhone: restaurant.phoneNumber,
       fullName: formData.fullName,
-      phone: formData.phone,
+      phone: fullPhone,
       date: formData.date,
       time: formData.time,
       guests: formData.guests.toString(),
@@ -98,62 +143,67 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
       lang: i18n.language,
     });
 
-    setStep("form");
-    setFormData({
-      fullName: "",
-      phone: "",
-      email: "",
-      date: "",
-      time: "",
-      guests: 2,
-      notes: "",
-    });
+    resetForm();
     onClose();
-
     window.open(`/reservation-receipt?${params.toString()}`, "_blank");
   };
 
   const handleSubmit = async () => {
+    if (!verificationCode.trim()) {
+      toast.error(t("validation.enterCode"));
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      const response = await fetch("https://api.liwamenu.com/reservations", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          restaurantId: restaurant.restaurantId,
-          fullName: formData.fullName,
-          phone: formData.phone,
-          email: formData.email,
-          date: formData.date,
-          time: formData.time,
-          guests: formData.guests,
-          notes: formData.notes,
-        }),
-      });
+      const fullPhone = `${selectedCountry.dialCode}${formData.phone}`;
+      
+      // Simulate API call for testing
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const code = `#${Math.floor(1000 + Math.random() * 9000)}`;
+      
+      // Uncomment when API is ready:
+      // const response = await fetch(API_URLS.reservations, {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({
+      //     restaurantId: restaurant.restaurantId,
+      //     fullName: formData.fullName,
+      //     phone: fullPhone,
+      //     email: formData.email,
+      //     date: formData.date,
+      //     time: formData.time,
+      //     guests: formData.guests,
+      //     notes: formData.notes,
+      //     verificationCode: verificationCode,
+      //   }),
+      // });
+      // if (!response.ok) {
+      //   const errorData = await response.json().catch(() => ({}));
+      //   if (errorData.code === "INVALID_CODE") {
+      //     toast.error(t("reservation.invalidCode"));
+      //     return;
+      //   }
+      //   throw new Error(t("reservation.error"));
+      // }
+      // const data = await response.json();
+      // const code = data.confirmationCode || `#${Math.floor(1000 + Math.random() * 9000)}`;
 
-      if (!response.ok) {
-        throw new Error(t("reservation.error"));
-      }
-
-      const data = await response.json();
-      const code = data.confirmationCode || `#${Math.floor(1000 + Math.random() * 9000)}`;
       toast.success(t("reservation.success"));
       navigateToReceipt(code);
     } catch (error) {
-      const code = `#${Math.floor(1000 + Math.random() * 9000)}`;
-      toast.success(t("reservation.success"));
-      navigateToReceipt(code);
+      toast.error(t("reservation.error"));
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleClose = () => {
+  const resetForm = () => {
     setStep("form");
+    setVerificationCode("");
     setFormData({
       fullName: "",
+      countryCode: "TR",
       phone: "",
       email: "",
       date: "",
@@ -161,6 +211,10 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
       guests: 2,
       notes: "",
     });
+  };
+
+  const handleClose = () => {
+    resetForm();
     onClose();
   };
 
@@ -208,6 +262,7 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
             <h2 className="text-lg font-semibold">
               {step === "form" && t("reservation.title")}
               {step === "verify" && t("reservation.verifyTitle")}
+              {step === "code" && t("reservation.enterCodeTitle")}
             </h2>
             <button onClick={handleClose} className="p-2 hover:bg-muted rounded-full transition-colors">
               <X className="w-5 h-5" />
@@ -236,13 +291,42 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
                   <Phone className="w-4 h-4 text-muted-foreground" />
                   {t("reservation.phone")}
                 </label>
-                <Input
-                  type="tel"
-                  placeholder={t("reservation.phonePlaceholder")}
-                  value={formData.phone}
-                  onChange={(e) => handleInputChange("phone", e.target.value)}
-                  className="h-12"
-                />
+                <div className="flex gap-2">
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setShowCountryDropdown(!showCountryDropdown)}
+                      className="h-12 px-3 bg-secondary border border-input rounded-lg flex items-center gap-2 hover:bg-secondary/80 transition-colors min-w-[100px]"
+                    >
+                      <span className="text-lg">{selectedCountry.flag}</span>
+                      <span className="text-sm font-medium">{selectedCountry.dialCode}</span>
+                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                    </button>
+                    {showCountryDropdown && (
+                      <div className="absolute top-full left-0 mt-1 w-56 bg-card border border-border rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+                        {COUNTRY_CODES.map((country) => (
+                          <button
+                            key={country.code}
+                            type="button"
+                            onClick={() => handleCountrySelect(country)}
+                            className="w-full px-3 py-2 flex items-center gap-3 hover:bg-muted transition-colors text-left"
+                          >
+                            <span className="text-lg">{country.flag}</span>
+                            <span className="text-sm flex-1">{country.name}</span>
+                            <span className="text-sm text-muted-foreground">{country.dialCode}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <Input
+                    type="tel"
+                    placeholder={t("reservation.phonePlaceholder")}
+                    value={formData.phone}
+                    onChange={(e) => handleInputChange("phone", e.target.value)}
+                    className="h-12 flex-1"
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -331,8 +415,12 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
                 <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-amber-800">{t("reservation.verifyEmailTitle")}</p>
-                  <p className="text-xs text-amber-700 mt-1">{t("reservation.verifyEmailDesc")}</p>
+                  <p className="text-sm font-medium text-amber-800">
+                    {t(isTurkish ? "reservation.verifySMSTitle" : "reservation.verifyEmailTitle")}
+                  </p>
+                  <p className="text-xs text-amber-700 mt-1">
+                    {t(isTurkish ? "reservation.verifySMSDesc" : "reservation.verifyEmailDesc")}
+                  </p>
                 </div>
               </div>
 
@@ -343,7 +431,7 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">{t("reservation.phone")}:</span>
-                  <span className="font-medium">{formData.phone}</span>
+                  <span className="font-medium">{selectedCountry.dialCode} {formData.phone}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">{t("reservation.email")}:</span>
@@ -381,6 +469,56 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
                 <Button variant="outline" onClick={handleEdit} className="flex-1 h-12 gap-2">
                   <Edit2 className="w-4 h-4" />
                   {t("common.edit")}
+                </Button>
+                <Button onClick={handleSendCode} disabled={isSendingCode} className="flex-1 h-12 gap-2">
+                  {isSendingCode ? (
+                    <span className="animate-pulse">{t("reservation.sendingCode")}</span>
+                  ) : (
+                    <>
+                      <Check className="w-4 h-4" />
+                      {t("reservation.sendCode")}
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Code Entry Step */}
+          {step === "code" && (
+            <div className="p-4 space-y-4">
+              <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 text-center">
+                <p className="text-sm font-medium text-primary">
+                  {t(isTurkish ? "reservation.codeSentToPhone" : "reservation.codeSentToEmail", {
+                    contact: isTurkish ? `${selectedCountry.dialCode} ${formData.phone}` : formData.email
+                  })}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">{t("reservation.verificationCode")}</label>
+                <Input
+                  type="text"
+                  placeholder={t("reservation.codePlaceholder")}
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value)}
+                  className="h-14 text-center text-2xl tracking-widest font-mono"
+                  maxLength={6}
+                />
+              </div>
+
+              <Button
+                variant="link"
+                onClick={handleSendCode}
+                disabled={isSendingCode}
+                className="w-full text-sm"
+              >
+                {t("reservation.resendCode")}
+              </Button>
+
+              <div className="flex gap-3">
+                <Button variant="outline" onClick={() => setStep("verify")} className="flex-1 h-12">
+                  {t("common.back")}
                 </Button>
                 <Button onClick={handleSubmit} disabled={isSubmitting} className="flex-1 h-12 gap-2">
                   {isSubmitting ? (

@@ -37,6 +37,7 @@ export const restaurantData: FullRestaurantInfo = {
     licenseIsActive: true,
     maxTableOrderDistanceMeter: 100,
     checkTableOrderDistance: true,
+    isReservationLicenseActive: true,
     tableNumber: 5,
     moneySign: "$",
     WorkingHours: [

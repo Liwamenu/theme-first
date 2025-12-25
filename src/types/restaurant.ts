@@ -118,6 +118,7 @@ export interface RestaurantData {
   licenseIsActive: boolean;
   maxTableOrderDistanceMeter: number;
   checkTableOrderDistance: boolean;
+  isReservationLicenseActive: boolean;
   tableNumber?: number;
   moneySign?: string | null;
   WorkingHours: WorkingHour[];
