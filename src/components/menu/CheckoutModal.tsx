@@ -97,7 +97,24 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
         toast.error(t("order.locationError"));
         return;
       }
-    } else {
+    } else if (type === "inPerson") {
+      // Check table order distance if enabled
+      if (restaurant.checkTableOrderDistance) {
+        try {
+          await getLocation();
+          // Convert maxTableOrderDistanceMeter from meters to kilometers
+          const maxDistanceKm = restaurant.maxTableOrderDistanceMeter / 1000;
+          const withinTableRange = checkDistance(restaurant.latitude, restaurant.longitude, maxDistanceKm);
+
+          if (!withinTableRange) {
+            toast.error(t("order.tableOrderOutOfRange", { max: restaurant.maxTableOrderDistanceMeter }));
+            return;
+          }
+        } catch (error) {
+          toast.error(t("order.locationError"));
+          return;
+        }
+      }
       setStep("details");
     }
   };

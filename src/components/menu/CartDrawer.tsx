@@ -4,6 +4,7 @@ import { ShoppingCart, X, Plus, Minus, Trash2 } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { useRestaurant } from '@/hooks/useRestaurant';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -14,9 +15,12 @@ interface CartDrawerProps {
 export function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
   const { t } = useTranslation();
   const { items, updateQuantity, removeItem, getTotal, clearCart } = useCart();
-  const { formatPrice } = useRestaurant();
+  const { formatPrice, restaurant } = useRestaurant();
 
   const total = getTotal();
+  const minOrderAmount = restaurant.minOrderAmount;
+  const remaining = minOrderAmount - total;
+  const progress = Math.min((total / minOrderAmount) * 100, 100);
 
   return (
     <AnimatePresence>
@@ -156,6 +160,19 @@ export function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
             {/* Footer */}
             {items.length > 0 && (
               <div className="p-5 border-t border-border space-y-4">
+                {/* Minimum Order Progress for Online Orders */}
+                {remaining > 0 && (
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">
+                        {t('order.minOrderProgress', { remaining: formatPrice(remaining) })}
+                      </span>
+                      <span className="text-muted-foreground">{formatPrice(minOrderAmount)}</span>
+                    </div>
+                    <Progress value={progress} className="h-2" />
+                  </div>
+                )}
+                
                 <div className="flex items-center justify-between">
                   <button
                     onClick={clearCart}
