@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, Bell, CalendarPlus } from "lucide-react";
+import { Search, X, Bell } from "lucide-react";
 import { RestaurantHeader } from "@/components/menu/RestaurantHeader";
 import { CategoryTabs } from "@/components/menu/CategoryTabs";
 import { ProductCard } from "@/components/menu/ProductCard";
@@ -255,19 +255,8 @@ export function MenuPage() {
       {/* Reservation Modal */}
       <ReservationModal isOpen={showReservation} onClose={() => setShowReservation(false)} />
 
-      {/* Floating Action Buttons */}
-      <div className="fixed bottom-24 right-4 z-40 flex flex-col gap-2">
-        {/* Reservation Button */}
-        <button
-          onClick={() => setShowReservation(true)}
-          className="h-10 px-3 rounded-full bg-primary text-primary-foreground shadow-md flex items-center gap-2 hover:bg-primary/90 transition-colors text-sm font-medium"
-          aria-label={t("reservation.title")}
-        >
-          <CalendarPlus className="w-4 h-4" />
-          <span>{t("reservation.button")}</span>
-        </button>
-
-        {/* Call Waiter Button */}
+      {/* Floating Call Waiter Button */}
+      <div className="fixed bottom-24 right-4 z-40">
         <button
           onClick={() => setShowCallWaiter(true)}
           className="h-10 px-3 rounded-full bg-amber-500 text-white shadow-md flex items-center gap-2 hover:bg-amber-600 transition-colors text-sm font-medium"
