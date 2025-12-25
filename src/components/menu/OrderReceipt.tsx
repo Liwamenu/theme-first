@@ -86,15 +86,13 @@ export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
                 {format(new Date(order.createdAt), "dd MMM yyyy, HH:mm", { locale: dateLocale })}
               </span>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-4">
               <span className="text-muted-foreground text-sm">{t("orderReceipt.orderType")}</span>
               <div className="flex items-center gap-2">
                 {order.orderType === "inPerson" ? (
                   <>
                     <Bell className="w-4 h-4 text-primary" />
-                    <span className="font-medium">
-                      {t("common.table")} {order.tableNumber}
-                    </span>
+                    <span className="font-medium">{t("order.inPerson")}</span>
                   </>
                 ) : (
                   <>
@@ -104,58 +102,67 @@ export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
                 )}
               </div>
             </div>
-          </div>
 
-          {/* Order Status */}
-          <div className="p-6 border-b border-dashed border-border">
-            <h3 className="font-semibold mb-4">{t("orderReceipt.orderStatus")}</h3>
-
-            {isCancelled ? (
-              <div className="flex items-center gap-3 p-4 bg-destructive/10 rounded-xl">
-                <XCircle className="w-6 h-6 text-destructive" />
-                <span className="font-medium text-destructive">{t("orderReceipt.orderCancelled")}</span>
-              </div>
-            ) : (
+            {order.orderType === "inPerson" && order.tableNumber && (
               <div className="flex items-center justify-between">
-                {statusSteps.map((step, index) => {
-                  const isActive = index <= currentStepIndex;
-                  const isCurrent = index === currentStepIndex;
-                  const stepConfig = statusConfig[step];
-
-                  return (
-                    <div key={step} className="flex flex-col items-center flex-1">
-                      <div
-                        className={cn(
-                          "w-10 h-10 rounded-full flex items-center justify-center transition-all",
-                          isActive ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground",
-                          isCurrent && "ring-4 ring-primary/20",
-                        )}
-                      >
-                        {stepConfig.icon}
-                      </div>
-                      <span
-                        className={cn(
-                          "text-xs mt-2 text-center",
-                          isActive ? "text-foreground font-medium" : "text-muted-foreground",
-                        )}
-                      >
-                        {stepConfig.label}
-                      </span>
-                      {index < statusSteps.length - 1 && (
-                        <div
-                          className={cn(
-                            "absolute h-0.5 w-full top-5 left-1/2",
-                            isActive ? "bg-primary" : "bg-secondary",
-                          )}
-                          style={{ display: "none" }}
-                        />
-                      )}
-                    </div>
-                  );
-                })}
+                <span className="text-muted-foreground text-sm">{t("common.table")}</span>
+                <span className="font-medium">{order.tableNumber}</span>
               </div>
             )}
           </div>
+
+          {/* Order Status */}
+          {order.orderType === "online" && (
+            <div className="p-6 border-b border-dashed border-border">
+              <h3 className="font-semibold mb-4">{t("orderReceipt.orderStatus")}</h3>
+
+              {isCancelled ? (
+                <div className="flex items-center gap-3 p-4 bg-destructive/10 rounded-xl">
+                  <XCircle className="w-6 h-6 text-destructive" />
+                  <span className="font-medium text-destructive">{t("orderReceipt.orderCancelled")}</span>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between">
+                  {statusSteps.map((step, index) => {
+                    const isActive = index <= currentStepIndex;
+                    const isCurrent = index === currentStepIndex;
+                    const stepConfig = statusConfig[step];
+
+                    return (
+                      <div key={step} className="flex flex-col items-center flex-1">
+                        <div
+                          className={cn(
+                            "w-10 h-10 rounded-full flex items-center justify-center transition-all",
+                            isActive ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground",
+                            isCurrent && "ring-4 ring-primary/20",
+                          )}
+                        >
+                          {stepConfig.icon}
+                        </div>
+                        <span
+                          className={cn(
+                            "text-xs mt-2 text-center",
+                            isActive ? "text-foreground font-medium" : "text-muted-foreground",
+                          )}
+                        >
+                          {stepConfig.label}
+                        </span>
+                        {index < statusSteps.length - 1 && (
+                          <div
+                            className={cn(
+                              "absolute h-0.5 w-full top-5 left-1/2",
+                              isActive ? "bg-primary" : "bg-secondary",
+                            )}
+                            style={{ display: "none" }}
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Customer Info (for online orders) */}
           {order.orderType === "online" && order.customerInfo && (
