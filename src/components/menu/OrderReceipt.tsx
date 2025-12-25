@@ -77,13 +77,13 @@ export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
                 {format(new Date(order.createdAt), 'dd MMM yyyy, HH:mm', { locale: dateLocale })}
               </span>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-4">
               <span className="text-muted-foreground text-sm">{t('orderReceipt.orderType')}</span>
               <div className="flex items-center gap-2">
                 {order.orderType === 'inPerson' ? (
                   <>
                     <Bell className="w-4 h-4 text-primary" />
-                    <span className="font-medium">{t('common.table')} {order.tableNumber}</span>
+                    <span className="font-medium">{t('order.inPerson')}</span>
                   </>
                 ) : (
                   <>
@@ -93,9 +93,16 @@ export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
                 )}
               </div>
             </div>
+            {order.orderType === 'inPerson' && order.tableNumber && (
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground text-sm">{t('common.table')}</span>
+                <span className="font-medium">{order.tableNumber}</span>
+              </div>
+            )}
           </div>
 
           {/* Order Status */}
+          {order.orderType ==="online" && (
           <div className="p-6 border-b border-dashed border-border">
             <h3 className="font-semibold mb-4">{t('orderReceipt.orderStatus')}</h3>
             
@@ -143,6 +150,7 @@ export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
               </div>
             )}
           </div>
+          )}
 
           {/* Customer Info (for online orders) */}
           {order.orderType === 'online' && order.customerInfo && (
@@ -170,27 +178,37 @@ export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
           {/* Order Items */}
           <div className="p-6 border-b border-dashed border-border">
             <h3 className="font-semibold mb-4">{t('orderReceipt.orderDetails')}</h3>
-            <div className="space-y-4">
+           <div className="border-t border-border pt-3 space-y-3">
               {order.items.map((item, index) => (
-                <div key={index} className="flex justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{item.quantity}x</span>
-                      <span>{item.productName}</span>
+                <div key={index} className="space-y-1">
+                    <div className="flex justify-between text-sm">
+                      <div className="flex-1">
+                        <span className="font-medium">
+                          {item.quantity}x {item.productName}
+                        </span>
+                        <span className="text-muted-foreground ml-1">({item.portionName})</span>
+                      </div>
+                        <span className="font-medium">{formatPrice(item.itemTotal)}</span>
                     </div>
-                    <p className="text-sm text-muted-foreground">{item.portionName}</p>
+
+                    {/* Order Tags */}
                     {item.selectedTags.length > 0 && (
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {item.selectedTags.map(tag => 
-                          `${tag.itemName}${tag.quantity > 1 ? ` x${tag.quantity}` : ''}`
-                        ).join(', ')}
+                      <div className="ml-4 space-y-0.5">
+                        {item.selectedTags.map((tag, idx) => (
+                          <div key={idx} className="flex justify-between text-xs text-muted-foreground">
+                            <span>
+                              + {tag.itemName} {tag.quantity > 1 ? `x${tag.quantity}` : ""}
+                            </span>
+                            {tag.price > 0 && <span>{formatPrice(tag.price * tag.quantity * item.quantity)}</span>}
+                          </div>
+                        ))}
                       </div>
                     )}
+
+                    {/* Item Note */}
                     {item.note && (
                       <p className="text-xs text-muted-foreground italic mt-1">{t('orderReceipt.note')}: {item.note}</p>
                     )}
-                  </div>
-                  <span className="font-medium">{formatPrice(item.itemTotal)}</span>
                 </div>
               ))}
             </div>
