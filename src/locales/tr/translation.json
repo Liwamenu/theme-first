@@ -138,6 +138,22 @@
     "success": "Garson çağrıldı! Kısa süre içinde masanıza gelecek.",
     "error": "Garson çağrılırken bir hata oluştu."
   },
+  "changeTable": {
+    "title": "Masa Değiştir",
+    "currentTable": "Mevcut Masa",
+    "newTable": "Yeni Masa",
+    "scanPrompt": "Yeni masanızdaki QR kodu tarayın",
+    "scanQR": "QR Kod Tara",
+    "invalidQR": "Geçersiz QR kod. Lütfen restoran QR kodunu tarayın.",
+    "cameraPermission": "Kamera izni gerekli. Lütfen kamera erişimine izin verin.",
+    "cameraNotFound": "Kamera bulunamadı. Lütfen kameralı bir cihaz kullanın.",
+    "cameraError": "Kamera açılamadı. Lütfen tekrar deneyin.",
+    "tableFound": "Masa {{table}} bulundu!",
+    "scanAgain": "Tekrar Tara",
+    "tableChanged": "Masa {{table}} olarak değiştirildi!",
+    "sameTable": "Zaten bu masadasınız.",
+    "scanInfo": "Masa değiştirmek için yeni masanızdaki QR kodu taramanız gerekmektedir."
+  },
   "reservation": {
     "title": "Rezervasyon Yap",
     "button": "Rezervasyon",

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, QrCode, Loader2, Check, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ interface ChangeTableModalProps {
 }
 
 export function ChangeTableModal({ isOpen, onClose, onTableChange, currentTable }: ChangeTableModalProps) {
+  const { t } = useTranslation();
   const [isScanning, setIsScanning] = useState(false);
   const [scannedTable, setScannedTable] = useState<number | null>(null);
   const [scannerError, setScannerError] = useState<string | null>(null);
@@ -99,7 +101,7 @@ export function ChangeTableModal({ isOpen, onClose, onTableChange, currentTable 
             stopScanner();
             setIsScanning(false);
           } else {
-            toast.error("Geçersiz QR kod. Lütfen restoran QR kodunu tarayın.");
+            toast.error(t("changeTable.invalidQR"));
           }
         },
         () => {
@@ -112,14 +114,14 @@ export function ChangeTableModal({ isOpen, onClose, onTableChange, currentTable 
       
       if (err instanceof Error) {
         if (err.message.includes("Permission")) {
-          setScannerError("Kamera izni gerekli. Lütfen kamera erişimine izin verin.");
+          setScannerError(t("changeTable.cameraPermission"));
         } else if (err.message.includes("NotFoundError") || err.message.includes("No camera")) {
-          setScannerError("Kamera bulunamadı. Lütfen kameralı bir cihaz kullanın.");
+          setScannerError(t("changeTable.cameraNotFound"));
         } else {
-          setScannerError("Kamera açılamadı. Lütfen tekrar deneyin.");
+          setScannerError(t("changeTable.cameraError"));
         }
       } else {
-        setScannerError("Kamera açılamadı. Lütfen tekrar deneyin.");
+        setScannerError(t("changeTable.cameraError"));
       }
     }
   };
@@ -127,10 +129,10 @@ export function ChangeTableModal({ isOpen, onClose, onTableChange, currentTable 
   const handleConfirmTable = () => {
     if (scannedTable && scannedTable !== currentTable) {
       onTableChange(scannedTable);
-      toast.success(`Masa ${scannedTable} olarak değiştirildi!`);
+      toast.success(t("changeTable.tableChanged", { table: scannedTable }));
       onClose();
     } else if (scannedTable === currentTable) {
-      toast.info("Zaten bu masadasınız.");
+      toast.info(t("changeTable.sameTable"));
       onClose();
     }
   };
@@ -164,7 +166,7 @@ export function ChangeTableModal({ isOpen, onClose, onTableChange, currentTable 
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                     <QrCode className="w-5 h-5 text-primary" />
                   </div>
-                  <h2 className="text-lg font-bold">Masa Değiştir</h2>
+                  <h2 className="text-lg font-bold">{t("changeTable.title")}</h2>
                 </div>
                 <button
                   onClick={handleClose}
@@ -179,14 +181,14 @@ export function ChangeTableModal({ isOpen, onClose, onTableChange, currentTable 
                 {/* Current Table */}
                 <div className="flex items-center gap-4 p-4 bg-secondary rounded-2xl">
                   <div className="flex-1">
-                    <p className="text-sm text-muted-foreground">Mevcut Masa</p>
+                    <p className="text-sm text-muted-foreground">{t("changeTable.currentTable")}</p>
                     <p className="text-xl font-bold">{currentTable}</p>
                   </div>
                   {scannedTable && (
                     <>
                       <div className="text-muted-foreground">→</div>
                       <div className="flex-1 text-right">
-                        <p className="text-sm text-muted-foreground">Yeni Masa</p>
+                        <p className="text-sm text-muted-foreground">{t("changeTable.newTable")}</p>
                         <p className="text-xl font-bold text-primary">{scannedTable}</p>
                       </div>
                     </>
@@ -211,7 +213,7 @@ export function ChangeTableModal({ isOpen, onClose, onTableChange, currentTable 
                           ) : (
                             <>
                               <QrCode className="w-16 h-16 text-muted-foreground" />
-                              <p className="text-muted-foreground text-center px-4">Yeni masanızdaki QR kodu tarayın</p>
+                              <p className="text-muted-foreground text-center px-4">{t("changeTable.scanPrompt")}</p>
                             </>
                           )}
                         </div>
@@ -226,12 +228,12 @@ export function ChangeTableModal({ isOpen, onClose, onTableChange, currentTable 
                       {isScanning ? (
                         <>
                           <X className="w-5 h-5 mr-2" />
-                          İptal
+                          {t("common.cancel")}
                         </>
                       ) : (
                         <>
                           <Camera className="w-5 h-5 mr-2" />
-                          QR Kod Tara
+                          {t("changeTable.scanQR")}
                         </>
                       )}
                     </Button>
@@ -243,7 +245,9 @@ export function ChangeTableModal({ isOpen, onClose, onTableChange, currentTable 
                       <div className="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center">
                         <Check className="w-8 h-8 text-white" />
                       </div>
-                      <p className="text-green-600 dark:text-green-400 font-medium">Masa {scannedTable} bulundu!</p>
+                      <p className="text-green-600 dark:text-green-400 font-medium">
+                        {t("changeTable.tableFound", { table: scannedTable })}
+                      </p>
                     </div>
 
                     <div className="flex gap-3">
@@ -253,21 +257,21 @@ export function ChangeTableModal({ isOpen, onClose, onTableChange, currentTable 
                         size="lg"
                         className="flex-1 h-14 text-lg font-semibold rounded-2xl"
                       >
-                        Tekrar Tara
+                        {t("changeTable.scanAgain")}
                       </Button>
                       <Button
                         onClick={handleConfirmTable}
                         size="lg"
                         className="flex-1 h-14 text-lg font-semibold rounded-2xl"
                       >
-                        Onayla
+                        {t("common.confirm")}
                       </Button>
                     </div>
                   </>
                 )}
 
                 <p className="text-xs text-center text-muted-foreground">
-                  Masa değiştirmek için yeni masanızdaki QR kodu taramanız gerekmektedir.
+                  {t("changeTable.scanInfo")}
                 </p>
               </div>
             </div>
