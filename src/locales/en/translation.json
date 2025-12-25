@@ -138,6 +138,22 @@
     "success": "Waiter called! Someone will be with you shortly.",
     "error": "An error occurred while calling the waiter."
   },
+  "changeTable": {
+    "title": "Change Table",
+    "currentTable": "Current Table",
+    "newTable": "New Table",
+    "scanPrompt": "Scan the QR code at your new table",
+    "scanQR": "Scan QR Code",
+    "invalidQR": "Invalid QR code. Please scan a restaurant QR code.",
+    "cameraPermission": "Camera permission required. Please allow camera access.",
+    "cameraNotFound": "Camera not found. Please use a device with a camera.",
+    "cameraError": "Could not open camera. Please try again.",
+    "tableFound": "Table {{table}} found!",
+    "scanAgain": "Scan Again",
+    "tableChanged": "Changed to Table {{table}}!",
+    "sameTable": "You are already at this table.",
+    "scanInfo": "You need to scan the QR code at your new table to change tables."
+  },
   "reservation": {
     "title": "Make Reservation",
     "button": "Reserve",
