@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Clock, MapPin, Phone, AlertTriangle, CalendarDays } from 'lucide-react';
-import { useRestaurant } from '@/hooks/useRestaurant';
-import { useTranslation } from 'react-i18next';
-import { LanguageSwitcher } from './LanguageSwitcher';
-import { ReservationModal } from './ReservationModal';
-import { Button } from '@/components/ui/button';
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Clock, MapPin, Phone, AlertTriangle, CalendarDays } from "lucide-react";
+import { useRestaurant } from "@/hooks/useRestaurant";
+import { useTranslation } from "react-i18next";
+import { LanguageSwitcher } from "./LanguageSwitcher";
+import { ReservationModal } from "./ReservationModal";
+import { Button } from "@/components/ui/button";
 
 export function RestaurantHeader() {
   const { restaurant, isRestaurantActive, isCurrentlyOpen, getCurrentWorkingHour } = useRestaurant();
@@ -18,12 +18,12 @@ export function RestaurantHeader() {
     <header className="relative overflow-hidden">
       {/* Hero Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-primary/20 to-background" />
-      <div 
+      <div
         className="absolute inset-0 opacity-20"
         style={{
           backgroundImage: `url(https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&h=400&fit=crop)`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundSize: "cover",
+          backgroundPosition: "center",
         }}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
@@ -50,15 +50,13 @@ export function RestaurantHeader() {
           </div>
 
           {/* Name & Slogan */}
-          <h1 className="font-display text-3xl font-bold text-foreground mb-1">
-            {restaurant.name}
-          </h1>
+          <h1 className="font-display text-3xl font-bold text-foreground mb-1">{restaurant.name}</h1>
           <p className="text-muted-foreground text-sm mb-4">
             {restaurant.slogan1} {restaurant.slogan2}
           </p>
 
           {/* Status Badges */}
-          <div className="flex flex-wrap gap-2 justify-center mb-4">
+          <div className="flex flex-wrap gap-2 justify-center">
             {!isRestaurantActive ? (
               <motion.div
                 initial={{ scale: 0.9 }}
@@ -66,12 +64,12 @@ export function RestaurantHeader() {
                 className="flex items-center gap-2 px-4 py-2 bg-destructive/10 text-destructive rounded-full text-sm font-medium"
               >
                 <AlertTriangle className="w-4 h-4" />
-                <span>{t('header.notServing')}</span>
+                <span>{t("header.notServing")}</span>
               </motion.div>
             ) : isCurrentlyOpen ? (
               <div className="flex items-center gap-2 px-4 py-2 bg-success/10 text-success rounded-full text-sm font-medium">
                 <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                <span>{t('header.open')}</span>
+                <span>{t("header.open")}</span>
                 {workingHour && (
                   <span className="text-muted-foreground">
                     • {workingHour.Open} - {workingHour.Close}
@@ -81,9 +79,9 @@ export function RestaurantHeader() {
             ) : (
               <div className="flex items-center gap-2 px-4 py-2 bg-muted text-muted-foreground rounded-full text-sm font-medium">
                 <Clock className="w-4 h-4" />
-                <span>{t('header.closed')}</span>
+                <span>{t("header.closed")}</span>
                 {workingHour && !workingHour.IsClosed && (
-                  <span>• {t('header.opensAt', { time: workingHour.Open })}</span>
+                  <span>• {t("header.opensAt", { time: workingHour.Open })}</span>
                 )}
               </div>
             )}
@@ -94,10 +92,10 @@ export function RestaurantHeader() {
             onClick={() => setIsReservationOpen(true)}
             variant="outline"
             size="sm"
-            className="flex items-center gap-2 rounded-full"
+            className="flex items-center gap-2 rounded-full my-2"
           >
             <CalendarDays className="w-4 h-4" />
-            <span>{t('reservation.button')}</span>
+            <span>{t("reservation.button")}</span>
           </Button>
 
           {/* Info Row */}
@@ -111,7 +109,9 @@ export function RestaurantHeader() {
             </a>
             <div className="flex items-center gap-1.5">
               <MapPin className="w-4 h-4" />
-              <span>{restaurant.district}, {restaurant.city}</span>
+              <span>
+                {restaurant.district}, {restaurant.city}
+              </span>
             </div>
           </div>
         </motion.div>
