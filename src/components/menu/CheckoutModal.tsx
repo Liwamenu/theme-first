@@ -150,8 +150,8 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
       if (!isValidPhoneNumber(customerInfo.phone)) {
         toast.error(t("validation.invalidPhone"));
         return false;
+        setStep("payment");
       }
-      setStep("payment");
     }
   };
 
@@ -542,13 +542,6 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                           <p className="text-xs text-muted-foreground italic ml-4">
                             {t("orderReceipt.note")}: {item.note}
                           </p>
-                        )}
-
-                        {/* Item Total if has tags */}
-                        {item.selectedTags.length > 0 && (
-                          <div className="flex justify-end text-xs text-primary font-medium">
-                            Alt toplam: {formatPrice(itemTotal)}
-                          </div>
                         )}
                       </div>
                     );
