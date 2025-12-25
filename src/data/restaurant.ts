@@ -35,6 +35,8 @@ export const restaurantData: FullRestaurantInfo = {
     specialPriceName: "Öğrenci İndirimi",
     googleAnalytics: "",
     licenseIsActive: true,
+    maxTableOrderDistanceMeter: 100,
+    checkTableOrderDistance: true,
     tableNumber: 5,
     moneySign: "$",
     deliveryPrice: 15,
