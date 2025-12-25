@@ -45,6 +45,7 @@ export interface Product {
   subCategoryName: string | null;
   subCategoryImage: string | null;
   subCategorySortOrder: number;
+  isNoteAllowed?: boolean;
   portions: Portion[];
 }
 
