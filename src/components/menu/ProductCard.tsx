@@ -97,7 +97,9 @@ export function ProductCard({ product, onSelect, isSpecialPriceActive, specialPr
 
           <div className="flex items-center gap-2">
             {hasMultiplePortions && (
-              <span className="text-xs text-muted-foreground">{product.portions.length} porsiyon</span>
+              <span className="text-xs text-muted-foreground">
+                {product.portions.length} {t("productCard.portion")}
+              </span>
             )}
             <button className="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-md hover:shadow-glow transition-all">
               <Plus className="w-5 h-5" />

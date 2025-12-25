@@ -44,7 +44,8 @@
   },
   "productCard": {
     "recommended": "Önerilen",
-    "campaign": "Kampanya"
+    "campaign": "Kampanya",
+    "portion": "Porsiyon"
   },
   "product": {
     "addToCart": "Sepete Ekle",
