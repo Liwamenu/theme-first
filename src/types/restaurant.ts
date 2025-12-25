@@ -116,6 +116,8 @@ export interface RestaurantData {
   specialPriceName: string;
   googleAnalytics: string;
   licenseIsActive: boolean;
+  maxTableOrderDistanceMeter: number;
+  checkTableOrderDistance: boolean;
   tableNumber?: number;
   moneySign?: string | null;
   WorkingHours: WorkingHour[];

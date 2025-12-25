@@ -52,7 +52,7 @@ export function RestaurantHeader() {
           {/* Name & Slogan */}
           <h1 className="font-display text-3xl font-bold text-foreground mb-1">{restaurant.name}</h1>
           <p className="text-muted-foreground text-sm mb-4">
-            {restaurant.slogan1} {restaurant.slogan2}
+            {restaurant.slogan1}
           </p>
 
           {/* Status Badges */}
