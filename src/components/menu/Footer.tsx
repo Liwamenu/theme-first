@@ -64,7 +64,7 @@ export function Footer() {
           </div>
 
           {/* Reservation Button - Only show if license is active */}
-          {restaurant.isReservationLicenseActive && (
+          {restaurant.isReservationLicenseActive && restaurant.isReservationActive && (
             <div className="flex justify-center mt-6">
               <Button
                 onClick={() => setIsReservationOpen(true)}

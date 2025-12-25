@@ -88,7 +88,7 @@ export function RestaurantHeader() {
           </div>
 
           {/* Reservation Button - Only show if license is active */}
-          {restaurant.isReservationLicenseActive && (
+          {restaurant.isReservationLicenseActive && restaurant.isReservationActive && (
             <Button
               onClick={() => setIsReservationOpen(true)}
               variant="outline"
