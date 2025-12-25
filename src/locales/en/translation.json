@@ -65,8 +65,7 @@
     "onlineDesc": "Delivery to your address (within {{distance}} km)",
     "orderInfo": "Order Info",
     "deliveryInfo": "Delivery Info",
-    "tableNumber": "Table",
-    "isTableNumberChange": "Has your table changed?",
+    "tableNumber": "Table Number",
     "change": "Change",
     "fullName": "Full Name",
     "fullNamePlaceholder": "Your Full Name",
@@ -87,7 +86,7 @@
     "fillAllFields": "Please fill in all fields",
     "outOfRange": "You are outside the delivery area. ({{distance}} km away, max: {{max}} km)",
     "locationError": "Could not get location. Location permission is required for online orders.",
-    "noOrdersAvailable": "Orders are not available at this time. Please try again later."
+    "noOrdersAvailable": "Orders are not being accepted at this time. Outside of business hours. Please try again later."
   },
   "orderReceipt": {
     "title": "Order Details",
