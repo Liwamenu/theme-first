@@ -71,7 +71,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
 
   const discountRate = getDiscountRate();
   const discountAmount = (subtotal * discountRate) / 100;
-  const deliveryFee = orderType === "online" ? restaurant.deliveryPrice : 0;
+  const deliveryFee = orderType === "online" ? restaurant.deliveryFee : 0;
   const total = subtotal - discountAmount + deliveryFee;
 
   const handleSelectOrderType = async (type: OrderType) => {
