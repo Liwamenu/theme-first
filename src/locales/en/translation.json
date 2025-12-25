@@ -42,7 +42,7 @@
     "viewCart": "View Cart",
     "checkout": "Checkout"
   },
-    "productCard": {
+  "productCard": {
     "recommended": "Recommended",
     "campaign": "Campaign",
     "portion": "Portion"
@@ -162,6 +162,12 @@
     "workingHours": "Working Hours",
     "closed": "Closed",
     "allRightsReserved": "All rights reserved."
+  },
+  "header": {
+    "notServing": "Restaurant Currently Not Serving",
+    "open": "Open",
+    "closed": "Closed",
+    "opensAt": "Opens at {{time}}"
   },
   "sound": {
     "title": "Notification Sound",

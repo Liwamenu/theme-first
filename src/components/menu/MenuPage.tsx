@@ -17,7 +17,6 @@ import { useRestaurant } from "@/hooks/useRestaurant";
 import { useOrder } from "@/hooks/useOrder";
 import { Product, Order } from "@/types/restaurant";
 import { Input } from "@/components/ui/input";
-import { changeLanguage } from "@/lib/i18n";
 
 type View = "menu" | "order";
 
@@ -36,13 +35,6 @@ export function MenuPage() {
   const [showCallWaiter, setShowCallWaiter] = useState(false);
   const [showReservation, setShowReservation] = useState(false);
   const categoryRefs = useRef<Record<string, HTMLElement | null>>({});
-
-  // Sync language with restaurant menuLang
-  useEffect(() => {
-    if (restaurant.menuLang) {
-      changeLanguage(restaurant.menuLang);
-    }
-  }, [restaurant.menuLang]);
 
   // Handle category scroll sync
   useEffect(() => {
@@ -143,6 +135,7 @@ export function MenuPage() {
                 }}
                 className="h-12 px-4 rounded-full bg-primary text-primary-foreground flex items-center gap-2 font-medium hover:bg-primary/90 transition-colors"
               >
+                {/* <Receipt className="w-5 h-5" /> */}
                 <span className="sm:inline">{t("menu.myOrder")}</span>
               </button>
             )}
@@ -191,7 +184,13 @@ export function MenuPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <AnimatePresence mode="popLayout">
                 {category.products.map((product) => (
-                  <ProductCard key={product.id} product={product} onSelect={setSelectedProduct} isSpecialPriceActive={restaurant.isSpecialPriceActive} specialPriceName={restaurant.specialPriceName} />
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onSelect={setSelectedProduct}
+                    isSpecialPriceActive={restaurant.isSpecialPriceActive}
+                    specialPriceName={restaurant.specialPriceName}
+                  />
                 ))}
               </AnimatePresence>
             </div>
@@ -229,8 +228,8 @@ export function MenuPage() {
       {/* Checkout Modal */}
       <AnimatePresence>
         {isCheckoutOpen && (
-          <CheckoutModal 
-            onClose={() => setIsCheckoutOpen(false)} 
+          <CheckoutModal
+            onClose={() => setIsCheckoutOpen(false)}
             onOrderComplete={handleOrderComplete}
             onShowSoundPermission={() => setShowSoundPermission(true)}
           />
@@ -241,26 +240,20 @@ export function MenuPage() {
       <SoundPermissionModal
         isOpen={showSoundPermission}
         onAllow={() => {
-          localStorage.setItem('soundPermission', 'allowed');
+          localStorage.setItem("soundPermission", "allowed");
           setShowSoundPermission(false);
         }}
         onDeny={() => {
-          localStorage.setItem('soundPermission', 'denied');
+          localStorage.setItem("soundPermission", "denied");
           setShowSoundPermission(false);
         }}
       />
 
       {/* Call Waiter Modal */}
-      <CallWaiterModal
-        isOpen={showCallWaiter}
-        onClose={() => setShowCallWaiter(false)}
-      />
+      <CallWaiterModal isOpen={showCallWaiter} onClose={() => setShowCallWaiter(false)} />
 
       {/* Reservation Modal */}
-      <ReservationModal
-        isOpen={showReservation}
-        onClose={() => setShowReservation(false)}
-      />
+      <ReservationModal isOpen={showReservation} onClose={() => setShowReservation(false)} />
 
       {/* Floating Action Buttons */}
       <div className="fixed bottom-24 right-4 z-40 flex flex-col gap-2">
