@@ -82,7 +82,7 @@ export function Footer() {
           <p className="font-semibold text-foreground mb-1">{restaurant.name}</p>
           {restaurant.slogan2 && <p className="text-primary italic mb-2">{restaurant.slogan2}</p>}
           <a
-            href={`https://www.google.com/maps?q=${restaurant.latitude},${restaurant.longitude}`}
+            href={`https://www.google.com/maps/search/?api=1&query=${restaurant.latitude},${restaurant.longitude}`}
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-primary transition-colors"
