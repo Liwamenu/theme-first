@@ -57,8 +57,20 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
   const [isWithinRange, setIsWithinRange] = useState(false);
   const [isChangeTableOpen, setIsChangeTableOpen] = useState(false);
 
-  const total = getTotal();
+  const subtotal = getTotal();
   const tableNumber = restaurant.tableNumber;
+
+  // Calculate discount and final total
+  const getDiscountRate = () => {
+    if (orderType === 'inPerson') return restaurant.tableOrderDiscountRate;
+    if (orderType === 'online') return restaurant.onlineOrderDiscountRate;
+    return 0;
+  };
+
+  const discountRate = getDiscountRate();
+  const discountAmount = (subtotal * discountRate) / 100;
+  const deliveryFee = orderType === 'online' ? restaurant.deliveryPrice : 0;
+  const total = subtotal - discountAmount + deliveryFee;
 
   const handleSelectOrderType = async (type: OrderType) => {
     setOrderType(type);
@@ -505,9 +517,37 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
                   </div>
                 )}
 
-                <div className="border-t border-border pt-3 flex justify-between font-bold text-lg">
-                  <span>{t("common.total")}</span>
-                  <span className="text-primary">{formatPrice(total)}</span>
+                {/* Price Breakdown */}
+                <div className="border-t border-border pt-3 space-y-2">
+                  {/* Subtotal */}
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">{t("order.subtotal")}</span>
+                    <span>{formatPrice(subtotal)}</span>
+                  </div>
+
+                  {/* Discount */}
+                  {discountRate > 0 && (
+                    <div className="flex justify-between text-sm text-success">
+                      <span>
+                        {orderType === 'inPerson' ? t("order.tableDiscount") : t("order.onlineDiscount")} ({discountRate}%)
+                      </span>
+                      <span>-{formatPrice(discountAmount)}</span>
+                    </div>
+                  )}
+
+                  {/* Delivery Fee */}
+                  {orderType === 'online' && deliveryFee > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">{t("order.deliveryFee")}</span>
+                      <span>{formatPrice(deliveryFee)}</span>
+                    </div>
+                  )}
+
+                  {/* Total */}
+                  <div className="flex justify-between font-bold text-lg pt-2 border-t border-border">
+                    <span>{t("common.total")}</span>
+                    <span className="text-primary">{formatPrice(total)}</span>
+                  </div>
                 </div>
               </div>
 
