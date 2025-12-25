@@ -32,7 +32,7 @@ function getPriceDisplay(portion: Portion, isSpecialPriceActive: boolean) {
   return { displayPrice, originalPrice, priceType };
 }
 
-export function ProductCard({ product, onSelect }: ProductCardProps) {
+export function ProductCard({ product, onSelect, isSpecialPriceActive, specialPriceName }: ProductCardProps) {
   const { formatPrice } = useRestaurant();
   const firstPortion = product.portions[0];
   const { displayPrice, originalPrice, priceType } = getPriceDisplay(firstPortion, isSpecialPriceActive);
