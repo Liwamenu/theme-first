@@ -1,12 +1,16 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Clock, MapPin, Phone, AlertTriangle } from 'lucide-react';
+import { Clock, MapPin, Phone, AlertTriangle, CalendarDays } from 'lucide-react';
 import { useRestaurant } from '@/hooks/useRestaurant';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { ReservationModal } from './ReservationModal';
+import { Button } from '@/components/ui/button';
 
 export function RestaurantHeader() {
   const { restaurant, isRestaurantActive, isCurrentlyOpen, getCurrentWorkingHour } = useRestaurant();
   const { t } = useTranslation();
+  const [isReservationOpen, setIsReservationOpen] = useState(false);
 
   const workingHour = getCurrentWorkingHour;
 
@@ -85,6 +89,17 @@ export function RestaurantHeader() {
             )}
           </div>
 
+          {/* Reservation Button */}
+          <Button
+            onClick={() => setIsReservationOpen(true)}
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2 rounded-full"
+          >
+            <CalendarDays className="w-4 h-4" />
+            <span>{t('reservation.button')}</span>
+          </Button>
+
           {/* Info Row */}
           <div className="flex flex-wrap gap-4 justify-center text-sm text-muted-foreground">
             <a
@@ -101,6 +116,8 @@ export function RestaurantHeader() {
           </div>
         </motion.div>
       </div>
+
+      <ReservationModal isOpen={isReservationOpen} onClose={() => setIsReservationOpen(false)} />
     </header>
   );
 }

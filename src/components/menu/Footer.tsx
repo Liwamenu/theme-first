@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Facebook, Instagram, Youtube, MessageCircle } from 'lucide-react';
+import { Facebook, Instagram, Youtube, MessageCircle, CalendarDays } from 'lucide-react';
 import { useRestaurant } from '@/hooks/useRestaurant';
+import { ReservationModal } from './ReservationModal';
+import { Button } from '@/components/ui/button';
 
 const dayKeys = ['', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
@@ -8,6 +11,7 @@ export function Footer() {
   const { t } = useTranslation();
   const { restaurant } = useRestaurant();
   const { SocialLinks, WorkingHours } = restaurant;
+  const [isReservationOpen, setIsReservationOpen] = useState(false);
 
   const socialLinks = [
     { url: SocialLinks.facebookUrl, icon: Facebook, label: 'Facebook' },
@@ -58,6 +62,18 @@ export function Footer() {
               </div>
             ))}
           </div>
+
+          {/* Reservation Button */}
+          <div className="flex justify-center mt-6">
+            <Button
+              onClick={() => setIsReservationOpen(true)}
+              variant="outline"
+              className="flex items-center gap-2 rounded-full"
+            >
+              <CalendarDays className="w-4 h-4" />
+              <span>{t('reservation.button')}</span>
+            </Button>
+          </div>
         </div>
 
         {/* Restaurant Info */}
@@ -72,6 +88,8 @@ export function Footer() {
           <p>© {new Date().getFullYear()} {restaurant.name}. {t('footer.allRightsReserved')}</p>
         </div>
       </div>
+
+      <ReservationModal isOpen={isReservationOpen} onClose={() => setIsReservationOpen(false)} />
     </footer>
   );
 }
