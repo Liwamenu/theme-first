@@ -35,7 +35,7 @@ import "react-phone-number-input/style.css";
 
 interface CheckoutModalProps {
   onClose: () => void;
-  onOrderComplete: (order: Order, orderType: 'inPerson' | 'online') => void;
+  onOrderComplete: (order: Order, orderType: "inPerson" | "online") => void;
   onShowSoundPermission: () => void;
 }
 
@@ -246,7 +246,7 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
       clearCart();
 
       // Show sound permission modal after a short delay (only for online orders)
-      if (orderType === 'online') {
+      if (orderType === "online") {
         setTimeout(() => {
           onShowSoundPermission();
         }, 1000);
