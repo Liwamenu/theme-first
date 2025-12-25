@@ -45,7 +45,6 @@ export interface Product {
   subCategoryName: string | null;
   subCategoryImage: string | null;
   subCategorySortOrder: number;
-  isNoteAllowed?: boolean;
   portions: Portion[];
 }
 
@@ -120,6 +119,7 @@ export interface RestaurantData {
   maxTableOrderDistanceMeter: number;
   checkTableOrderDistance: boolean;
   isReservationLicenseActive: boolean;
+  isReservationActive: boolean;
   tableNumber?: number;
   moneySign?: string | null;
   WorkingHours: WorkingHour[];
@@ -154,7 +154,7 @@ export interface CartItem {
 
 export interface OrderPayload {
   restaurantId: string;
-  orderType: 'inPerson' | 'online';
+  orderType: "inPerson" | "online";
   items: {
     productId: string;
     productName: string;
@@ -181,5 +181,5 @@ export interface OrderPayload {
 
 export interface Order extends OrderPayload {
   id: string;
-  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';
+  status: "pending" | "confirmed" | "preparing" | "ready" | "delivered" | "cancelled";
 }

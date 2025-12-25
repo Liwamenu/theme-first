@@ -51,9 +51,7 @@ export function RestaurantHeader() {
 
           {/* Name & Slogan */}
           <h1 className="font-display text-3xl font-bold text-foreground mb-1">{restaurant.name}</h1>
-          <p className="text-muted-foreground text-sm mb-4">
-            {restaurant.slogan1}
-          </p>
+          <p className="text-muted-foreground text-sm mb-4">{restaurant.slogan1}</p>
 
           {/* Status Badges */}
           <div className="flex flex-wrap gap-2 justify-center">
@@ -88,7 +86,7 @@ export function RestaurantHeader() {
           </div>
 
           {/* Reservation Button - Only show if license is active */}
-          {restaurant.isReservationLicenseActive && (
+          {restaurant.isReservationLicenseActive && restaurant.isReservationActive && (
             <Button
               onClick={() => setIsReservationOpen(true)}
               variant="outline"
