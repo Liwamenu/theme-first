@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Calendar, Clock, Users, User, Phone, Mail, MessageSquare, AlertTriangle, Check, Edit2, ChevronDown } from "lucide-react";
+import { X, Calendar, Clock, Users, User, Phone, Mail, MessageSquare, AlertTriangle, Check, Edit2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useRestaurant } from "@/hooks/useRestaurant";
 import { toast } from "sonner";
-import { API_URLS, COUNTRY_CODES, isTurkishPhone, CountryCode } from "@/lib/api";
+import { API_URLS, isTurkishPhone } from "@/lib/api";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 interface ReservationModalProps {
   isOpen: boolean;
@@ -16,7 +18,6 @@ interface ReservationModalProps {
 
 interface ReservationFormData {
   fullName: string;
-  countryCode: string;
   phone: string;
   email: string;
   date: string;
@@ -34,10 +35,8 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSendingCode, setIsSendingCode] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
-  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const [formData, setFormData] = useState<ReservationFormData>({
     fullName: "",
-    countryCode: "TR",
     phone: "",
     email: "",
     date: "",
@@ -46,16 +45,10 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
     notes: "",
   });
 
-  const selectedCountry = COUNTRY_CODES.find(c => c.code === formData.countryCode) || COUNTRY_CODES[0];
-  const isTurkish = isTurkishPhone(formData.countryCode);
+  const isTurkish = isTurkishPhone(formData.phone);
 
   const handleInputChange = (field: keyof ReservationFormData, value: string | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleCountrySelect = (country: CountryCode) => {
-    setFormData((prev) => ({ ...prev, countryCode: country.code }));
-    setShowCountryDropdown(false);
   };
 
   const validateForm = (): boolean => {
@@ -63,8 +56,12 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
       toast.error(t("validation.enterName"));
       return false;
     }
-    if (!formData.phone.trim()) {
+    if (!formData.phone) {
       toast.error(t("validation.enterPhone"));
+      return false;
+    }
+    if (!isValidPhoneNumber(formData.phone)) {
+      toast.error(t("validation.invalidPhone"));
       return false;
     }
     if (!formData.email.trim() || !formData.email.includes("@")) {
@@ -99,7 +96,6 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
   const handleSendCode = async () => {
     setIsSendingCode(true);
     try {
-      const fullPhone = `${selectedCountry.dialCode}${formData.phone}`;
       const apiUrl = isTurkish ? API_URLS.sendReservationCodeSMS : API_URLS.sendReservationCodeEmail;
       
       // Simulate API call for testing
@@ -111,7 +107,7 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
       //   headers: { "Content-Type": "application/json" },
       //   body: JSON.stringify({
       //     restaurantId: restaurant.restaurantId,
-      //     phone: fullPhone,
+      //     phone: formData.phone,
       //     email: formData.email,
       //   }),
       // });
@@ -127,13 +123,12 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
   };
 
   const navigateToReceipt = (code: string) => {
-    const fullPhone = `${selectedCountry.dialCode}${formData.phone}`;
     const params = new URLSearchParams({
       restaurantName: restaurant.name,
       restaurantAddress: restaurant.address,
       restaurantPhone: restaurant.phoneNumber,
       fullName: formData.fullName,
-      phone: fullPhone,
+      phone: formData.phone,
       date: formData.date,
       time: formData.time,
       guests: formData.guests.toString(),
@@ -156,8 +151,6 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
 
     setIsSubmitting(true);
     try {
-      const fullPhone = `${selectedCountry.dialCode}${formData.phone}`;
-      
       // Simulate API call for testing
       await new Promise((resolve) => setTimeout(resolve, 1500));
       const code = `#${Math.floor(1000 + Math.random() * 9000)}`;
@@ -169,7 +162,7 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
       //   body: JSON.stringify({
       //     restaurantId: restaurant.restaurantId,
       //     fullName: formData.fullName,
-      //     phone: fullPhone,
+      //     phone: formData.phone,
       //     email: formData.email,
       //     date: formData.date,
       //     time: formData.time,
@@ -203,7 +196,6 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
     setVerificationCode("");
     setFormData({
       fullName: "",
-      countryCode: "TR",
       phone: "",
       email: "",
       date: "",
@@ -291,42 +283,13 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
                   <Phone className="w-4 h-4 text-muted-foreground" />
                   {t("reservation.phone")}
                 </label>
-                <div className="flex gap-2">
-                  <div className="relative">
-                    <button
-                      type="button"
-                      onClick={() => setShowCountryDropdown(!showCountryDropdown)}
-                      className="h-12 px-3 bg-secondary border border-input rounded-lg flex items-center gap-2 hover:bg-secondary/80 transition-colors min-w-[100px]"
-                    >
-                      <span className="text-lg">{selectedCountry.flag}</span>
-                      <span className="text-sm font-medium">{selectedCountry.dialCode}</span>
-                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                    </button>
-                    {showCountryDropdown && (
-                      <div className="absolute top-full left-0 mt-1 w-56 bg-card border border-border rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
-                        {COUNTRY_CODES.map((country) => (
-                          <button
-                            key={country.code}
-                            type="button"
-                            onClick={() => handleCountrySelect(country)}
-                            className="w-full px-3 py-2 flex items-center gap-3 hover:bg-muted transition-colors text-left"
-                          >
-                            <span className="text-lg">{country.flag}</span>
-                            <span className="text-sm flex-1">{country.name}</span>
-                            <span className="text-sm text-muted-foreground">{country.dialCode}</span>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <Input
-                    type="tel"
-                    placeholder={t("reservation.phonePlaceholder")}
-                    value={formData.phone}
-                    onChange={(e) => handleInputChange("phone", e.target.value)}
-                    className="h-12 flex-1"
-                  />
-                </div>
+                <PhoneInput
+                  international
+                  defaultCountry="TR"
+                  value={formData.phone}
+                  onChange={(value) => handleInputChange("phone", value || "")}
+                  className="phone-input-container"
+                />
               </div>
 
               <div className="space-y-2">
@@ -431,7 +394,7 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">{t("reservation.phone")}:</span>
-                  <span className="font-medium">{selectedCountry.dialCode} {formData.phone}</span>
+                  <span className="font-medium">{formData.phone}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">{t("reservation.email")}:</span>
@@ -490,7 +453,7 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
               <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 text-center">
                 <p className="text-sm font-medium text-primary">
                   {t(isTurkish ? "reservation.codeSentToPhone" : "reservation.codeSentToEmail", {
-                    contact: isTurkish ? `${selectedCountry.dialCode} ${formData.phone}` : formData.email
+                    contact: isTurkish ? formData.phone : formData.email
                   })}
                 </p>
               </div>
