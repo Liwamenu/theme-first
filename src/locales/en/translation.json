@@ -176,6 +176,7 @@
   "validation": {
     "enterName": "Please enter your name",
     "enterPhone": "Please enter your phone number",
+    "invalidPhone": "Please enter a valid phone number",
     "enterValidEmail": "Please enter a valid email address",
     "selectDate": "Please select a date",
     "selectTime": "Please select a time",
