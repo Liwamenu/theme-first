@@ -107,12 +107,17 @@ export function RestaurantHeader() {
               <Phone className="w-4 h-4" />
               <span>{restaurant.phoneNumber}</span>
             </a>
-            <div className="flex items-center gap-1.5">
+            <a
+              href={`https://www.google.com/maps?q=${restaurant.latitude},${restaurant.longitude}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 hover:text-primary transition-colors"
+            >
               <MapPin className="w-4 h-4" />
               <span>
                 {restaurant.district}, {restaurant.city}
               </span>
-            </div>
+            </a>
           </div>
         </motion.div>
       </div>
