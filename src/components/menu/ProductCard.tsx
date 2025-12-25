@@ -53,7 +53,7 @@ export function ProductCard({ product, onSelect, isSpecialPriceActive, specialPr
       {product.recommendation && (
         <div className="absolute top-3 left-3 z-10 flex items-center gap-1 px-2.5 py-1 bg-primary text-primary-foreground rounded-full text-xs font-medium shadow-md">
           <Star className="w-3 h-3 fill-current" />
-          <span>Önerilen</span>
+          <span>{t("productCard.recommended")}</span>
         </div>
       )}
 
@@ -65,7 +65,7 @@ export function ProductCard({ product, onSelect, isSpecialPriceActive, specialPr
             priceType === "campaign" ? "bg-campaign text-campaign-foreground" : "bg-special text-special-foreground",
           )}
         >
-          {priceType === "special" ? specialPriceName : "Kampanya"}
+          {priceType === "special" ? specialPriceName : t("productCard.campaign")}
         </div>
       )}
 

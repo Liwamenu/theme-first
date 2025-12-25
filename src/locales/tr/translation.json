@@ -42,6 +42,10 @@
     "viewCart": "Sepeti Görüntüle",
     "checkout": "Siparişi Tamamla"
   },
+  "productCard": {
+    "recommended": "Önerilen",
+    "campaign": "Kampanya"
+  },
   "product": {
     "addToCart": "Sepete Ekle",
     "addedToCart": "{{name}} sepete eklendi!",
