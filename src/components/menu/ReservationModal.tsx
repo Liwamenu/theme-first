@@ -1,19 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  X,
-  Calendar,
-  Clock,
-  Users,
-  User,
-  Phone,
-  Mail,
-  MessageSquare,
-  AlertTriangle,
-  Check,
-  Edit2,
-} from "lucide-react";
+import { X, Calendar, Clock, Users, User, Phone, Mail, MessageSquare, AlertTriangle, Check, Edit2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -106,10 +94,10 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
       guests: formData.guests.toString(),
       notes: formData.notes,
       confirmationCode: code,
-      createdAt: new Date().toLocaleString(i18n.language === 'en' ? 'en-US' : 'tr-TR'),
+      createdAt: new Date().toLocaleString(i18n.language === "en" ? "en-US" : "tr-TR"),
       lang: i18n.language,
     });
-    
+
     setStep("form");
     setFormData({
       fullName: "",
@@ -121,7 +109,7 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
       notes: "",
     });
     onClose();
-    
+
     window.open(`/reservation-receipt?${params.toString()}`, "_blank");
   };
 
@@ -179,13 +167,17 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
   const formatDate = (dateStr: string): string => {
     if (!dateStr) return "";
     const date = new Date(dateStr);
-    return date.toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'tr-TR', { day: "2-digit", month: "2-digit", year: "numeric" });
+    return date.toLocaleDateString(i18n.language === "en" ? "en-US" : "tr-TR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
   };
 
   const getDayName = (dateStr: string): string => {
     if (!dateStr) return "";
     const date = new Date(dateStr);
-    return date.toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'tr-TR', { weekday: "long" });
+    return date.toLocaleDateString(i18n.language === "en" ? "en-US" : "tr-TR", { weekday: "long" });
   };
 
   const getMinDate = () => {
@@ -201,7 +193,7 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-start justify-center p-4 overflow-y-auto"
+        className="fixed inset-0 z-[100] bg-background/80 backdrop-blur-sm flex items-start justify-center p-4 overflow-y-auto"
         onClick={handleClose}
       >
         <motion.div
@@ -340,9 +332,7 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
                 <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-amber-800">{t("reservation.verifyEmailTitle")}</p>
-                  <p className="text-xs text-amber-700 mt-1">
-                    {t("reservation.verifyEmailDesc")}
-                  </p>
+                  <p className="text-xs text-amber-700 mt-1">{t("reservation.verifyEmailDesc")}</p>
                 </div>
               </div>
 
@@ -372,7 +362,9 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">{t("reservation.guests")}:</span>
-                  <span className="font-medium">{formData.guests} {t("common.guests")}</span>
+                  <span className="font-medium">
+                    {formData.guests} {t("common.guests")}
+                  </span>
                 </div>
                 {formData.notes && (
                   <>

@@ -19,7 +19,7 @@ export const restaurantData: FullRestaurantInfo = {
       "http://localhost:5210/images/restaurants/538ba1a1-bf0d-47eb-9b88-054856703452.jpg",
     defaultLang: "TR",
     slogan1: "Lezzetin Adı",
-    slogan2: "Popeyes",
+    slogan2: "İnsanları bir araya getiren hiçbir şey, güzel yemek kadar etkili değildir.",
     onlineOrder: true,
     inPersonOrder: true,
     hide: false,
