@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Plus, Minus, Check } from 'lucide-react';
+import { X, Plus, Minus, Check, MessageSquare } from 'lucide-react';
 import { Product, Portion, OrderTag, OrderTagItem, SelectedTagItem } from '@/types/restaurant';
 import { useCart } from '@/hooks/useCart';
 import { useRestaurant } from '@/hooks/useRestaurant';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -21,6 +22,7 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
   const [selectedPortion, setSelectedPortion] = useState<Portion>(product.portions[0]);
   const [quantity, setQuantity] = useState(1);
   const [selectedTags, setSelectedTags] = useState<Record<string, SelectedTagItem[]>>({});
+  const [productNote, setProductNote] = useState('');
 
   const canAddToCart = isRestaurantActive && isCurrentlyOpen;
 
@@ -108,7 +110,7 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
     if (!validateTags()) return;
 
     const allSelectedTags = Object.values(selectedTags).flat();
-    addItem(product, selectedPortion, allSelectedTags, quantity);
+    addItem(product, selectedPortion, allSelectedTags, quantity, productNote.trim() || undefined);
     toast.success(t('product.addedToCart', { name: product.name }));
     onClose();
   };
@@ -245,6 +247,23 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
               </div>
             </div>
           ))}
+
+          {/* Product Note */}
+          {product.isNoteAllowed && (
+            <div className="mb-4">
+              <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                <MessageSquare className="w-4 h-4" />
+                {t('product.note')} ({t('common.optional')})
+              </h3>
+              <Textarea
+                placeholder={t('product.notePlaceholder')}
+                value={productNote}
+                onChange={(e) => setProductNote(e.target.value)}
+                className="rounded-xl resize-none"
+                rows={2}
+              />
+            </div>
+          )}
 
           {/* Quantity */}
           <div className="flex items-center justify-between py-4 border-t border-border">

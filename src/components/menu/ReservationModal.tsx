@@ -1,15 +1,20 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Calendar, Clock, Users, User, Phone, Mail, MessageSquare, AlertTriangle, Check, Edit2 } from "lucide-react";
+import { X, Calendar, Clock, Users, User, Phone, Mail, MessageSquare, AlertTriangle, Check, Edit2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRestaurant } from "@/hooks/useRestaurant";
 import { toast } from "sonner";
 import { API_URLS, isTurkishPhone } from "@/lib/api";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface ReservationModalProps {
   isOpen: boolean;
@@ -20,13 +25,27 @@ interface ReservationFormData {
   fullName: string;
   phone: string;
   email: string;
-  date: string;
+  date: Date | undefined;
   time: string;
   guests: number;
   notes: string;
 }
 
 type Step = "form" | "verify" | "code";
+
+// Generate time slots from 08:00 to 23:00
+const generateTimeSlots = () => {
+  const slots: string[] = [];
+  for (let hour = 8; hour <= 23; hour++) {
+    slots.push(`${hour.toString().padStart(2, "0")}:00`);
+    if (hour < 23) {
+      slots.push(`${hour.toString().padStart(2, "0")}:30`);
+    }
+  }
+  return slots;
+};
+
+const TIME_SLOTS = generateTimeSlots();
 
 export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
   const { t, i18n } = useTranslation();
@@ -35,11 +54,12 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSendingCode, setIsSendingCode] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [formData, setFormData] = useState<ReservationFormData>({
     fullName: "",
     phone: "",
     email: "",
-    date: "",
+    date: undefined,
     time: "",
     guests: 2,
     notes: "",
@@ -47,7 +67,7 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
 
   const isTurkish = isTurkishPhone(formData.phone);
 
-  const handleInputChange = (field: keyof ReservationFormData, value: string | number) => {
+  const handleInputChange = (field: keyof ReservationFormData, value: string | number | Date | undefined) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -129,7 +149,7 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
       restaurantPhone: restaurant.phoneNumber,
       fullName: formData.fullName,
       phone: formData.phone,
-      date: formData.date,
+      date: formData.date ? format(formData.date, "yyyy-MM-dd") : "",
       time: formData.time,
       guests: formData.guests.toString(),
       notes: formData.notes,
@@ -164,7 +184,7 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
       //     fullName: formData.fullName,
       //     phone: formData.phone,
       //     email: formData.email,
-      //     date: formData.date,
+      //     date: formData.date ? format(formData.date, "yyyy-MM-dd") : "",
       //     time: formData.time,
       //     guests: formData.guests,
       //     notes: formData.notes,
@@ -198,7 +218,7 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
       fullName: "",
       phone: "",
       email: "",
-      date: "",
+      date: undefined,
       time: "",
       guests: 2,
       notes: "",
@@ -210,25 +230,14 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
     onClose();
   };
 
-  const formatDate = (dateStr: string): string => {
-    if (!dateStr) return "";
-    const date = new Date(dateStr);
-    return date.toLocaleDateString(i18n.language === "en" ? "en-US" : "tr-TR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
+  const formatDisplayDate = (date: Date | undefined): string => {
+    if (!date) return "";
+    return format(date, i18n.language === "en" ? "MMM dd, yyyy" : "dd.MM.yyyy");
   };
 
-  const getDayName = (dateStr: string): string => {
-    if (!dateStr) return "";
-    const date = new Date(dateStr);
-    return date.toLocaleDateString(i18n.language === "en" ? "en-US" : "tr-TR", { weekday: "long" });
-  };
-
-  const getMinDate = () => {
-    const today = new Date();
-    return today.toISOString().split("T")[0];
+  const getDayName = (date: Date | undefined): string => {
+    if (!date) return "";
+    return format(date, i18n.language === "en" ? "EEEE" : "EEEE");
   };
 
   if (!isOpen) return null;
@@ -316,25 +325,54 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
                     <Calendar className="w-4 h-4 text-muted-foreground" />
                     {t("reservation.date")}
                   </label>
-                  <Input
-                    type="date"
-                    min={getMinDate()}
-                    value={formData.date}
-                    onChange={(e) => handleInputChange("date", e.target.value)}
-                    className="h-12"
-                  />
+                  <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full h-12 justify-start text-left font-normal",
+                          !formData.date && "text-muted-foreground"
+                        )}
+                      >
+                        <Calendar className="mr-2 h-4 w-4" />
+                        {formData.date ? formatDisplayDate(formData.date) : t("common.selectDate")}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <CalendarComponent
+                        mode="single"
+                        selected={formData.date}
+                        onSelect={(date) => {
+                          handleInputChange("date", date);
+                          setDatePickerOpen(false);
+                        }}
+                        disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                        initialFocus
+                        className="pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium flex items-center gap-2">
                     <Clock className="w-4 h-4 text-muted-foreground" />
                     {t("reservation.time")}
                   </label>
-                  <Input
-                    type="time"
+                  <Select
                     value={formData.time}
-                    onChange={(e) => handleInputChange("time", e.target.value)}
-                    className="h-12"
-                  />
+                    onValueChange={(value) => handleInputChange("time", value)}
+                  >
+                    <SelectTrigger className="h-12">
+                      <SelectValue placeholder={t("common.selectTime")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {TIME_SLOTS.map((time) => (
+                        <SelectItem key={time} value={time}>
+                          {time}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
@@ -404,7 +442,7 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">{t("reservation.date")}:</span>
                   <span className="font-medium">
-                    {formatDate(formData.date)} ({getDayName(formData.date)})
+                    {formatDisplayDate(formData.date)} ({getDayName(formData.date)})
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -479,21 +517,13 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
                 {t("reservation.resendCode")}
               </Button>
 
-              <div className="flex gap-3">
-                <Button variant="outline" onClick={() => setStep("verify")} className="flex-1 h-12">
-                  {t("common.back")}
-                </Button>
-                <Button onClick={handleSubmit} disabled={isSubmitting} className="flex-1 h-12 gap-2">
-                  {isSubmitting ? (
-                    <span className="animate-pulse">{t("reservation.submitting")}</span>
-                  ) : (
-                    <>
-                      <Check className="w-4 h-4" />
-                      {t("common.confirm")}
-                    </>
-                  )}
-                </Button>
-              </div>
+              <Button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="w-full h-12 text-base font-medium"
+              >
+                {isSubmitting ? t("reservation.submitting") : t("common.confirm")}
+              </Button>
             </div>
           )}
         </motion.div>

@@ -3,7 +3,7 @@ import { CartItem, Product, Portion, SelectedTagItem } from '@/types/restaurant'
 
 interface CartState {
   items: CartItem[];
-  addItem: (product: Product, portion: Portion, selectedTags: SelectedTagItem[], quantity?: number) => void;
+  addItem: (product: Product, portion: Portion, selectedTags: SelectedTagItem[], quantity?: number, note?: string) => void;
   removeItem: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
@@ -14,7 +14,7 @@ interface CartState {
 export const useCart = create<CartState>((set, get) => ({
   items: [],
   
-  addItem: (product, portion, selectedTags, quantity = 1) => {
+  addItem: (product, portion, selectedTags, quantity = 1, note) => {
     const id = `${product.id}-${portion.id}-${Date.now()}`;
     const newItem: CartItem = {
       id,
@@ -22,6 +22,7 @@ export const useCart = create<CartState>((set, get) => ({
       portion,
       quantity,
       selectedTags,
+      note,
     };
     set((state) => ({
       items: [...state.items, newItem],
