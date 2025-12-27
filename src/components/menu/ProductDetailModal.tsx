@@ -129,7 +129,7 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: '100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="fixed inset-x-0 bottom-[15%] z-50 max-h-[75vh] overflow-y-auto bg-card rounded-3xl mx-4"
+        className="fixed left-[3px] right-[3px] bottom-[15%] z-50 max-h-[75vh] overflow-y-auto bg-card rounded-3xl"
       >
         {/* Header Image */}
         <div className="relative h-56">
