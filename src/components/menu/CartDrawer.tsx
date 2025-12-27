@@ -204,21 +204,6 @@ export function CartDrawer({ isOpen, onClose, onCheckout, onCallWaiter }: CartDr
               {/* Footer */}
               {items.length > 0 && (
                 <div className="p-5 border-t border-border space-y-4">
-                  {/* Minimum Order Progress for Online Orders */}
-                  {remaining > 0 && (
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-destructive font-medium">
-                          {t('order.minOrderProgress', { remaining: formatPrice(remaining) })}
-                        </span>
-                        <div className="text-right">
-                          <span className="text-xs text-muted-foreground block">{t('order.minOrderLabel')}</span>
-                          <span className="text-muted-foreground">{formatPrice(minOrderAmount)}</span>
-                        </div>
-                      </div>
-                      <Progress value={progress} className="h-2" />
-                    </div>
-                  )}
                   
                   <div className="flex items-center justify-between">
                     <button

@@ -328,25 +328,39 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
               )}
 
               {canOrderOnline && (
-                <button
-                  onClick={() => handleSelectOrderType("online")}
-                  disabled={locationLoading}
-                  className="w-full flex items-center gap-4 p-5 bg-secondary rounded-2xl hover:bg-secondary/80 transition-colors disabled:opacity-50"
-                >
-                  <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
-                    {locationLoading && orderType === "online" ? (
-                      <Loader2 className="w-7 h-7 text-primary animate-spin" />
-                    ) : (
-                      <Home className="w-7 h-7 text-primary" />
-                    )}
-                  </div>
-                  <div className="text-left flex-1">
-                    <h4 className="font-semibold text-lg">{t("order.online")}</h4>
-                    <p className="text-sm text-muted-foreground">
-                      {t("order.onlineDesc", { distance: restaurant.maxDistance })}
-                    </p>
-                  </div>
-                </button>
+                <div className="space-y-2">
+                  {/* Minimum Order Warning for Online Orders */}
+                  {subtotal < restaurant.minOrderAmount && (
+                    <div className="flex items-center justify-between p-3 bg-destructive/10 rounded-xl text-sm">
+                      <span className="text-destructive font-medium">
+                        {t('order.minOrderProgress', { remaining: formatPrice(restaurant.minOrderAmount - subtotal) })}
+                      </span>
+                      <div className="text-right">
+                        <span className="text-xs text-muted-foreground block">{t('order.minOrderLabel')}</span>
+                        <span className="text-muted-foreground">{formatPrice(restaurant.minOrderAmount)}</span>
+                      </div>
+                    </div>
+                  )}
+                  <button
+                    onClick={() => handleSelectOrderType("online")}
+                    disabled={locationLoading}
+                    className="w-full flex items-center gap-4 p-5 bg-secondary rounded-2xl hover:bg-secondary/80 transition-colors disabled:opacity-50"
+                  >
+                    <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
+                      {locationLoading && orderType === "online" ? (
+                        <Loader2 className="w-7 h-7 text-primary animate-spin" />
+                      ) : (
+                        <Home className="w-7 h-7 text-primary" />
+                      )}
+                    </div>
+                    <div className="text-left flex-1">
+                      <h4 className="font-semibold text-lg">{t("order.online")}</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {t("order.onlineDesc", { distance: restaurant.maxDistance })}
+                      </p>
+                    </div>
+                  </button>
+                </div>
               )}
 
               {!canOrderInPerson && !canOrderOnline && (
