@@ -28,7 +28,7 @@ export function CartDrawer({ isOpen, onClose, onCheckout, onCallWaiter }: CartDr
   const { t } = useTranslation();
   const { items, updateQuantity, removeItem, getTotal, clearCart } = useCart();
   const { formatPrice, restaurant, canOrderOnline, canOrderInPerson } = useRestaurant();
-  const [itemToRemove, setItemToRemove] = useState<string | null>(null);
+  const [itemToRemove, setItemToRemove] = useState<{ id: string; name: string } | null>(null);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   const total = getTotal();
@@ -38,13 +38,13 @@ export function CartDrawer({ isOpen, onClose, onCheckout, onCallWaiter }: CartDr
 
   const canOrder = canOrderOnline || canOrderInPerson;
 
-  const handleRemoveItem = (itemId: string) => {
-    setItemToRemove(itemId);
+  const handleRemoveItem = (itemId: string, itemName: string) => {
+    setItemToRemove({ id: itemId, name: itemName });
   };
 
   const confirmRemoveItem = () => {
     if (itemToRemove) {
-      removeItem(itemToRemove);
+      removeItem(itemToRemove.id);
       setItemToRemove(null);
     }
   };
@@ -142,7 +142,7 @@ export function CartDrawer({ isOpen, onClose, onCheckout, onCallWaiter }: CartDr
                                 </p>
                               </div>
                               <button
-                                onClick={() => handleRemoveItem(item.id)}
+                                onClick={() => handleRemoveItem(item.id, item.product.name)}
                                 className="p-1.5 text-muted-foreground hover:text-destructive transition-colors"
                               >
                                 <Trash2 className="w-4 h-4" />
@@ -261,7 +261,7 @@ export function CartDrawer({ isOpen, onClose, onCheckout, onCallWaiter }: CartDr
           <AlertDialogHeader>
             <AlertDialogTitle>{t('cart.removeItemTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('cart.removeItemDescription')}
+              <span className="font-bold text-foreground">{itemToRemove?.name}</span> {t('cart.removeItemDescription')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
