@@ -141,9 +141,9 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
           <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent" />
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-card/90 backdrop-blur flex items-center justify-center shadow-lg"
+            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-red-100 backdrop-blur flex items-center justify-center shadow-lg"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5 text-red-500" />
           </button>
         </div>
 
