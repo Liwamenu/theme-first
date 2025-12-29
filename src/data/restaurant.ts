@@ -5,7 +5,7 @@ export const restaurantData: FullRestaurantInfo = {
     restaurantId: "538ba1a1-bf0d-47eb-9b88-054856703452",
     dealerId: null,
     userId: "01988d47-b5f1-7a3a-a7ed-77738062b0c9",
-    name: "Popeyes",
+    name: "Liwa Cafe & Bistro",
     phoneNumber: "905058433855",
     latitude: 37.600327,
     longitude: 36.860684,
@@ -38,7 +38,7 @@ export const restaurantData: FullRestaurantInfo = {
     checkTableOrderDistance: true,
     isReservationLicenseActive: true,
     tableNumber: 5,
-    moneySign: "$",
+    moneySign: "₺",
     isReservationActive: true,
     WorkingHours: [
       { Day: 1, IsClosed: false, Open: "00:00", Close: "23:59" },
