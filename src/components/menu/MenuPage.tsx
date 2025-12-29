@@ -13,8 +13,10 @@ import { Footer } from "@/components/menu/Footer";
 import { SoundPermissionModal } from "@/components/menu/SoundPermissionModal";
 import { CallWaiterModal } from "@/components/menu/CallWaiterModal";
 import { ReservationModal } from "@/components/menu/ReservationModal";
+import { FlyingEmoji } from "@/components/menu/FlyingEmoji";
 import { useRestaurant } from "@/hooks/useRestaurant";
 import { useOrder } from "@/hooks/useOrder";
+import { useFlyingEmoji } from "@/hooks/useFlyingEmoji";
 import { Product, Order } from "@/types/restaurant";
 import { Input } from "@/components/ui/input";
 
@@ -24,6 +26,7 @@ export function MenuPage() {
   const { t } = useTranslation();
   const { categories, recommendedProducts, isRestaurantActive, isCurrentlyOpen, restaurant } = useRestaurant();
   const { currentOrder, orders, setCurrentOrder } = useOrder();
+  const { isVisible: isFlyingEmojiVisible, startPosition: flyingEmojiPosition, hideFlyingEmoji } = useFlyingEmoji();
   const [activeCategory, setActiveCategory] = useState<string>(categories[0]?.id || "");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -272,6 +275,13 @@ export function MenuPage() {
 
       {/* Reservation Modal */}
       <ReservationModal isOpen={showReservation} onClose={() => setShowReservation(false)} />
+
+      {/* Flying Emoji Animation */}
+      <FlyingEmoji
+        isVisible={isFlyingEmojiVisible}
+        startPosition={flyingEmojiPosition}
+        onComplete={hideFlyingEmoji}
+      />
 
       {/* Floating Call Waiter Button */}
       <div className="fixed bottom-24 right-4 z-40">
