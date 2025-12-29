@@ -286,9 +286,9 @@ export function CartDrawer({ isOpen, onClose, onCheckout, onCallWaiter, waiterCo
       <AlertDialog open={!!itemToRemove} onOpenChange={() => setItemToRemove(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('cart.removeItemTitle')}</AlertDialogTitle>
+            <AlertDialogTitle>{itemToRemove?.name}</AlertDialogTitle>
             <AlertDialogDescription>
-              <span className="font-bold text-foreground">{itemToRemove?.name}</span> {t('cart.removeItemDescription')}
+              {t('cart.removeItemDescription')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
