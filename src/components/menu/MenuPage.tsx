@@ -283,7 +283,7 @@ export function MenuPage() {
       />
 
       {/* Floating Buttons Container - Top Right */}
-      <div className="fixed top-24 right-4 z-40 flex flex-col gap-3 items-end">
+      <div className="fixed top-24 right-4 z-50 flex flex-col gap-3 items-end">
         {/* Call Waiter Button */}
         <button
           onClick={() => setShowCallWaiter(true)}
