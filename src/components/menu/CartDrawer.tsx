@@ -106,12 +106,22 @@ export function CartDrawer({ isOpen, onClose, onCheckout, onCallWaiter, waiterCo
                     {items.length}
                   </span>
                 </div>
-                <button
-                  onClick={onClose}
-                  className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+                <div className="flex items-center gap-2">
+                  {items.length > 0 && (
+                    <button
+                      onClick={handleClearCart}
+                      className="text-sm text-destructive/80 hover:text-destructive bg-destructive/10 hover:bg-destructive/20 px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      {t('cart.clearCart')}
+                    </button>
+                  )}
+                  <button
+                    onClick={onClose}
+                    className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
 
               {/* Cart Items */}
@@ -226,15 +236,10 @@ export function CartDrawer({ isOpen, onClose, onCheckout, onCallWaiter, waiterCo
                 <div className="p-5 border-t border-border space-y-4">
                   
                   <div className="flex items-center justify-between">
-                    <button
-                      onClick={handleClearCart}
-                      className="text-sm text-destructive/80 hover:text-destructive bg-destructive/10 hover:bg-destructive/20 px-3 py-1.5 rounded-lg transition-colors"
-                    >
-                      {t('cart.clearCart')}
-                    </button>
-                    <div className="text-right">
-                      <p className="text-sm text-muted-foreground">{t('common.total')}</p>
-                      <p className="text-2xl font-bold text-primary">{formatPrice(total)}</p>
+                    <span className="text-lg font-medium">{t('common.total')}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">:</span>
+                      <span className="text-2xl font-bold text-primary">{formatPrice(total)}</span>
                     </div>
                   </div>
 
