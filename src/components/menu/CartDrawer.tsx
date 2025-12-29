@@ -228,7 +228,7 @@ export function CartDrawer({ isOpen, onClose, onCheckout, onCallWaiter, waiterCo
                   <div className="flex items-center justify-between">
                     <button
                       onClick={handleClearCart}
-                      className="text-sm text-muted-foreground hover:text-destructive transition-colors"
+                      className="text-sm text-destructive/80 hover:text-destructive bg-destructive/10 hover:bg-destructive/20 px-3 py-1.5 rounded-lg transition-colors"
                     >
                       {t('cart.clearCart')}
                     </button>
@@ -238,18 +238,18 @@ export function CartDrawer({ isOpen, onClose, onCheckout, onCallWaiter, waiterCo
                     </div>
                   </div>
 
-                  <div className="flex gap-3">
+                  <div className="flex gap-2">
                     {/* Call Waiter Button in Cart */}
                     <button
                       onClick={onCallWaiter}
                       disabled={waiterCooldown > 0}
-                      className={`h-14 px-4 rounded-2xl flex items-center gap-2 font-semibold transition-all ${
+                      className={`h-10 px-3 rounded-xl flex items-center gap-1.5 text-sm font-medium transition-all ${
                         waiterCooldown > 0
                           ? "bg-muted text-muted-foreground cursor-not-allowed"
                           : "bg-sky-400 text-white hover:bg-sky-500"
                       }`}
                     >
-                      <Bell className="w-5 h-5" />
+                      <Bell className="w-4 h-4" />
                       <span>
                         {waiterCooldown > 0 ? `${waiterCooldown}s` : t('waiter.button')}
                       </span>
@@ -258,8 +258,8 @@ export function CartDrawer({ isOpen, onClose, onCheckout, onCallWaiter, waiterCo
                     {canOrder ? (
                       <Button
                         onClick={onCheckout}
-                        size="lg"
-                        className="flex-1 h-14 text-lg font-semibold rounded-2xl shadow-glow"
+                        size="default"
+                        className="flex-1 h-10 text-sm font-semibold rounded-xl shadow-glow"
                       >
                         {t('cart.checkout')}
                       </Button>
@@ -267,10 +267,10 @@ export function CartDrawer({ isOpen, onClose, onCheckout, onCallWaiter, waiterCo
                       <Button
                         onClick={onCallWaiter}
                         disabled={waiterCooldown > 0}
-                        size="lg"
-                        className="flex-1 h-14 text-lg font-semibold rounded-2xl bg-amber-500 hover:bg-amber-600"
+                        size="default"
+                        className="flex-1 h-10 text-sm font-semibold rounded-xl bg-amber-500 hover:bg-amber-600"
                       >
-                        <Bell className="w-5 h-5 mr-2" />
+                        <Bell className="w-4 h-4 mr-1" />
                         {t('waiter.button')}
                       </Button>
                     )}
