@@ -304,6 +304,7 @@ export function CartButton({ onClick }: { onClick: () => void }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 50 }}
       onClick={onClick}
+      data-cart-button
       className="fixed bottom-6 left-4 right-4 z-40 flex items-center justify-between px-5 py-4 bg-primary text-primary-foreground rounded-2xl shadow-glow"
     >
       <div className="flex items-center gap-3">

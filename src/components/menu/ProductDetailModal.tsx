@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Minus, Check, MessageSquare } from 'lucide-react';
 import { Product, Portion, OrderTag, OrderTagItem, SelectedTagItem } from '@/types/restaurant';
 import { useCart } from '@/hooks/useCart';
 import { useRestaurant } from '@/hooks/useRestaurant';
+import { useFlyingEmoji } from '@/hooks/useFlyingEmoji';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
@@ -19,6 +20,8 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
   const { t } = useTranslation();
   const { restaurant, formatPrice, isRestaurantActive, isCurrentlyOpen } = useRestaurant();
   const { addItem } = useCart();
+  const { triggerFlyingEmoji } = useFlyingEmoji();
+  const addButtonRef = useRef<HTMLButtonElement>(null);
   const [selectedPortion, setSelectedPortion] = useState<Portion>(product.portions[0]);
   const [quantity, setQuantity] = useState(1);
   const [selectedTags, setSelectedTags] = useState<Record<string, SelectedTagItem[]>>({});
@@ -116,6 +119,12 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
       return;
     }
     if (!validateTags()) return;
+
+    // Trigger flying emoji animation
+    if (addButtonRef.current) {
+      const rect = addButtonRef.current.getBoundingClientRect();
+      triggerFlyingEmoji(rect.left + rect.width / 2, rect.top);
+    }
 
     const allSelectedTags = Object.values(selectedTags).flat();
     addItem(product, selectedPortion, allSelectedTags, quantity, productNote.trim() || undefined);
@@ -298,6 +307,7 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
         {/* Sticky Add to Cart Button */}
         <div className="sticky bottom-0 left-0 right-0 px-4 py-3 bg-card border-t border-border">
           <Button
+            ref={addButtonRef}
             onClick={handleAddToCart}
             size="default"
             className="w-full h-11 text-base font-semibold rounded-xl shadow-glow"
