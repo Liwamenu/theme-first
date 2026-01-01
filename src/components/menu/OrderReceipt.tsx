@@ -298,8 +298,7 @@ export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
         <div className="flex flex-col gap-3">
           <Button
             onClick={onBack}
-            variant="outline"
-            className="w-full h-12 rounded-xl gap-2"
+            className="w-full h-12 rounded-xl gap-2 bg-green-500 hover:bg-green-600 text-white"
           >
             <UtensilsCrossed className="w-5 h-5" />
             {t("orderReceipt.backToMenu")}
