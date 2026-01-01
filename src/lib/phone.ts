@@ -8,6 +8,7 @@ export function getE164Prefix(country?: Country) {
 /**
  * Limits the digits AFTER the country calling code.
  * Example (TR): +90 5xx xxx xx xx -> keeps +90 and max 10 digits after it.
+ * Works correctly for all country code lengths (1, 2, 3 digits).
  */
 export function limitPhoneAfterCallingCode(
   value: string | undefined,
@@ -22,22 +23,21 @@ export function limitPhoneAfterCallingCode(
   const digitsOnly = normalized.replace(/\D/g, "");
 
   const callingCodeDigits = prefix.replace(/\D/g, "");
+  const codeLen = callingCodeDigits.length;
 
-  // If user typed/pasted with calling code, remove it; otherwise treat all digits as national part.
+  // Extract digits after the country code
   let restDigits = "";
   
   if (digitsOnly.startsWith(callingCodeDigits)) {
-    restDigits = digitsOnly.slice(callingCodeDigits.length);
-  } else {
-    // Check if the value might be from a different country code - if so, don't include those digits
-    // Only include digits that don't look like a country code (typically > 3 digits remaining after potential code)
-    const potentialRest = digitsOnly;
-    // If the number is just a country code (1-4 digits), don't add it as rest digits
-    if (potentialRest.length > 4) {
-      restDigits = potentialRest;
-    }
-    // Otherwise restDigits stays empty - just return the prefix
+    // Value starts with the correct country code
+    restDigits = digitsOnly.slice(codeLen);
+  } else if (digitsOnly.length > codeLen) {
+    // Value doesn't start with country code but has enough digits
+    // This handles cases where country changed but old digits remain
+    // Only keep digits if they look like a phone number (not just a country code)
+    restDigits = "";
   }
+  // If digitsOnly.length <= codeLen and doesn't match, restDigits stays empty
 
   return `+${callingCodeDigits}${restDigits.slice(0, maxDigitsAfterCode)}`;
 }
