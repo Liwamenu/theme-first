@@ -11,22 +11,58 @@ interface CartState {
   getItemCount: () => number;
 }
 
+// Helper to compare selected tags
+const areTagsEqual = (tags1: SelectedTagItem[], tags2: SelectedTagItem[]): boolean => {
+  if (tags1.length !== tags2.length) return false;
+  
+  const sortedTags1 = [...tags1].sort((a, b) => `${a.tagId}-${a.itemId}`.localeCompare(`${b.tagId}-${b.itemId}`));
+  const sortedTags2 = [...tags2].sort((a, b) => `${a.tagId}-${a.itemId}`.localeCompare(`${b.tagId}-${b.itemId}`));
+  
+  return sortedTags1.every((tag, index) => 
+    tag.tagId === sortedTags2[index].tagId &&
+    tag.itemId === sortedTags2[index].itemId && 
+    tag.quantity === sortedTags2[index].quantity
+  );
+};
+
 export const useCart = create<CartState>((set, get) => ({
   items: [],
   
   addItem: (product, portion, selectedTags, quantity = 1, note) => {
-    const id = `${product.id}-${portion.id}-${Date.now()}`;
-    const newItem: CartItem = {
-      id,
-      product,
-      portion,
-      quantity,
-      selectedTags,
-      note,
-    };
-    set((state) => ({
-      items: [...state.items, newItem],
-    }));
+    const items = get().items;
+    
+    // Find existing item with same product, portion, tags, and note
+    const existingItemIndex = items.findIndex(item => 
+      item.product.id === product.id &&
+      item.portion.id === portion.id &&
+      (item.note || '') === (note || '') &&
+      areTagsEqual(item.selectedTags, selectedTags)
+    );
+    
+    if (existingItemIndex !== -1) {
+      // Merge: increase quantity of existing item
+      set((state) => ({
+        items: state.items.map((item, index) =>
+          index === existingItemIndex
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        ),
+      }));
+    } else {
+      // Add as new item
+      const id = `${product.id}-${portion.id}-${Date.now()}`;
+      const newItem: CartItem = {
+        id,
+        product,
+        portion,
+        quantity,
+        selectedTags,
+        note,
+      };
+      set((state) => ({
+        items: [...state.items, newItem],
+      }));
+    }
   },
   
   removeItem: (itemId) => {
