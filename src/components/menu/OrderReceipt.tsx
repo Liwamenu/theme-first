@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
@@ -13,6 +14,7 @@ import {
   MapPin,
   Phone,
   User,
+  UtensilsCrossed,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Order } from "@/types/restaurant";
@@ -21,6 +23,8 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { tr, enUS } from "date-fns/locale";
 import i18n from "@/lib/i18n";
+import { Button } from "@/components/ui/button";
+import { CallWaiterModal } from "./CallWaiterModal";
 
 interface OrderReceiptProps {
   order: Order;
@@ -43,6 +47,7 @@ const statusSteps: Order["status"][] = ["pending", "confirmed", "preparing", "re
 export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
   const { t } = useTranslation();
   const { restaurant, formatPrice } = useRestaurant();
+  const [showCallWaiterModal, setShowCallWaiterModal] = useState(false);
   const statusConfig = getStatusConfig(t);
   const status = statusConfig[order.status];
   const currentStepIndex = statusSteps.indexOf(order.status);
@@ -288,7 +293,35 @@ export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
             }}
           />
         </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col gap-3">
+          <Button
+            onClick={onBack}
+            variant="outline"
+            className="w-full h-12 rounded-xl gap-2"
+          >
+            <UtensilsCrossed className="w-5 h-5" />
+            {t("orderReceipt.backToMenu")}
+          </Button>
+
+          {order.orderType === "inPerson" && (
+            <Button
+              onClick={() => setShowCallWaiterModal(true)}
+              className="w-full h-12 rounded-xl gap-2"
+            >
+              <Bell className="w-5 h-5" />
+              {t("common.callWaiter")}
+            </Button>
+          )}
+        </div>
       </div>
+
+      {/* Call Waiter Modal */}
+      <CallWaiterModal
+        isOpen={showCallWaiterModal}
+        onClose={() => setShowCallWaiterModal(false)}
+      />
     </motion.div>
   );
 }
