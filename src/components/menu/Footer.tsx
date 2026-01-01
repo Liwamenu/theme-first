@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Facebook, Instagram, Youtube, MessageCircle, CalendarDays } from "lucide-react";
+import { Facebook, Instagram, Youtube, MessageCircle, CalendarDays, Star } from "lucide-react";
 import { useRestaurant } from "@/hooks/useRestaurant";
 import { ReservationModal } from "./ReservationModal";
+import { SurveyModal } from "./SurveyModal";
 import { Button } from "@/components/ui/button";
 
 const dayKeys = ["", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
@@ -12,6 +13,7 @@ export function Footer() {
   const { restaurant } = useRestaurant();
   const { SocialLinks, WorkingHours } = restaurant;
   const [isReservationOpen, setIsReservationOpen] = useState(false);
+  const [isSurveyOpen, setIsSurveyOpen] = useState(false);
 
   const socialLinks = [
     { url: SocialLinks.facebookUrl, icon: Facebook, label: "Facebook" },
@@ -62,9 +64,9 @@ export function Footer() {
             ))}
           </div>
 
-          {/* Reservation Button - Only show if license is active */}
-          {restaurant.isReservationLicenseActive && restaurant.isReservationActive && (
-            <div className="flex justify-center mt-6">
+          {/* Reservation and Survey Buttons */}
+          <div className="flex justify-center gap-3 mt-6 flex-wrap">
+            {restaurant.isReservationLicenseActive && restaurant.isReservationActive && (
               <Button
                 onClick={() => setIsReservationOpen(true)}
                 variant="outline"
@@ -73,8 +75,16 @@ export function Footer() {
                 <CalendarDays className="w-4 h-4" />
                 <span>{t("reservation.button")}</span>
               </Button>
-            </div>
-          )}
+            )}
+            <Button
+              onClick={() => setIsSurveyOpen(true)}
+              variant="outline"
+              className="flex items-center gap-2 rounded-full border-amber-500/50 text-amber-600 hover:bg-amber-50 hover:text-amber-700"
+            >
+              <Star className="w-4 h-4" />
+              <span>{t("survey.button")}</span>
+            </Button>
+          </div>
         </div>
 
         {/* Restaurant Info */}
@@ -101,6 +111,7 @@ export function Footer() {
       </div>
 
       <ReservationModal isOpen={isReservationOpen} onClose={() => setIsReservationOpen(false)} />
+      <SurveyModal isOpen={isSurveyOpen} onClose={() => setIsSurveyOpen(false)} />
     </footer>
   );
 }

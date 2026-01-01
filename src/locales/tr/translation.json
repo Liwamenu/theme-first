@@ -236,5 +236,29 @@
     "description": "Sipariş durumunuz değiştiğinde sesli bildirim almak ister misiniz?",
     "allow": "İzin Ver",
     "deny": "Hayır"
+  },
+  "survey": {
+    "title": "Bizi Değerlendirin",
+    "button": "Değerlendir",
+    "subtitle": "Deneyiminizi bizimle paylaşın",
+    "categories": {
+      "food": "Yemekler",
+      "service": "Hizmet",
+      "ambiance": "Ortam"
+    },
+    "feedback": "Görüşleriniz",
+    "feedbackPlaceholder": "Deneyiminiz hakkında düşüncelerinizi paylaşın...",
+    "optionalInfo": "İsterseniz iletişim bilgilerinizi bırakabilirsiniz",
+    "name": "Ad Soyad",
+    "namePlaceholder": "Adınız Soyadınız",
+    "email": "E-posta",
+    "emailPlaceholder": "ornek@email.com",
+    "emailNote": "Size teşekkür maili göndereceğiz",
+    "phone": "Telefon",
+    "phonePlaceholder": "555 123 45 67",
+    "submit": "Gönder",
+    "successTitle": "Teşekkürler!",
+    "successMessage": "Değerlendirmeniz için çok teşekkür ederiz. Görüşleriniz bizim için çok değerli.",
+    "yourRatings": "Verdiğiniz Puanlar"
   }
 }

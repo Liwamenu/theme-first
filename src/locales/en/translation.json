@@ -236,5 +236,29 @@
     "description": "Would you like to receive sound notifications when your order status changes?",
     "allow": "Allow",
     "deny": "No"
+  },
+  "survey": {
+    "title": "Rate Us",
+    "button": "Rate Us",
+    "subtitle": "Share your experience with us",
+    "categories": {
+      "food": "Food",
+      "service": "Service",
+      "ambiance": "Ambiance"
+    },
+    "feedback": "Your Feedback",
+    "feedbackPlaceholder": "Share your thoughts about your experience...",
+    "optionalInfo": "Optionally leave your contact information",
+    "name": "Full Name",
+    "namePlaceholder": "Your Name",
+    "email": "Email",
+    "emailPlaceholder": "example@email.com",
+    "emailNote": "We'll send you a thank you email",
+    "phone": "Phone",
+    "phonePlaceholder": "555 123 4567",
+    "submit": "Submit",
+    "successTitle": "Thank You!",
+    "successMessage": "Thank you so much for your feedback. Your opinion is very valuable to us.",
+    "yourRatings": "Your Ratings"
   }
 }

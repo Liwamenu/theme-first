@@ -5,6 +5,7 @@ export const API_URLS = {
   sendReservationCodeEmail: "https://api.liwamenu.com/sendReservationCodeEmail",
   orders: "https://api.liwamenu.com/orders",
   callWaiter: "https://api.liwamenu.com/callWaiter",
+  surveys: "https://api.liwamenu.com/surveys",
 } as const;
 
 // Helper to check if phone is Turkish based on the phone number

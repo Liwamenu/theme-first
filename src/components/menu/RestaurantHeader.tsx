@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Clock, MapPin, Phone, AlertTriangle, CalendarDays, Receipt } from "lucide-react";
+import { Clock, MapPin, Phone, AlertTriangle, CalendarDays, Receipt, Star } from "lucide-react";
 import { useRestaurant } from "@/hooks/useRestaurant";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { ReservationModal } from "./ReservationModal";
+import { SurveyModal } from "./SurveyModal";
 import { Button } from "@/components/ui/button";
 import { Order } from "@/types/restaurant";
 
@@ -17,6 +18,7 @@ export function RestaurantHeader({ orders = [], onViewOrder }: RestaurantHeaderP
   const { restaurant, isRestaurantActive, isCurrentlyOpen, getCurrentWorkingHour } = useRestaurant();
   const { t } = useTranslation();
   const [isReservationOpen, setIsReservationOpen] = useState(false);
+  const [isSurveyOpen, setIsSurveyOpen] = useState(false);
 
   const workingHour = getCurrentWorkingHour;
 
@@ -91,8 +93,8 @@ export function RestaurantHeader({ orders = [], onViewOrder }: RestaurantHeaderP
             )}
           </div>
 
-          {/* Reservation and My Order Buttons */}
-          <div className="flex gap-2 my-2">
+          {/* Reservation, Survey and My Order Buttons */}
+          <div className="flex gap-2 my-2 flex-wrap justify-center">
             {restaurant.isReservationLicenseActive && restaurant.isReservationActive && (
               <Button
                 onClick={() => setIsReservationOpen(true)}
@@ -104,6 +106,15 @@ export function RestaurantHeader({ orders = [], onViewOrder }: RestaurantHeaderP
                 <span>{t("reservation.button")}</span>
               </Button>
             )}
+            <Button
+              onClick={() => setIsSurveyOpen(true)}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2 rounded-full border-amber-500/50 text-amber-600 hover:bg-amber-50 hover:text-amber-700"
+            >
+              <Star className="w-4 h-4" />
+              <span>{t("survey.button")}</span>
+            </Button>
             {orders.length > 0 && onViewOrder && (
               <Button
                 onClick={() => onViewOrder(orders[0])}
@@ -141,6 +152,7 @@ export function RestaurantHeader({ orders = [], onViewOrder }: RestaurantHeaderP
       </div>
 
       <ReservationModal isOpen={isReservationOpen} onClose={() => setIsReservationOpen(false)} />
+      <SurveyModal isOpen={isSurveyOpen} onClose={() => setIsSurveyOpen(false)} />
     </header>
   );
 }
