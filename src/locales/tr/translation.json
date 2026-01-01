@@ -27,7 +27,8 @@
     "selectDate": "Tarih seçin",
     "selectTime": "Saat seçin",
     "okay": "Tamam",
-    "phoneError": "Ülke kodundan sonra tam 10 rakam giriniz"
+    "phoneError": "Ülke kodundan sonra tam 10 rakam giriniz",
+    "callWaiter": "Garson Çağır"
   },
   "days": {
     "monday": "Pazartesi",
@@ -135,7 +136,8 @@
     "orderDetails": "Sipariş Detayları",
     "note": "Not",
     "orderNote": "Sipariş Notu",
-    "paymentMethod": "Ödeme Yöntemi"
+    "paymentMethod": "Ödeme Yöntemi",
+    "backToMenu": "Menüye Dön"
   },
   "status": {
     "pending": "Onay Bekleniyor",
