@@ -126,11 +126,11 @@ export function CheckoutModal({ onClose, onOrderComplete, onShowSoundPermission 
           );
 
           if (!withinTableRange) {
-            toast.error(t("order.tableOrderOutOfRange", { max: restaurant.maxTableOrderDistanceMeter }));
+            toast.error(t("order.tableOrderOutOfRange"));
             return;
           }
         } catch (error) {
-          toast.error(t("order.locationError"));
+          toast.error(t("order.tableOrderOutOfRange"));
           return;
         }
       }
