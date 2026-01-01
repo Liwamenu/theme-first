@@ -5,11 +5,23 @@ import { getCountryCallingCode } from "react-phone-number-input";
 function countDigitsAfterCallingCode(value: string, country: Country, maxDigitsAfterCode: number) {
   const digits = value.replace(/\D/g, "");
   const codeDigits = String(getCountryCallingCode(country));
-  const rest = digits.startsWith(codeDigits) ? digits.slice(codeDigits.length) : digits;
+  const codeLen = codeDigits.length;
+  
+  // Check if the digits start with the country code
+  let restDigits = "";
+  if (digits.startsWith(codeDigits)) {
+    restDigits = digits.slice(codeLen);
+  } else {
+    // If digits don't start with country code, all are considered "rest"
+    // But only if there are more than just potential code digits
+    restDigits = digits.length > codeLen ? digits : "";
+  }
+  
   return {
     codeDigits,
-    restLen: rest.length,
-    remaining: Math.max(0, maxDigitsAfterCode - rest.length),
+    codeLen,
+    restLen: restDigits.length,
+    remaining: Math.max(0, maxDigitsAfterCode - restDigits.length),
   };
 }
 
