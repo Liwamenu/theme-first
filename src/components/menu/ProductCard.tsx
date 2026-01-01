@@ -1,7 +1,7 @@
+import { memo, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Star, Plus } from "lucide-react";
 import { Product, Portion } from "@/types/restaurant";
-import { useRestaurant } from "@/hooks/useRestaurant";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 
@@ -10,6 +10,7 @@ interface ProductCardProps {
   onSelect: (product: Product) => void;
   isSpecialPriceActive: boolean;
   specialPriceName: string;
+  formatPrice: (price: number) => string;
 }
 
 function getPriceDisplay(portion: Portion, isSpecialPriceActive: boolean) {
@@ -33,12 +34,21 @@ function getPriceDisplay(portion: Portion, isSpecialPriceActive: boolean) {
   return { displayPrice, originalPrice, priceType };
 }
 
-export function ProductCard({ product, onSelect, isSpecialPriceActive, specialPriceName }: ProductCardProps) {
+export const ProductCard = memo(function ProductCard({ 
+  product, 
+  onSelect, 
+  isSpecialPriceActive, 
+  specialPriceName,
+  formatPrice 
+}: ProductCardProps) {
   const { t } = useTranslation();
-  const { formatPrice } = useRestaurant();
   const firstPortion = product.portions[0];
   const { displayPrice, originalPrice, priceType } = getPriceDisplay(firstPortion, isSpecialPriceActive);
   const hasMultiplePortions = product.portions.length > 1;
+
+  const handleClick = useCallback(() => {
+    onSelect(product);
+  }, [onSelect, product]);
 
   return (
     <motion.div
@@ -48,7 +58,7 @@ export function ProductCard({ product, onSelect, isSpecialPriceActive, specialPr
       exit={{ opacity: 0, y: -20 }}
       whileHover={{ y: -2 }}
       whileTap={{ scale: 0.98 }}
-      onClick={() => onSelect(product)}
+      onClick={handleClick}
       className="group relative bg-card rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-300 overflow-hidden cursor-pointer"
     >
       {/* Recommendation Badge */}
@@ -109,4 +119,4 @@ export function ProductCard({ product, onSelect, isSpecialPriceActive, specialPr
       </div>
     </motion.div>
   );
-}
+});

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, Bell } from "lucide-react";
@@ -22,9 +22,21 @@ import { Input } from "@/components/ui/input";
 
 type View = "menu" | "order";
 
+// Throttle helper function
+function throttle<T extends (...args: unknown[]) => void>(fn: T, delay: number): T {
+  let lastCall = 0;
+  return ((...args: Parameters<T>) => {
+    const now = Date.now();
+    if (now - lastCall >= delay) {
+      lastCall = now;
+      fn(...args);
+    }
+  }) as T;
+}
+
 export function MenuPage() {
   const { t } = useTranslation();
-  const { categories, recommendedProducts, isRestaurantActive, isCurrentlyOpen, restaurant } = useRestaurant();
+  const { categories, recommendedProducts, isRestaurantActive, isCurrentlyOpen, restaurant, formatPrice } = useRestaurant();
   const { currentOrder, orders, setCurrentOrder } = useOrder();
   const { isVisible: isFlyingEmojiVisible, startPosition: flyingEmojiPosition, hideFlyingEmoji } = useFlyingEmoji();
   const [activeCategory, setActiveCategory] = useState<string>(categories[0]?.id || "");
@@ -60,15 +72,15 @@ export function MenuPage() {
   }, [waiterCooldown]);
 
   // Save cooldown end time when it starts
-  const handleWaiterSuccess = () => {
+  const handleWaiterSuccess = useCallback(() => {
     const endTime = Date.now() + 60 * 1000;
     localStorage.setItem('waiterCooldownEnd', endTime.toString());
     setWaiterCooldown(60);
-  };
+  }, []);
 
-  // Handle category scroll sync
+  // Handle category scroll sync with throttle
   useEffect(() => {
-    const handleScroll = () => {
+    const handleScroll = throttle(() => {
       const scrollPosition = window.scrollY + 200;
 
       for (const category of categories) {
@@ -81,13 +93,13 @@ export function MenuPage() {
           }
         }
       }
-    };
+    }, 100); // Throttle to max 10 calls per second
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [categories]);
 
-  const scrollToCategory = (categoryId: string) => {
+  const scrollToCategory = useCallback((categoryId: string) => {
     const element = categoryRefs.current[categoryId];
     if (element) {
       const offset = 140; // Account for sticky header
@@ -95,34 +107,99 @@ export function MenuPage() {
       window.scrollTo({ top: elementPosition, behavior: "smooth" });
     }
     setActiveCategory(categoryId);
-  };
+  }, []);
 
-  // Filter products by search
-  const filteredCategories = searchQuery
-    ? categories
-        .map((cat) => ({
-          ...cat,
-          products: cat.products.filter(
-            (p) =>
-              p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              p.description.toLowerCase().includes(searchQuery.toLowerCase()),
-          ),
-        }))
-        .filter((cat) => cat.products.length > 0)
-    : categories;
+  // Filter products by search - memoized
+  const filteredCategories = useMemo(() => {
+    if (!searchQuery) return categories;
+    
+    const lowerQuery = searchQuery.toLowerCase();
+    return categories
+      .map((cat) => ({
+        ...cat,
+        products: cat.products.filter(
+          (p) =>
+            p.name.toLowerCase().includes(lowerQuery) ||
+            p.description.toLowerCase().includes(lowerQuery),
+        ),
+      }))
+      .filter((cat) => cat.products.length > 0);
+  }, [categories, searchQuery]);
 
   const canOrder = isRestaurantActive && isCurrentlyOpen;
 
-  const handleOrderComplete = (order: Order, orderType: 'inPerson' | 'online') => {
+  const handleOrderComplete = useCallback((order: Order, orderType: 'inPerson' | 'online') => {
     setIsCheckoutOpen(false);
     setViewingOrder(order);
     setCurrentView("order");
-  };
+  }, []);
 
-  const handleBackToMenu = () => {
+  const handleBackToMenu = useCallback(() => {
     setCurrentView("menu");
     setViewingOrder(null);
-  };
+  }, []);
+
+  // Memoized callbacks for child components
+  const handleViewOrder = useCallback((order: Order) => {
+    setViewingOrder(order);
+    setCurrentView("order");
+  }, []);
+
+  const handleSelectProduct = useCallback((product: Product) => {
+    setSelectedProduct(product);
+  }, []);
+
+  const handleCloseProduct = useCallback(() => {
+    setSelectedProduct(null);
+  }, []);
+
+  const handleOpenCart = useCallback(() => {
+    setIsCartOpen(true);
+  }, []);
+
+  const handleCloseCart = useCallback(() => {
+    setIsCartOpen(false);
+  }, []);
+
+  const handleOpenCheckout = useCallback(() => {
+    setIsCartOpen(false);
+    setIsCheckoutOpen(true);
+  }, []);
+
+  const handleCloseCheckout = useCallback(() => {
+    setIsCheckoutOpen(false);
+  }, []);
+
+  const handleOpenCallWaiter = useCallback(() => {
+    setIsCartOpen(false);
+    setShowCallWaiter(true);
+  }, []);
+
+  const handleCloseCallWaiter = useCallback(() => {
+    setShowCallWaiter(false);
+  }, []);
+
+  const handleOpenCallWaiterFloating = useCallback(() => {
+    setShowCallWaiter(true);
+  }, []);
+
+  const handleShowSoundPermission = useCallback(() => {
+    setShowSoundPermission(true);
+  }, []);
+
+  const handleAllowSound = useCallback(() => {
+    localStorage.setItem("soundPermission", "allowed");
+    setShowSoundPermission(false);
+  }, []);
+
+  const handleDenySound = useCallback(() => {
+    localStorage.setItem("soundPermission", "denied");
+    setShowSoundPermission(false);
+  }, []);
+
+  const handleCloseReservation = useCallback(() => {
+    setShowReservation(false);
+  }, []);
 
   // Show order receipt view
   if (currentView === "order" && viewingOrder) {
@@ -134,10 +211,7 @@ export function MenuPage() {
       {/* Restaurant Header */}
       <RestaurantHeader 
         orders={orders}
-        onViewOrder={(order) => {
-          setViewingOrder(order);
-          setCurrentView("order");
-        }}
+        onViewOrder={handleViewOrder}
       />
 
       {/* Search Bar */}
@@ -162,7 +236,7 @@ export function MenuPage() {
 
             {/* Cart Button - next to search */}
             {canOrder && !isCartOpen && !selectedProduct && !showCallWaiter && !isCheckoutOpen && !showReservation && (
-              <CartButton onClick={() => setIsCartOpen(true)} />
+              <CartButton onClick={handleOpenCart} />
             )}
           </div>
         </div>
@@ -182,7 +256,7 @@ export function MenuPage() {
               <motion.div
                 key={product.id}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => setSelectedProduct(product)}
+                onClick={() => handleSelectProduct(product)}
                 className="flex-shrink-0 w-40 cursor-pointer"
               >
                 <div className="relative aspect-square rounded-2xl overflow-hidden mb-2">
@@ -212,9 +286,10 @@ export function MenuPage() {
                   <ProductCard
                     key={product.id}
                     product={product}
-                    onSelect={setSelectedProduct}
+                    onSelect={handleSelectProduct}
                     isSpecialPriceActive={restaurant.isSpecialPriceActive}
                     specialPriceName={restaurant.specialPriceName}
+                    formatPrice={formatPrice}
                   />
                 ))}
               </AnimatePresence>
@@ -236,21 +311,15 @@ export function MenuPage() {
 
       {/* Product Detail Modal */}
       <AnimatePresence>
-        {selectedProduct && <ProductDetailModal product={selectedProduct} onClose={() => setSelectedProduct(null)} />}
+        {selectedProduct && <ProductDetailModal product={selectedProduct} onClose={handleCloseProduct} />}
       </AnimatePresence>
 
       {/* Cart Drawer */}
       <CartDrawer
         isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        onCheckout={() => {
-          setIsCartOpen(false);
-          setIsCheckoutOpen(true);
-        }}
-        onCallWaiter={() => {
-          setIsCartOpen(false);
-          setShowCallWaiter(true);
-        }}
+        onClose={handleCloseCart}
+        onCheckout={handleOpenCheckout}
+        onCallWaiter={handleOpenCallWaiter}
         waiterCooldown={waiterCooldown}
       />
 
@@ -258,9 +327,9 @@ export function MenuPage() {
       <AnimatePresence>
         {isCheckoutOpen && (
           <CheckoutModal
-            onClose={() => setIsCheckoutOpen(false)}
+            onClose={handleCloseCheckout}
             onOrderComplete={handleOrderComplete}
-            onShowSoundPermission={() => setShowSoundPermission(true)}
+            onShowSoundPermission={handleShowSoundPermission}
           />
         )}
       </AnimatePresence>
@@ -268,25 +337,19 @@ export function MenuPage() {
       {/* Sound Permission Modal */}
       <SoundPermissionModal
         isOpen={showSoundPermission}
-        onAllow={() => {
-          localStorage.setItem("soundPermission", "allowed");
-          setShowSoundPermission(false);
-        }}
-        onDeny={() => {
-          localStorage.setItem("soundPermission", "denied");
-          setShowSoundPermission(false);
-        }}
+        onAllow={handleAllowSound}
+        onDeny={handleDenySound}
       />
 
       {/* Call Waiter Modal */}
       <CallWaiterModal 
         isOpen={showCallWaiter} 
-        onClose={() => setShowCallWaiter(false)} 
+        onClose={handleCloseCallWaiter} 
         onSuccess={handleWaiterSuccess}
       />
 
       {/* Reservation Modal */}
-      <ReservationModal isOpen={showReservation} onClose={() => setShowReservation(false)} />
+      <ReservationModal isOpen={showReservation} onClose={handleCloseReservation} />
 
       {/* Flying Emoji Animation */}
       <FlyingEmoji
@@ -299,7 +362,7 @@ export function MenuPage() {
       {!isCartOpen && !selectedProduct && !showCallWaiter && !isCheckoutOpen && !showReservation && (
         <div className="fixed top-[138px] right-4 z-50">
           <button
-            onClick={() => setShowCallWaiter(true)}
+            onClick={handleOpenCallWaiterFloating}
             disabled={waiterCooldown > 0}
             className={`h-10 px-3 rounded-full shadow-md flex items-center gap-2 text-sm font-medium transition-all ${
               waiterCooldown > 0
