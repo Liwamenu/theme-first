@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, memo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Category } from '@/hooks/useRestaurant';
 import { cn } from '@/lib/utils';
@@ -9,15 +9,28 @@ interface CategoryTabsProps {
   onCategoryChange: (categoryId: string) => void;
 }
 
-export function CategoryTabs({ categories, activeCategory, onCategoryChange }: CategoryTabsProps) {
+// Throttle helper function
+function throttle<T extends (...args: unknown[]) => void>(fn: T, delay: number): T {
+  let lastCall = 0;
+  return ((...args: Parameters<T>) => {
+    const now = Date.now();
+    if (now - lastCall >= delay) {
+      lastCall = now;
+      fn(...args);
+    }
+  }) as T;
+}
+
+export const CategoryTabs = memo(function CategoryTabs({ categories, activeCategory, onCategoryChange }: CategoryTabsProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isSticky, setIsSticky] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
+    const handleScroll = throttle(() => {
       setIsSticky(window.scrollY > 280);
-    };
-    window.addEventListener('scroll', handleScroll);
+    }, 100); // Throttle to max 10 calls per second
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -28,6 +41,10 @@ export function CategoryTabs({ categories, activeCategory, onCategoryChange }: C
       activeElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     }
   }, [activeCategory]);
+
+  const handleClick = useCallback((categoryId: string) => {
+    onCategoryChange(categoryId);
+  }, [onCategoryChange]);
 
   return (
     <div
@@ -44,7 +61,7 @@ export function CategoryTabs({ categories, activeCategory, onCategoryChange }: C
           <motion.button
             key={category.id}
             data-category={category.id}
-            onClick={() => onCategoryChange(category.id)}
+            onClick={() => handleClick(category.id)}
             whileTap={{ scale: 0.95 }}
             className={cn(
               'flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200',
@@ -62,4 +79,4 @@ export function CategoryTabs({ categories, activeCategory, onCategoryChange }: C
       </div>
     </div>
   );
-}
+});
