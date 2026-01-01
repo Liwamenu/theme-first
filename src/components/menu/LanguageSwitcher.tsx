@@ -12,6 +12,15 @@ import { changeLanguage } from '@/lib/i18n';
 const languages = [
   { code: 'tr', label: 'Türkçe', flag: '🇹🇷' },
   { code: 'en', label: 'English', flag: '🇬🇧' },
+  { code: 'de', label: 'Deutsch', flag: '🇩🇪' },
+  { code: 'fr', label: 'Français', flag: '🇫🇷' },
+  { code: 'it', label: 'Italiano', flag: '🇮🇹' },
+  { code: 'es', label: 'Español', flag: '🇪🇸' },
+  { code: 'ar', label: 'العربية', flag: '🇸🇦' },
+  { code: 'az', label: 'Azərbaycan', flag: '🇦🇿' },
+  { code: 'ru', label: 'Русский', flag: '🇷🇺' },
+  { code: 'el', label: 'Ελληνικά', flag: '🇬🇷' },
+  { code: 'zh', label: '中文', flag: '🇨🇳' },
 ];
 
 export function LanguageSwitcher() {
