@@ -150,6 +150,7 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
       //     restaurantId: restaurant.restaurantId,
       //     phone: formData.phone,
       //     email: formData.email,
+      //     language: i18n.language, // Send current UI language for localized email content
       //   }),
       // });
       // if (!response.ok) throw new Error("Failed to send code");
