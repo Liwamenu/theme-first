@@ -203,7 +203,14 @@ export function MenuPage() {
 
   // Show order receipt view
   if (currentView === "order" && viewingOrder) {
-    return <OrderReceipt order={viewingOrder} onBack={handleBackToMenu} />;
+    return (
+      <OrderReceipt
+        order={viewingOrder}
+        onBack={handleBackToMenu}
+        waiterCooldown={waiterCooldown}
+        onWaiterSuccess={handleWaiterSuccess}
+      />
+    );
   }
 
   return (
