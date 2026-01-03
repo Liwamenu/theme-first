@@ -29,6 +29,8 @@ import { CallWaiterModal } from "./CallWaiterModal";
 interface OrderReceiptProps {
   order: Order;
   onBack: () => void;
+  waiterCooldown: number;
+  onWaiterSuccess: () => void;
 }
 
 const getStatusConfig = (
@@ -44,7 +46,7 @@ const getStatusConfig = (
 
 const statusSteps: Order["status"][] = ["pending", "confirmed", "preparing", "ready", "delivered"];
 
-export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
+export function OrderReceipt({ order, onBack, waiterCooldown, onWaiterSuccess }: OrderReceiptProps) {
   const { t } = useTranslation();
   const { restaurant, formatPrice } = useRestaurant();
   const [showCallWaiterModal, setShowCallWaiterModal] = useState(false);
@@ -307,10 +309,13 @@ export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
           {order.orderType === "inPerson" && (
             <Button
               onClick={() => setShowCallWaiterModal(true)}
-              className="w-full h-12 rounded-xl gap-2"
+              disabled={waiterCooldown > 0}
+              className={`w-full h-12 rounded-xl gap-2 ${
+                waiterCooldown > 0 ? "bg-muted text-muted-foreground" : ""
+              }`}
             >
               <Bell className="w-5 h-5" />
-              {t("common.callWaiter")}
+              {waiterCooldown > 0 ? `${t("common.callWaiter")} (${waiterCooldown}s)` : t("common.callWaiter")}
             </Button>
           )}
         </div>
@@ -320,6 +325,7 @@ export function OrderReceipt({ order, onBack }: OrderReceiptProps) {
       <CallWaiterModal
         isOpen={showCallWaiterModal}
         onClose={() => setShowCallWaiterModal(false)}
+        onSuccess={onWaiterSuccess}
       />
     </motion.div>
   );
