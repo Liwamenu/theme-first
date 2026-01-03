@@ -83,7 +83,8 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
     };
   }, [isOpen]);
 
-  const isTurkish = isTurkishPhone(formData.phone);
+  // Only Turkish phone numbers (+90) can receive SMS
+  const isTurkish = phoneCountry === "TR";
 
   const handleInputChange = (field: keyof ReservationFormData, value: string | number | Date | undefined) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
