@@ -43,6 +43,7 @@
     "searchPlaceholder": "Поиск блюд...",
     "myOrder": "Мой заказ",
     "recommended": "Рекомендуемые",
+    "campaignProducts": "Акции",
     "noResults": "Нет результатов для \"{{query}}\""
   },
   "cart": {

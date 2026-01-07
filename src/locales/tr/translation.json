@@ -43,6 +43,7 @@
     "searchPlaceholder": "Yemek ara...",
     "myOrder": "Siparişim",
     "recommended": "Önerilen Lezzetler",
+    "campaignProducts": "Kampanyalı Ürünler",
     "noResults": "\"{{query}}\" için sonuç bulunamadı"
   },
   "cart": {

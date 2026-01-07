@@ -43,6 +43,7 @@
     "searchPlaceholder": "搜索菜品...",
     "myOrder": "我的订单",
     "recommended": "推荐菜品",
+    "campaignProducts": "优惠活动",
     "noResults": "未找到 {{query}} 的结果"
   },
   "cart": {

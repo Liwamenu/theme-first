@@ -43,6 +43,7 @@
     "searchPlaceholder": "Yemək axtar...",
     "myOrder": "Sifarişim",
     "recommended": "Tövsiyə olunan",
+    "campaignProducts": "Kampaniya Məhsulları",
     "noResults": "\"{{query}}\" üçün nəticə tapılmadı"
   },
   "cart": {

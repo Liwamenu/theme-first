@@ -43,6 +43,7 @@
     "searchPlaceholder": "Search food...",
     "myOrder": "My Order",
     "recommended": "Recommended",
+    "campaignProducts": "Campaign Products",
     "noResults": "No results for \"{{query}}\""
   },
   "cart": {
