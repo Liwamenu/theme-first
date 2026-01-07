@@ -43,6 +43,7 @@
     "searchPlaceholder": "Cerca piatto...",
     "myOrder": "Il Mio Ordine",
     "recommended": "Raccomandati",
+    "campaignProducts": "Offerte",
     "noResults": "Nessun risultato per \"{{query}}\""
   },
   "cart": {

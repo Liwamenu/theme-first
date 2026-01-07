@@ -43,6 +43,7 @@
     "searchPlaceholder": "Rechercher un plat...",
     "myOrder": "Ma Commande",
     "recommended": "Recommandations",
+    "campaignProducts": "Promotions",
     "noResults": "Aucun résultat pour \"{{query}}\""
   },
   "cart": {

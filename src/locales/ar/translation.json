@@ -43,6 +43,7 @@
     "searchPlaceholder": "البحث عن طبق...",
     "myOrder": "طلبي",
     "recommended": "الأطباق الموصى بها",
+    "campaignProducts": "العروض",
     "noResults": "لا توجد نتائج لـ \"{{query}}\""
   },
   "cart": {

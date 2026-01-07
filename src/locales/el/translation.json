@@ -43,6 +43,7 @@
     "searchPlaceholder": "Αναζήτηση πιάτου...",
     "myOrder": "Η Παραγγελία μου",
     "recommended": "Προτεινόμενα",
+    "campaignProducts": "Προσφορές",
     "noResults": "Δεν βρέθηκαν αποτελέσματα για \"{{query}}\""
   },
   "cart": {

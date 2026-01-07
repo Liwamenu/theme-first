@@ -126,6 +126,18 @@ export function useRestaurant() {
     return products;
   }, [data, allowedCategoryIds]);
 
+  // Get products with campaign prices
+  const campaignProducts = useMemo(() => {
+    let products = data.Products.filter(p => !p.hide && p.portions.some(portion => portion.campaignPrice !== null));
+    
+    // Filter by menu categories if there's an active menu
+    if (allowedCategoryIds) {
+      products = products.filter(p => allowedCategoryIds.has(p.categoryId));
+    }
+    
+    return products;
+  }, [data, allowedCategoryIds]);
+
   const enabledPaymentMethods = useMemo(() => {
     return data.PaymentMethods.filter(pm => pm.enabled);
   }, [data]);
@@ -140,6 +152,7 @@ export function useRestaurant() {
     getCurrentWorkingHour,
     categories,
     recommendedProducts,
+    campaignProducts,
     enabledPaymentMethods,
     canOrderOnline,
     canOrderInPerson,

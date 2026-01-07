@@ -7,6 +7,11 @@ interface CategoryTabsProps {
   categories: Category[];
   activeCategory: string;
   onCategoryChange: (categoryId: string) => void;
+  campaignTab?: {
+    id: string;
+    name: string;
+    count: number;
+  } | null;
 }
 
 // Throttle helper function
@@ -21,7 +26,7 @@ function throttle<T extends (...args: unknown[]) => void>(fn: T, delay: number):
   }) as T;
 }
 
-export const CategoryTabs = memo(function CategoryTabs({ categories, activeCategory, onCategoryChange }: CategoryTabsProps) {
+export const CategoryTabs = memo(function CategoryTabs({ categories, activeCategory, onCategoryChange, campaignTab }: CategoryTabsProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isSticky, setIsSticky] = useState(false);
 
@@ -57,6 +62,27 @@ export const CategoryTabs = memo(function CategoryTabs({ categories, activeCateg
         ref={scrollRef}
         className="flex overflow-x-auto hide-scrollbar gap-2 px-4 py-3"
       >
+        {/* Campaign Tab - appears first if there are campaign products */}
+        {campaignTab && campaignTab.count > 0 && (
+          <motion.button
+            key={campaignTab.id}
+            data-category={campaignTab.id}
+            onClick={() => handleClick(campaignTab.id)}
+            whileTap={{ scale: 0.95 }}
+            className={cn(
+              'flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200',
+              activeCategory === campaignTab.id
+                ? 'bg-orange-500 text-white shadow-glow'
+                : 'bg-orange-100 text-orange-700 hover:bg-orange-200 dark:bg-orange-900/30 dark:text-orange-300'
+            )}
+          >
+            🔥 {campaignTab.name}
+            <span className="ml-1.5 text-xs opacity-70">
+              ({campaignTab.count})
+            </span>
+          </motion.button>
+        )}
+        
         {categories.map((category) => (
           <motion.button
             key={category.id}

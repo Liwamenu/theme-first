@@ -38,7 +38,7 @@ function throttle<T extends (...args: unknown[]) => void>(fn: T, delay: number):
 
 export function MenuPage() {
   const { t } = useTranslation();
-  const { categories, recommendedProducts, isRestaurantActive, isCurrentlyOpen, restaurant, formatPrice, setTableNumber } = useRestaurant();
+  const { categories, recommendedProducts, campaignProducts, isRestaurantActive, isCurrentlyOpen, restaurant, formatPrice, setTableNumber } = useRestaurant();
   const { currentOrder, orders, setCurrentOrder } = useOrder();
   const { isVisible: isFlyingEmojiVisible, startPosition: flyingEmojiPosition, hideFlyingEmoji } = useFlyingEmoji();
   const [activeCategory, setActiveCategory] = useState<string>(categories[0]?.id || "");
@@ -102,7 +102,22 @@ export function MenuPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [categories]);
 
+  // Campaign category ID for special handling
+  const CAMPAIGN_CATEGORY_ID = '__campaign__';
+
   const scrollToCategory = useCallback((categoryId: string) => {
+    // Handle campaign category scrolling
+    if (categoryId === CAMPAIGN_CATEGORY_ID) {
+      const element = categoryRefs.current[CAMPAIGN_CATEGORY_ID];
+      if (element) {
+        const offset = 140;
+        const elementPosition = element.offsetTop - offset;
+        window.scrollTo({ top: elementPosition, behavior: "smooth" });
+      }
+      setActiveCategory(CAMPAIGN_CATEGORY_ID);
+      return;
+    }
+    
     const element = categoryRefs.current[categoryId];
     if (element) {
       const offset = 140; // Account for sticky header
@@ -110,7 +125,7 @@ export function MenuPage() {
       window.scrollTo({ top: elementPosition, behavior: "smooth" });
     }
     setActiveCategory(categoryId);
-  }, []);
+  }, [CAMPAIGN_CATEGORY_ID]);
 
   // Filter products by search - memoized
   const filteredCategories = useMemo(() => {
@@ -266,7 +281,16 @@ export function MenuPage() {
 
         {/* Category Tabs */}
         {!searchQuery && (
-          <CategoryTabs categories={categories} activeCategory={activeCategory} onCategoryChange={scrollToCategory} />
+          <CategoryTabs 
+            categories={categories} 
+            activeCategory={activeCategory} 
+            onCategoryChange={scrollToCategory}
+            campaignTab={campaignProducts.length > 0 ? {
+              id: CAMPAIGN_CATEGORY_ID,
+              name: t('menu.campaignProducts'),
+              count: campaignProducts.length
+            } : null}
+          />
         )}
       </div>
 
@@ -297,6 +321,33 @@ export function MenuPage() {
 
       {/* Menu Categories */}
       <div className="container px-4 pb-8">
+        {/* Campaign Products Section */}
+        {!searchQuery && campaignProducts.length > 0 && (
+          <section 
+            ref={(el) => (categoryRefs.current[CAMPAIGN_CATEGORY_ID] = el)} 
+            className="mb-8"
+          >
+            <h2 className="font-display text-xl font-bold mb-4 flex items-center gap-2">
+              🔥 {t('menu.campaignProducts')}
+              <span className="text-sm font-normal text-muted-foreground">({campaignProducts.length})</span>
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <AnimatePresence mode="popLayout">
+                {campaignProducts.map((product) => (
+                  <ProductCard
+                    key={`campaign-${product.id}`}
+                    product={product}
+                    onSelect={handleSelectProduct}
+                    isSpecialPriceActive={restaurant.isSpecialPriceActive}
+                    specialPriceName={restaurant.specialPriceName}
+                    formatPrice={formatPrice}
+                  />
+                ))}
+              </AnimatePresence>
+            </div>
+          </section>
+        )}
+
         {filteredCategories.map((category) => (
           <section key={category.id} ref={(el) => (categoryRefs.current[category.id] = el)} className="mb-8">
             <h2 className="font-display text-xl font-bold mb-4 flex items-center gap-2">

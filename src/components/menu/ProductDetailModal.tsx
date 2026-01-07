@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Minus, Check, MessageSquare } from 'lucide-react';
@@ -26,6 +26,8 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
   const [quantity, setQuantity] = useState(1);
   const [selectedTags, setSelectedTags] = useState<Record<string, SelectedTagItem[]>>({});
   const [productNote, setProductNote] = useState('');
+  const [shakingTagId, setShakingTagId] = useState<string | null>(null);
+  const tagRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -101,17 +103,26 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
     return (selectedTags[tagId] || []).some(t => t.itemId === itemId);
   };
 
-  // Validate required tags
-  const validateTags = (): boolean => {
+  // Validate required tags and scroll to first invalid one
+  const validateTags = useCallback((): boolean => {
     for (const tag of selectedPortion.orderTags) {
       const selectedCount = (selectedTags[tag.id] || []).length;
       if (tag.minSelected > 0 && selectedCount < tag.minSelected) {
+        // Scroll to the tag section
+        const tagElement = tagRefs.current[tag.id];
+        if (tagElement) {
+          tagElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        // Trigger shake animation
+        setShakingTagId(tag.id);
+        setTimeout(() => setShakingTagId(null), 1500);
+        
         toast.error(t('product.minSelectionError', { name: tag.name, min: tag.minSelected }));
         return false;
       }
     }
     return true;
-  };
+  }, [selectedPortion.orderTags, selectedTags, t]);
 
   const handleAddToCart = () => {
     if (!canAddToCart) {
@@ -213,56 +224,82 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
           )}
 
           {/* Order Tags */}
-          {selectedPortion.orderTags.map((tag) => (
-            <div key={tag.id} className="mb-4">
-              <div className="flex items-center gap-2 mb-3">
-                <h3 className="font-semibold text-foreground">{tag.name}</h3>
-                {tag.minSelected > 0 && (
-                  <span className="px-2 py-0.5 bg-destructive/10 text-destructive text-xs rounded-full">
-                    {t('common.required')}
-                  </span>
+          {selectedPortion.orderTags.map((tag) => {
+            const isRequired = tag.minSelected > 0;
+            const selectedCount = (selectedTags[tag.id] || []).length;
+            const isUnfulfilled = isRequired && selectedCount < tag.minSelected;
+            const isShaking = shakingTagId === tag.id;
+            
+            return (
+              <div 
+                key={tag.id} 
+                ref={(el) => (tagRefs.current[tag.id] = el)}
+                className={cn(
+                  "mb-4 p-3 rounded-xl transition-all",
+                  isShaking && "animate-shake bg-destructive/5 ring-2 ring-destructive"
                 )}
-                {tag.maxSelected > 1 && (
-                  <span className="text-xs text-muted-foreground">
-                    ({t('product.maxSelection', { max: tag.maxSelected })})
-                  </span>
-                )}
-              </div>
-              <div className="space-y-2">
-                {tag.orderTagItems.map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => handleTagSelect(tag, item)}
-                    className={cn(
-                      'w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all',
-                      isTagItemSelected(tag.id, item.id)
-                        ? 'bg-primary/10 border-2 border-primary'
-                        : 'bg-secondary border-2 border-transparent'
-                    )}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={cn(
-                        'w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all',
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <h3 className={cn(
+                    "font-semibold",
+                    isShaking ? "text-destructive" : "text-foreground"
+                  )}>{tag.name}</h3>
+                  {isRequired && (
+                    <span className={cn(
+                      "px-2 py-0.5 text-xs rounded-full transition-all",
+                      isShaking 
+                        ? "bg-destructive text-destructive-foreground animate-pulse" 
+                        : "bg-destructive/10 text-destructive"
+                    )}>
+                      {t('common.required')}
+                    </span>
+                  )}
+                  {tag.maxSelected > 1 && (
+                    <span className="text-xs text-muted-foreground">
+                      ({t('product.maxSelection', { max: tag.maxSelected })})
+                    </span>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  {tag.orderTagItems.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => handleTagSelect(tag, item)}
+                      className={cn(
+                        'w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all',
                         isTagItemSelected(tag.id, item.id)
-                          ? 'bg-primary border-primary'
-                          : 'border-muted-foreground/30'
-                      )}>
-                        {isTagItemSelected(tag.id, item.id) && (
-                          <Check className="w-3 h-3 text-primary-foreground" />
-                        )}
+                          ? 'bg-primary/10 border-2 border-primary'
+                          : isShaking && isUnfulfilled
+                            ? 'bg-secondary border-2 border-destructive/50 animate-pulse'
+                            : 'bg-secondary border-2 border-transparent'
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={cn(
+                          'w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all',
+                          isTagItemSelected(tag.id, item.id)
+                            ? 'bg-primary border-primary'
+                            : isShaking && isUnfulfilled
+                              ? 'border-destructive'
+                              : 'border-muted-foreground/30'
+                        )}>
+                          {isTagItemSelected(tag.id, item.id) && (
+                            <Check className="w-3 h-3 text-primary-foreground" />
+                          )}
+                        </div>
+                        <span className="font-medium">{item.name}</span>
                       </div>
-                      <span className="font-medium">{item.name}</span>
-                    </div>
-                    {item.price > 0 && (
-                      <span className="text-sm text-muted-foreground">
-                        +{formatPrice(item.price)}
-                      </span>
-                    )}
-                  </button>
-                ))}
+                      {item.price > 0 && (
+                        <span className="text-sm text-muted-foreground">
+                          +{formatPrice(item.price)}
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
 
           {/* Product Note */}
           {product.isNoteAllowed && (

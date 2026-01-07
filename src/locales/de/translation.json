@@ -43,6 +43,7 @@
     "searchPlaceholder": "Essen suchen...",
     "myOrder": "Meine Bestellung",
     "recommended": "Empfehlungen",
+    "campaignProducts": "Angebote",
     "noResults": "Keine Ergebnisse für \"{{query}}\""
   },
   "cart": {

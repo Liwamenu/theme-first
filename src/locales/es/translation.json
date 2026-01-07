@@ -43,6 +43,7 @@
     "searchPlaceholder": "Buscar plato...",
     "myOrder": "Mi Pedido",
     "recommended": "Recomendados",
+    "campaignProducts": "Ofertas",
     "noResults": "Sin resultados para \"{{query}}\""
   },
   "cart": {
