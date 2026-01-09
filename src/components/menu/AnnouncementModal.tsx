@@ -16,12 +16,12 @@ export const AnnouncementModal = ({ isOpen, onClose, htmlContent }: Announcement
   // Prevent body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     }
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     };
   }, [isOpen]);
 
@@ -58,7 +58,7 @@ export const AnnouncementModal = ({ isOpen, onClose, htmlContent }: Announcement
 
             {/* Scrollable content */}
             <div className="relative max-h-[calc(85vh-80px)] overflow-y-auto p-6 pt-8">
-              <div 
+              <div
                 className="announcement-content prose prose-sm dark:prose-invert max-w-none"
                 dangerouslySetInnerHTML={{ __html: htmlContent }}
               />
@@ -66,12 +66,12 @@ export const AnnouncementModal = ({ isOpen, onClose, htmlContent }: Announcement
 
             {/* Footer with button */}
             <div className="relative p-4 pt-2 border-t border-border/50 bg-background/80 backdrop-blur-sm">
-              <Button 
+              <Button
                 onClick={onClose}
                 className="w-full h-11 bg-gradient-to-r from-primary to-amber-600 hover:from-primary/90 hover:to-amber-600/90 text-primary-foreground font-medium rounded-xl shadow-lg"
               >
                 <Sparkles className="h-4 w-4 mr-2" />
-                {t('common.ok', 'Tamam')}
+                {t("common.ok", "Tamam")}
               </Button>
             </div>
           </motion.div>
@@ -90,7 +90,7 @@ export const getNewYearAnnouncementContent = (): string => {
         Yeni Yılınız Kutlu Olsun!
       </h2>
       <p class="text-muted-foreground">
-        2025 yılının sağlık, mutluluk ve başarılarla dolu olmasını dileriz!
+        2026 yılının sağlık, mutluluk ve başarılarla dolu olmasını dileriz!
       </p>
       
       <div class="my-6 p-4 rounded-xl bg-gradient-to-r from-primary/10 to-amber-500/10 border border-primary/20">
@@ -110,14 +110,8 @@ export const getNewYearAnnouncementContent = (): string => {
       </div>
       
       <p class="text-xs text-muted-foreground italic">
-        Kampanya 31 Ocak 2025 tarihine kadar geçerlidir.
+        Kampanya 31 Ocak 2026 tarihine kadar geçerlidir.
       </p>
-      
-      <div class="mt-6 p-4 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-300 dark:border-emerald-700">
-        <p class="text-sm text-emerald-800 dark:text-emerald-200">
-          💡 Müşterileriniz menüye eriştikten belli bir süre sonra otomatik olarak bu şekilde bir duyuru penceresi gösterebilir ve özel günlerde kutlama veya kampanya mesajları yayınlayabilirsiniz.
-        </p>
-      </div>
     </div>
   `;
 };
