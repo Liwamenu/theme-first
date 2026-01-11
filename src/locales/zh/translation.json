@@ -246,6 +246,8 @@
     "notServing": "餐厅当前不营业",
     "open": "营业中",
     "closed": "已打烊",
+    "currentlyClosed": "我们目前已打烊",
+    "workingHours": "营业时间",
     "opensAt": "{{time}}开门"
   },
   "sound": {

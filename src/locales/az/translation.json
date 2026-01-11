@@ -246,6 +246,8 @@
     "notServing": "Restoran hazırda xidmət göstərmir",
     "open": "Açıq",
     "closed": "Bağlı",
+    "currentlyClosed": "Hazırda bağlıyıq",
+    "workingHours": "İş saatları",
     "opensAt": "{{time}}-da açılacaq"
   },
   "sound": {

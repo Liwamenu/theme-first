@@ -99,10 +99,19 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "pulse-red": {
+          "0%, 100%": { 
+            backgroundColor: "hsl(0 84% 60% / 0.15)" 
+          },
+          "50%": { 
+            backgroundColor: "hsl(0 84% 60% / 0.35)" 
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "pulse-red": "pulse-red 1.5s ease-in-out infinite",
       },
     },
   },

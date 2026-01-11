@@ -246,6 +246,8 @@
     "notServing": "Restaurante actualmente cerrado",
     "open": "Abierto",
     "closed": "Cerrado",
+    "currentlyClosed": "Actualmente estamos cerrados",
+    "workingHours": "Horario de apertura",
     "opensAt": "Abre a las {{time}}"
   },
   "sound": {

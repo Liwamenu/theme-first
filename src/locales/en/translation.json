@@ -250,6 +250,8 @@
     "notServing": "Restaurant Currently Not Serving",
     "open": "Open",
     "closed": "Closed",
+    "currentlyClosed": "We are currently closed",
+    "workingHours": "Working hours",
     "opensAt": "Opens at {{time}}"
   },
   "sound": {

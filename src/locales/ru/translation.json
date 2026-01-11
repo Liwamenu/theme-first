@@ -246,6 +246,8 @@
     "notServing": "Ресторан сейчас закрыт",
     "open": "Открыто",
     "closed": "Закрыто",
+    "currentlyClosed": "Сейчас мы закрыты",
+    "workingHours": "Часы работы",
     "opensAt": "Откроется в {{time}}"
   },
   "sound": {
