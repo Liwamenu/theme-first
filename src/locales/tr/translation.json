@@ -250,6 +250,8 @@
     "notServing": "Restoran Şu An Hizmet Vermiyor",
     "open": "Açık",
     "closed": "Kapalı",
+    "currentlyClosed": "Şu anda kapalıyız",
+    "workingHours": "Çalışma saatleri",
     "opensAt": "{{time}}'da açılacak"
   },
   "sound": {

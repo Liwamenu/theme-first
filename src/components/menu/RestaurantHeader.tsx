@@ -85,13 +85,21 @@ export function RestaurantHeader({ orders = [], onViewOrder }: RestaurantHeaderP
                 )}
               </div>
             ) : (
-              <div className="flex items-center gap-2 px-4 py-2 bg-muted text-muted-foreground rounded-full text-sm font-medium">
-                <Clock className="w-4 h-4" />
-                <span>{t("header.closed")}</span>
+              <motion.div
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                className="flex flex-col items-center gap-2 px-5 py-3 rounded-2xl text-sm font-medium animate-pulse-red"
+              >
+                <div className="flex items-center gap-2 text-destructive">
+                  <Clock className="w-4 h-4" />
+                  <span className="font-semibold">{t("header.currentlyClosed")}</span>
+                </div>
                 {workingHour && !workingHour.IsClosed && (
-                  <span>• {t("header.opensAt", { time: workingHour.Open })}</span>
+                  <div className="text-muted-foreground text-xs">
+                    {t("header.workingHours")}: {workingHour.Open} - {workingHour.Close}
+                  </div>
                 )}
-              </div>
+              </motion.div>
             )}
           </div>
 

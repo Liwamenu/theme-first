@@ -246,6 +246,8 @@
     "notServing": "المطعم مغلق حالياً",
     "open": "مفتوح",
     "closed": "مغلق",
+    "currentlyClosed": "نحن مغلقون حالياً",
+    "workingHours": "ساعات العمل",
     "opensAt": "يفتح في {{time}}"
   },
   "sound": {
