@@ -97,7 +97,8 @@ export function CheckoutModal({
   const discountRate = getDiscountRate();
   const discountAmount = subtotal * discountRate / 100;
   const deliveryFee = orderType === "online" ? restaurant.deliveryFee : 0;
-  const total = subtotal - discountAmount + deliveryFee;
+  const coverCharge = orderType === "inPerson" ? (restaurant.coverCharge || 0) : 0;
+  const total = subtotal - discountAmount + deliveryFee + coverCharge;
   const handleSelectOrderType = async (type: OrderType) => {
     setOrderType(type);
     if (type === "online") {
@@ -570,6 +571,12 @@ export function CheckoutModal({
                   {orderType === "online" && deliveryFee > 0 && <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">{t("order.deliveryFee")}</span>
                       <span>{formatPrice(deliveryFee)}</span>
+                    </div>}
+
+                  {/* Cover Charge */}
+                  {orderType === "inPerson" && coverCharge > 0 && <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">{t("order.coverCharge")}</span>
+                      <span>{formatPrice(coverCharge)}</span>
                     </div>}
 
                   {/* Total */}
