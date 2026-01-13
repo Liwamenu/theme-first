@@ -41,45 +41,67 @@ export function useLocation() {
         return;
       }
 
-      // Try with high accuracy first, fallback to low accuracy for Opera and some mobile browsers
+      let hasResolved = false;
+      let attempts = 0;
+      const maxAttempts = 2;
+
+      // Helper function to handle successful position
+      const handleSuccess = (position: GeolocationPosition) => {
+        if (hasResolved) return;
+        hasResolved = true;
+        const { latitude, longitude } = position.coords;
+        setState({ latitude, longitude, error: null, loading: false });
+        resolve({ latitude, longitude });
+      };
+
+      // Helper function to handle errors
+      const handleError = (error: GeolocationPositionError, highAccuracy: boolean) => {
+        if (hasResolved) return;
+        
+        attempts++;
+        
+        // If high accuracy fails (any error except permission denied), try low accuracy
+        if (highAccuracy && error.code !== error.PERMISSION_DENIED && attempts < maxAttempts) {
+          console.log('High accuracy failed, trying low accuracy...', error.code, error.message);
+          tryGetPosition(false);
+          return;
+        }
+        
+        hasResolved = true;
+        let errorMessage = 'Konum alınamadı.';
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = 'Konum izni reddedildi. Lütfen tarayıcı ayarlarından konum iznini verin.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = 'Konum bilgisi alınamıyor. Lütfen konum servislerinin açık olduğundan emin olun.';
+            break;
+          case error.TIMEOUT:
+            errorMessage = 'Konum isteği zaman aşımına uğradı. Lütfen tekrar deneyin.';
+            break;
+        }
+        setState((prev) => ({ ...prev, loading: false, error: errorMessage }));
+        reject(new Error(errorMessage));
+      };
+
+      // Try to get position with specified accuracy
       const tryGetPosition = (highAccuracy: boolean) => {
+        // Desktop browsers often work better with low accuracy (IP-based)
+        // Mobile browsers work better with high accuracy (GPS)
+        const options: PositionOptions = {
+          enableHighAccuracy: highAccuracy,
+          timeout: highAccuracy ? 15000 : 20000, // Longer timeout for desktop
+          maximumAge: highAccuracy ? 0 : 30000, // Allow cached position for low accuracy
+        };
+
         navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const { latitude, longitude } = position.coords;
-            setState({ latitude, longitude, error: null, loading: false });
-            resolve({ latitude, longitude });
-          },
-          (error) => {
-            // If high accuracy fails with timeout or unavailable, try low accuracy
-            if (highAccuracy && (error.code === error.TIMEOUT || error.code === error.POSITION_UNAVAILABLE)) {
-              console.log('High accuracy failed, trying low accuracy...');
-              tryGetPosition(false);
-              return;
-            }
-            
-            let errorMessage = 'Konum alınamadı.';
-            switch (error.code) {
-              case error.PERMISSION_DENIED:
-                errorMessage = 'Konum izni reddedildi. Lütfen tarayıcı ayarlarından konum iznini verin.';
-                break;
-              case error.POSITION_UNAVAILABLE:
-                errorMessage = 'Konum bilgisi alınamıyor. Lütfen konum servislerinin açık olduğundan emin olun.';
-                break;
-              case error.TIMEOUT:
-                errorMessage = 'Konum isteği zaman aşımına uğradı. Lütfen tekrar deneyin.';
-                break;
-            }
-            setState((prev) => ({ ...prev, loading: false, error: errorMessage }));
-            reject(new Error(errorMessage));
-          },
-          {
-            enableHighAccuracy: highAccuracy,
-            timeout: highAccuracy ? 10000 : 15000,
-            maximumAge: 0,
-          }
+          handleSuccess,
+          (error) => handleError(error, highAccuracy),
+          options
         );
       };
 
+      // Start with high accuracy, will fallback to low accuracy if needed
       tryGetPosition(true);
     });
   }, []);
