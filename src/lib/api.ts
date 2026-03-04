@@ -3,7 +3,7 @@ export const USE_DUMMY_DATA = true;
 
 // API Configuration - Change these URLs as needed
 export const API_URLS = {
-  reservations: "https://api.liwamenu.com/Reservations",
+  reservations: "https://api.liwamenu.com/SetReservations",
   sendReservationCodeSMS: "https://api.liwamenu.com/SendReservationCodeSMS",
   sendReservationCodeEmail: "https://api.liwamenu.com/SendReservationCodeEmail",
   orders: "https://api.liwamenu.com/SendOrders",
