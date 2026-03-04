@@ -122,10 +122,14 @@ export function useRestaurant() {
   }, [activeMenu]);
 
   const categories = useMemo((): Category[] => {
-    let visibleProducts = data.products.filter(p => !p.hide);
+    const allVisible = data.products.filter(p => !p.hide);
+    let visibleProducts = allVisible;
     
     if (allowedCategoryIds) {
-      visibleProducts = visibleProducts.filter(p => allowedCategoryIds.has(p.categoryId));
+      const filtered = allVisible.filter(p => allowedCategoryIds.has(p.categoryId));
+      if (filtered.length > 0) {
+        visibleProducts = filtered;
+      }
     }
 
     const categoryMap = new Map<string, Category>();
@@ -159,19 +163,21 @@ export function useRestaurant() {
   };
 
   const recommendedProducts = useMemo(() => {
-    let products = data.products.filter(p => p.recommendation && !p.hide);
+    const all = data.products.filter(p => p.recommendation && !p.hide);
     if (allowedCategoryIds) {
-      products = products.filter(p => allowedCategoryIds.has(p.categoryId));
+      const filtered = all.filter(p => allowedCategoryIds.has(p.categoryId));
+      return filtered.length > 0 ? filtered : all;
     }
-    return products;
+    return all;
   }, [data, allowedCategoryIds]);
 
   const campaignProducts = useMemo(() => {
-    let products = data.products.filter(p => !p.hide && p.portions.some(portion => portion.campaignPrice !== null));
+    const all = data.products.filter(p => !p.hide && p.portions.some(portion => portion.campaignPrice !== null));
     if (allowedCategoryIds) {
-      products = products.filter(p => allowedCategoryIds.has(p.categoryId));
+      const filtered = all.filter(p => allowedCategoryIds.has(p.categoryId));
+      return filtered.length > 0 ? filtered : all;
     }
-    return products;
+    return all;
   }, [data, allowedCategoryIds]);
 
   const enabledPaymentMethods = useMemo(() => {
