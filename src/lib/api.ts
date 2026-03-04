@@ -29,13 +29,15 @@ export function getTenant(): string {
   // Subdomain-based: addis.liwamenu.com → "addis"
   const parts = hostname.split(".");
   if (parts.length > 2) {
-    return parts[0];
+    // return parts[0];
+    return "addis";
   }
 
   // Path-based: liwamenu.com/addis → "addis"
   const pathSegment = window.location.pathname.split("/")[1];
   if (pathSegment) {
-    return pathSegment;
+    // return pathSegment;
+    return "addis";
   }
 
   return "addis"; // fallback
