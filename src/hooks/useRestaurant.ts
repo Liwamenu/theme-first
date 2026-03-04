@@ -58,7 +58,8 @@ export function useInitializeRestaurant() {
         if (!res.ok) throw new Error(`API error: ${res.status}`);
         const json = await res.json();
         if (!cancelled) {
-          setRestaurantData(json.restaurantData ?? json);
+          const restaurantData = json.data?.restaurantData ?? json.restaurantData ?? json;
+          setRestaurantData(restaurantData);
         }
       } catch (err: any) {
         if (!cancelled) {
