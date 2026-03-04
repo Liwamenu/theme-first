@@ -3,13 +3,13 @@ export const USE_DUMMY_DATA = false;
 
 // API Configuration - Change these URLs as needed
 export const API_URLS = {
-  reservations: "https://api.liwamenu.com/SetReservations",
-  sendReservationCodeSMS: "https://api.liwamenu.com/SendReservationCodeSMS",
-  sendReservationCodeEmail: "https://api.liwamenu.com/SendReservationCodeEmail",
-  orders: "https://api.liwamenu.com/SendOrders",
-  callWaiter: "https://api.liwamenu.com/CallWaiter",
-  sendSurvey: "https://api.liwamenu.com/SendSurvey",
-  getRestaurantFull: "https://api.liwamenu.com/api/Restaurants/GetRestaurantFullByTenant",
+  reservations: "https://liwamenu.pentegrasyon.net/api/Reservations/SetReservations",
+  sendReservationCodeSMS: "https://liwamenu.pentegrasyon.net/api/Reservations/SendReservationCodeSMS",
+  sendReservationCodeEmail: "https://liwamenu.pentegrasyon.net/api/Reservations/SendReservationCodeEmail",
+  orders: "https://liwamenu.pentegrasyon.net/api/Orders/SendOrders",
+  callWaiter: "https://liwamenu.pentegrasyon.net/api/Orders/CallWaiter",
+  sendSurvey: "https://liwamenu.pentegrasyon.net/api/Surveys/SendSurvey",
+  getRestaurantFull: "https://liwamenu.pentegrasyon.net/api/Restaurants/GetRestaurantFullByTenant",
 } as const;
 
 // Resolve tenant from URL
