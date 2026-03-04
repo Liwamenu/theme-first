@@ -1,5 +1,5 @@
 // Toggle: set to true to use dummy data from src/data/restaurant.ts, false to fetch from API
-export const USE_DUMMY_DATA = true;
+export const USE_DUMMY_DATA = false;
 
 // API Configuration - Change these URLs as needed
 export const API_URLS = {
