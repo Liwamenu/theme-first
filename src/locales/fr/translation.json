@@ -76,6 +76,8 @@
     "maxSelection": "Max. {{max}}",
     "maxSelectionError": "Vous pouvez sélectionner maximum {{max}} articles",
     "minSelectionError": "Veuillez sélectionner au moins {{min}} pour \"{{name}}\"",
+    "minQuantityError": "\"{{name}}\" nécessite une quantité minimum de {{min}}",
+    "maxQuantityError": "\"{{name}}\" autorise une quantité maximum de {{max}}",
     "note": "Note du produit",
     "notePlaceholder": "Ajoutez vos demandes spéciales..."
   },

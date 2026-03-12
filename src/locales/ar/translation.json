@@ -76,6 +76,8 @@
     "maxSelection": "الحد الأقصى {{max}}",
     "maxSelectionError": "يمكنك اختيار {{max}} عناصر كحد أقصى",
     "minSelectionError": "يرجى اختيار {{min}} على الأقل لـ \"{{name}}\"",
+    "minQuantityError": "\"{{name}}\" يتطلب حد أدنى {{min}}",
+    "maxQuantityError": "\"{{name}}\" يسمح بحد أقصى {{max}}",
     "note": "ملاحظة المنتج",
     "notePlaceholder": "أضف طلبات خاصة لهذا العنصر..."
   },

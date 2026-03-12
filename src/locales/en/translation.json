@@ -77,6 +77,8 @@
     "maxSelection": "Max {{max}}",
     "maxSelectionError": "You can select maximum {{max}} items",
     "minSelectionError": "Please select at least {{min}} for \"{{name}}\"",
+    "minQuantityError": "\"{{name}}\" requires a minimum quantity of {{min}}",
+    "maxQuantityError": "\"{{name}}\" allows a maximum quantity of {{max}}",
     "note": "Product Note",
     "notePlaceholder": "Add any special requests for this item..."
   },
