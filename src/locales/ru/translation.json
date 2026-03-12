@@ -76,6 +76,8 @@
     "maxSelection": "Макс. {{max}}",
     "maxSelectionError": "Можно выбрать максимум {{max}} позиций",
     "minSelectionError": "Выберите минимум {{min}} для \"{{name}}\"",
+    "minQuantityError": "\"{{name}}\" требует минимум {{min}} шт.",
+    "maxQuantityError": "\"{{name}}\" допускает максимум {{max}} шт.",
     "note": "Примечание к товару",
     "notePlaceholder": "Добавьте особые пожелания к этому товару..."
   },

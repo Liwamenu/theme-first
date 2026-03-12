@@ -76,6 +76,8 @@
     "maxSelection": "Μέγ. {{max}}",
     "maxSelectionError": "Μπορείτε να επιλέξετε μέχρι {{max}} προϊόντα",
     "minSelectionError": "Επιλέξτε τουλάχιστον {{min}} για \"{{name}}\"",
+    "minQuantityError": "\"{{name}}\" απαιτεί ελάχιστη ποσότητα {{min}}",
+    "maxQuantityError": "\"{{name}}\" επιτρέπει μέγιστη ποσότητα {{max}}",
     "note": "Σημείωση προϊόντος",
     "notePlaceholder": "Προσθέστε ειδικά αιτήματα για αυτό το προϊόν..."
   },

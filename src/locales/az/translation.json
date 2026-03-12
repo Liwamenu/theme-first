@@ -76,6 +76,8 @@
     "maxSelection": "Maksimum {{max}}",
     "maxSelectionError": "Maksimum {{max}} seçim edə bilərsiniz",
     "minSelectionError": "\"{{name}}\" üçün ən azı {{min}} seçim etməlisiniz",
+    "minQuantityError": "\"{{name}}\" üçün minimum {{min}} ədəd tələb olunur",
+    "maxQuantityError": "\"{{name}}\" üçün maksimum {{max}} ədəd seçilə bilər",
     "note": "Məhsul qeydi",
     "notePlaceholder": "Bu məhsul üçün xüsusi istəklərinizi yazın..."
   },

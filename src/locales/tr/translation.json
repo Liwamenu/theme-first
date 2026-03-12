@@ -77,6 +77,8 @@
     "maxSelection": "En fazla {{max}}",
     "maxSelectionError": "En fazla {{max}} seçim yapabilirsiniz",
     "minSelectionError": "\"{{name}}\" için en az {{min}} seçim yapmalısınız",
+    "minQuantityError": "\"{{name}}\" için minimum {{min}} adet gereklidir",
+    "maxQuantityError": "\"{{name}}\" için maksimum {{max}} adet seçilebilir",
     "note": "Ürün Notu",
     "notePlaceholder": "Bu ürün için özel isteklerinizi yazın..."
   },
