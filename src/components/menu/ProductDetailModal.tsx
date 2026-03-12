@@ -147,19 +147,34 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
   // Validate required tags and scroll to first invalid one
   const validateTags = useCallback((): boolean => {
     for (const tag of selectedPortion.orderTags) {
-      const selectedCount = (selectedTags[tag.id] || []).length;
+      const currentTagItems = selectedTags[tag.id] || [];
+      const selectedCount = currentTagItems.length;
+      
+      // Check group-level minSelected
       if (tag.minSelected > 0 && selectedCount < tag.minSelected) {
-        // Scroll to the tag section
         const tagElement = tagRefs.current[tag.id];
         if (tagElement) {
           tagElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
-        // Trigger shake animation
         setShakingTagId(tag.id);
         setTimeout(() => setShakingTagId(null), 1500);
-        
         toast.error(t('product.minSelectionError', { name: tag.name, min: tag.minSelected }));
         return false;
+      }
+
+      // Check per-item minQuantity for selected items
+      for (const selectedItem of currentTagItems) {
+        const orderTagItem = tag.orderTagItems.find(i => i.id === selectedItem.itemId);
+        if (orderTagItem && orderTagItem.minQuantity > 0 && selectedItem.quantity < orderTagItem.minQuantity) {
+          const tagElement = tagRefs.current[tag.id];
+          if (tagElement) {
+            tagElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          setShakingTagId(tag.id);
+          setTimeout(() => setShakingTagId(null), 1500);
+          toast.error(t('product.minQuantityError', { name: selectedItem.itemName, min: orderTagItem.minQuantity }));
+          return false;
+        }
       }
     }
     return true;
