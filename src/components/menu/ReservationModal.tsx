@@ -157,21 +157,15 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
     try {
       const apiUrl = isTurkish ? API_URLS.sendReservationCodeSMS : API_URLS.sendReservationCodeEmail;
       
-      // Simulate API call for testing
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      
-      // Uncomment when API is ready:
-      // const response = await fetch(apiUrl, {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({
-      //     restaurantId: restaurant.restaurantId,
-      //     phone: formData.phone,
-      //     email: formData.email,
-      //     language: i18n.language, // Send current UI language for localized email content
-      //   }),
-      // });
-      // if (!response.ok) throw new Error("Failed to send code");
+      await apiFetch(apiUrl, {
+        method: "POST",
+        body: JSON.stringify({
+          restaurantId: restaurant.restaurantId,
+          phone: formData.phone,
+          email: formData.email,
+          language: i18n.language,
+        }),
+      });
 
       toast.success(t(isTurkish ? "reservation.codeSentSMS" : "reservation.codeSentEmail"));
       setStep("code");
