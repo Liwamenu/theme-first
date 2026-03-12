@@ -94,10 +94,11 @@ export function CallWaiterModal({ isOpen, onClose, onSuccess }: CallWaiterModalP
     };
 
     try {
-      console.log('Calling waiter at https://api.liwamnenu.com/CallWaiter:', JSON.stringify(payload, null, 2));
-      
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await apiCallWaiter({
+        restaurantId: restaurant.restaurantId,
+        tableNumber: Number(restaurant.tableNumber),
+        note: reason.trim() || null,
+      });
 
       setReason('');
       setShowSuccessAnimation(true);
