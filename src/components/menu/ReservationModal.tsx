@@ -205,42 +205,31 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
 
     setIsSubmitting(true);
     try {
-      // Simulate API call for testing
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      const code = `#${Math.floor(1000 + Math.random() * 9000)}`;
-      
-      // Uncomment when API is ready:
-      // const response = await fetch(API_URLS.reservations, {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({
-      //     restaurantId: restaurant.restaurantId,
-      //     fullName: formData.fullName,
-      //     phone: formData.phone,
-      //     email: formData.email,
-      //     date: formData.date ? format(formData.date, "yyyy-MM-dd") : "",
-      //     time: formData.time,
-      //     guests: formData.guests,
-      //     notes: formData.notes,
-      //     verificationCode: verificationCode,
-      //     language: i18n.language, // Send current UI language for localized confirmation
-      //   }),
-      // });
-      // if (!response.ok) {
-      //   const errorData = await response.json().catch(() => ({}));
-      //   if (errorData.code === "INVALID_CODE") {
-      //     toast.error(t("reservation.invalidCode"));
-      //     return;
-      //   }
-      //   throw new Error(t("reservation.error"));
-      // }
-      // const data = await response.json();
-      // const code = data.confirmationCode || `#${Math.floor(1000 + Math.random() * 9000)}`;
+      const res = await createReservation({
+        restaurantId: restaurant.restaurantId,
+        fullName: formData.fullName,
+        phoneCountryCode: formData.phone.startsWith("+90") ? "+90" : "+1",
+        phoneNumber: formData.phone.replace(/^\+\d+/, ""),
+        email: formData.email,
+        reservationDate: formData.date ? format(formData.date, "yyyy-MM-dd") : "",
+        reservationTime: formData.time + ":00",
+        guestCount: formData.guests,
+        specialNotes: formData.notes,
+        verificationCode: verificationCode,
+        language: i18n.language,
+      });
+      const data = getResponseData(res);
+      const reservation = data?.reservation || data?.Reservation || data;
+      const code = reservation?.confirmationCode || reservation?.id || `#${Math.floor(1000 + Math.random() * 9000)}`;
 
       toast.success(t("reservation.success"));
       navigateToReceipt(code);
-    } catch (error) {
-      toast.error(t("reservation.error"));
+    } catch (error: any) {
+      if (error?.message?.includes("INVALID_CODE")) {
+        toast.error(t("reservation.invalidCode"));
+      } else {
+        toast.error(t("reservation.error"));
+      }
     } finally {
       setIsSubmitting(false);
     }
