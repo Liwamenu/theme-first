@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { useRestaurant, useRestaurantStore } from '@/hooks/useRestaurant';
+import { apiCallWaiter } from '@/lib/api';
 import { WaiterSuccessAnimation } from './WaiterSuccessAnimation';
 import { ChangeTableModal } from './ChangeTableModal';
 
