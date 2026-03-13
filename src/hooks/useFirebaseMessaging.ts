@@ -71,6 +71,11 @@ export async function initializeFirebaseMessaging() {
         const msg = parsePayload(payload);
         store.addMessage(msg);
         console.log("[FCM] Foreground message:", msg);
+
+        // Handle order status changes
+        if (msg.type === "order_status_changed" && msg.orderId && msg.orderId !== "-") {
+          handleOrderStatusChange(msg);
+        }
       });
     }
   } catch (err) {
