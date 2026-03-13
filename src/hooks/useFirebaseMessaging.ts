@@ -170,7 +170,7 @@ export async function initializeFirebaseMessaging() {
     store.setInitialized(true);
 
     if (supported) {
-      console.log("[FCM] Subscribing to foreground messages...");
+      // console.log("[FCM] Subscribing to foreground messages...");
       subscribeForegroundMessages((payload: any) => {
         handlePushPayload(payload, "foreground");
       });
