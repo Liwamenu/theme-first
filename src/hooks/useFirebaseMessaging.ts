@@ -174,7 +174,7 @@ export async function initializeFirebaseMessaging() {
       subscribeForegroundMessages((payload: any) => {
         handlePushPayload(payload, "foreground");
       });
-      console.log("[FCM] Foreground subscription active");
+      // console.log("[FCM] Foreground subscription active");
     } else {
       console.warn("[FCM] Not supported, skipping foreground subscription");
     }
