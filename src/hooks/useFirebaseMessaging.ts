@@ -159,7 +159,7 @@ export async function initializeFirebaseMessaging() {
         handlePushPayload(event.data.payload, "SW-relay");
       }
     });
-    console.log("[FCM] SW message listener registered");
+    // console.log("[FCM] SW message listener registered");
   }
 
   try {
