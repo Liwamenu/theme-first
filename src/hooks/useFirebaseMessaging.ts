@@ -101,7 +101,7 @@ function playNotificationSound() {
 function handleOrderStatusChange(msg: PushMessage) {
   const mappedStatus = STATUS_MAP[msg.status];
   if (!mappedStatus) {
-    console.warn("[FCM] Unknown order status:", msg.status);
+    // console.warn("[FCM] Unknown order status:", msg.status);
     return;
   }
 
