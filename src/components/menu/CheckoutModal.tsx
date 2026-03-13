@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { OrderPayload, Order } from "@/types/restaurant";
 import { createOnlineOrder, getResponseData } from "@/lib/api";
 import { useFirebaseMessagingStore } from "@/hooks/useFirebaseMessaging";
+import { initFirebaseMessaging } from "@/lib/firebase";
 import { ChangeTableModal } from "@/components/menu/ChangeTableModal";
 import confetti from "canvas-confetti";
 import { buildE164Phone, sanitizeSubscriberDigits } from "@/lib/phoneValidation";
