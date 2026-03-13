@@ -55,6 +55,45 @@ function parsePayload(payload: any): PushMessage {
   };
 }
 
+// Map FCM status strings to Order status type
+const STATUS_MAP: Record<string, Order["status"]> = {
+  Pending: "pending",
+  Confirmed: "confirmed",
+  Preparing: "preparing",
+  Ready: "ready",
+  Delivered: "delivered",
+  Cancelled: "cancelled",
+  // lowercase variants
+  pending: "pending",
+  confirmed: "confirmed",
+  preparing: "preparing",
+  ready: "ready",
+  delivered: "delivered",
+  cancelled: "cancelled",
+};
+
+function handleOrderStatusChange(msg: PushMessage) {
+  const mappedStatus = STATUS_MAP[msg.status];
+  if (!mappedStatus) {
+    console.warn("[FCM] Unknown order status:", msg.status);
+    return;
+  }
+
+  // Update order in Zustand store
+  useOrder.getState().updateOrderStatus(msg.orderId, mappedStatus);
+  console.log(`[FCM] Order ${msg.orderId} status → ${mappedStatus}`);
+
+  // Show toast with notification body
+  toast.info(msg.title, { description: msg.body });
+
+  // Text-to-speech announcement if sound permission granted
+  if (localStorage.getItem("soundPermission") === "granted" && "speechSynthesis" in window) {
+    const utterance = new SpeechSynthesisUtterance(msg.body);
+    utterance.lang = document.documentElement.lang || "en";
+    window.speechSynthesis.speak(utterance);
+  }
+}
+
 /**
  * Initialize Firebase messaging once. Safe to call multiple times.
  * Call this early in the app lifecycle (e.g. ThemeRouter after data loads).
