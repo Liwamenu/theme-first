@@ -30,30 +30,31 @@ export async function initFirebaseMessaging(): Promise<{
   supported: boolean;
   token: string | null;
 }> {
+  console.log("[FCM] Starting init...");
+
   const supported = await isSupported();
+  console.log("[FCM] isSupported:", supported);
   if (!supported) return { supported: false, token: null };
 
-  if (!app) {
-    app = initializeApp(firebaseConfig);
-  }
-
-  if (!messaging) {
-    messaging = getMessaging(app);
-  }
+  if (!app) app = initializeApp(firebaseConfig);
+  if (!messaging) messaging = getMessaging(app);
 
   // Register the service worker for background messages
   try {
     await navigator.serviceWorker.register("/firebase-messaging-sw.js");
+    console.log("[FCM] Service worker registered");
   } catch (err) {
-    console.warn("Firebase SW registration failed:", err);
+    console.error("[FCM] SW registration failed:", err);
   }
 
   const permission = await Notification.requestPermission();
+  console.log("[FCM] Permission result:", permission);
   if (permission !== "granted") {
     return { supported: true, token: null };
   }
 
   const token = await getToken(messaging, { vapidKey: VAPID_KEY });
+  console.log("[FCM] Token received:", token ? token.substring(0, 20) + "..." : "null");
   return { supported: true, token };
 }
 
