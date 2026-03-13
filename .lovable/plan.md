@@ -1,46 +1,44 @@
 
 
-## Plan: Fetch Restaurant Data from API with Dummy Data Fallback
+## Plan: Add debug logging to Firebase init and test on published URL
 
-### Overview
-Add a `GetRestaurantFullByTenant` API call to load restaurant data dynamically. A single toggle variable controls whether to use the API or the existing dummy data. The tenant is determined automatically: `"addis"` in local development, extracted from the URL in production.
+### Problem
+The preview iframe blocks notification permissions, so `getToken()` never executes. There's also zero logging to diagnose failures on the published URL.
 
 ### Changes
 
-**1. `src/lib/api.ts`** -- Add the new endpoint and tenant resolver
-- Add `getRestaurantFull` endpoint: `https://api.liwamenu.com/api/Restaurants/GetRestaurantFullByTenant`
-- Add `USE_DUMMY_DATA` boolean constant (set to `true` by default for dev)
-- Add `getTenant()` helper: returns `"addis"` if `localhost`, otherwise extracts tenant from the URL subdomain or path
+**File: `src/lib/firebase.ts`** — Add `console.log` at each step so you can see exactly where it stops:
 
-**2. `src/hooks/useRestaurant.ts`** -- Add API fetching with loading/error states
-- Expand the Zustand store with: `setRestaurantData`, `isLoading`, `error`, `isInitialized`
-- Add a `useInitializeRestaurant()` hook that:
-  - If `USE_DUMMY_DATA` is `true`: loads from `src/data/restaurant.ts` (current behavior)
-  - If `false`: calls `GET /api/Restaurants/GetRestaurantFullByTenant?tenant={tenant}` on mount
-  - Sets loading/error states accordingly
-- Keep all existing `useRestaurant()` logic unchanged -- it continues reading from the Zustand store
+```typescript
+export async function initFirebaseMessaging() {
+  console.log("[FCM] Starting init...");
+  
+  const supported = await isSupported();
+  console.log("[FCM] isSupported:", supported);
+  if (!supported) return { supported: false, token: null };
 
-**3. `src/components/menu/MenuPage.tsx`** -- Call the initializer and show loading state
-- Call `useInitializeRestaurant()` at the top of `MenuPage`
-- Show a loading spinner while `isLoading` is true
-- Show an error state if the fetch fails
+  if (!app) app = initializeApp(firebaseConfig);
+  if (!messaging) messaging = getMessaging(app);
 
-**4. `src/data/restaurant.ts`** -- No changes, kept as dummy/fallback data
+  // SW registration
+  try {
+    await navigator.serviceWorker.register("/firebase-messaging-sw.js");
+    console.log("[FCM] Service worker registered");
+  } catch (err) {
+    console.error("[FCM] SW registration failed:", err);
+  }
 
-### Tenant Resolution Logic
-```text
-localhost / 127.0.0.1  →  "addis"
-liwamenu.com/addis     →  "addis"  (path-based)
-addis.liwamenu.com     →  "addis"  (subdomain-based)
+  const permission = await Notification.requestPermission();
+  console.log("[FCM] Permission result:", permission);
+  if (permission !== "granted") {
+    return { supported: true, token: null };
+  }
+
+  const token = await getToken(messaging, { vapidKey: VAPID_KEY });
+  console.log("[FCM] Token received:", token ? token.substring(0, 20) + "..." : "null");
+  return { supported: true, token };
+}
 ```
 
-The `getTenant()` function will check the hostname first. If local, return `"addis"`. Otherwise, extract from the first path segment (e.g., `window.location.pathname.split('/')[1]`). This can be adjusted once you finalize your production URL structure.
-
-### Summary of Files
-| File | Action |
-|------|--------|
-| `src/lib/api.ts` | Add endpoint, `USE_DUMMY_DATA` flag, `getTenant()` |
-| `src/hooks/useRestaurant.ts` | Add `setRestaurantData`, `useInitializeRestaurant()` |
-| `src/components/menu/MenuPage.tsx` | Call initializer, loading/error UI |
-| `src/data/restaurant.ts` | No changes |
+This is a single file change. Once deployed to the published URL, open the browser console there to see exactly which step fails. The preview will likely show `isSupported: false` or permission denied — that's expected in an iframe.
 
