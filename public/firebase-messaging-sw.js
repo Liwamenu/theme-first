@@ -22,7 +22,6 @@ function relayToClients(data, notification) {
 }
 
 messaging.onBackgroundMessage((payload) => {
-  console.log("[FCM background] onBackgroundMessage:", payload);
   const data = payload?.data || {};
   const notification = payload?.notification || {};
   relayToClients(data, notification);
@@ -36,13 +35,9 @@ self.addEventListener("push", (event) => {
     payload = {};
   }
 
-  console.log("[FCM background] push event received:", payload);
-
   const title = payload?.notification?.title || "QR Menu";
   const body = payload?.notification?.body || "New update";
   const data = payload?.data || {};
-
-  relayToClients(data, payload?.notification);
 
   event.waitUntil(
     self.registration.showNotification(title, {

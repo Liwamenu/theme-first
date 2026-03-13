@@ -94,20 +94,20 @@ function playNotificationSound() {
     oscillator.start(audioCtx.currentTime);
     oscillator.stop(audioCtx.currentTime + 0.4);
   } catch (e) {
-    console.warn("[FCM] Could not play notification sound:", e);
+    // console.warn("[FCM] Could not play notification sound:", e);
   }
 }
 
 function handleOrderStatusChange(msg: PushMessage) {
   const mappedStatus = STATUS_MAP[msg.status];
   if (!mappedStatus) {
-    console.warn("[FCM] Unknown order status:", msg.status);
+    // console.warn("[FCM] Unknown order status:", msg.status);
     return;
   }
 
   // Update order in Zustand store
   useOrder.getState().updateOrderStatus(msg.orderId, mappedStatus);
-  console.log(`[FCM] Order ${msg.orderId} status → ${mappedStatus}`);
+  // console.log(`[FCM] Order ${msg.orderId} status → ${mappedStatus}`);
 
   // Play notification sound
   playNotificationSound();
@@ -127,16 +127,16 @@ function handleOrderStatusChange(msg: PushMessage) {
  * Handle any incoming push message (foreground or relayed from SW).
  */
 function handlePushPayload(payload: any, source: string) {
-  console.log(`[FCM] 🔔 ${source} payload:`, JSON.stringify(payload, null, 2));
+  // console.log(`[FCM] 🔔 ${source} payload:`, JSON.stringify(payload, null, 2));
   const msg = parsePayload(payload);
-  console.log(`[FCM] 🔔 Parsed message:`, JSON.stringify(msg, null, 2));
+  // console.log(`[FCM] 🔔 Parsed message:`, JSON.stringify(msg, null, 2));
   useFirebaseMessagingStore.getState().addMessage(msg);
 
   if (msg.type === "order_status_changed" && msg.orderId && msg.orderId !== "-") {
-    console.log("[FCM] 🔄 Processing order status change:", msg.orderId, "→", msg.status);
+    // console.log("[FCM] 🔄 Processing order status change:", msg.orderId, "→", msg.status);
     handleOrderStatusChange(msg);
   } else {
-    console.log("[FCM] ℹ️ Non-order message, type:", msg.type);
+    // console.log("[FCM] ℹ️ Non-order message, type:", msg.type);
   }
 }
 
@@ -147,7 +147,7 @@ function handlePushPayload(payload: any, source: string) {
 export async function initializeFirebaseMessaging() {
   const store = useFirebaseMessagingStore.getState();
   if (store.isInitialized) {
-    console.log("[FCM] Already initialized, skipping");
+    // console.log("[FCM] Already initialized, skipping");
     return;
   }
 
@@ -155,31 +155,31 @@ export async function initializeFirebaseMessaging() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.addEventListener("message", (event) => {
       if (event.data?.type === "FCM_BACKGROUND_MESSAGE") {
-        console.log("[FCM] 📬 Received SW relay message");
+        // console.log("[FCM] 📬 Received SW relay message");
         handlePushPayload(event.data.payload, "SW-relay");
       }
     });
-    console.log("[FCM] SW message listener registered");
+    // console.log("[FCM] SW message listener registered");
   }
 
   try {
     const { supported, token } = await initFirebaseMessaging();
-    console.log("[FCM] Init result — supported:", supported, "token:", token ? token.substring(0, 20) + "..." : "null");
+    // console.log("[FCM] Init result — supported:", supported, "token:", token ? token.substring(0, 20) + "..." : "null");
     store.setSupported(supported);
     store.setPushToken(token);
     store.setInitialized(true);
 
     if (supported) {
-      console.log("[FCM] Subscribing to foreground messages...");
+      // console.log("[FCM] Subscribing to foreground messages...");
       subscribeForegroundMessages((payload: any) => {
         handlePushPayload(payload, "foreground");
       });
-      console.log("[FCM] Foreground subscription active");
+      // console.log("[FCM] Foreground subscription active");
     } else {
-      console.warn("[FCM] Not supported, skipping foreground subscription");
+      // console.warn("[FCM] Not supported, skipping foreground subscription");
     }
   } catch (err) {
-    console.error("[FCM] Firebase messaging init failed:", err);
+    // console.error("[FCM] Firebase messaging init failed:", err);
     store.setInitialized(true);
   }
 }
