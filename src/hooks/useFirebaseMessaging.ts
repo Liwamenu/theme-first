@@ -155,7 +155,7 @@ export async function initializeFirebaseMessaging() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.addEventListener("message", (event) => {
       if (event.data?.type === "FCM_BACKGROUND_MESSAGE") {
-        console.log("[FCM] 📬 Received SW relay message");
+        // console.log("[FCM] 📬 Received SW relay message");
         handlePushPayload(event.data.payload, "SW-relay");
       }
     });
