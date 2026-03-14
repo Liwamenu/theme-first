@@ -176,8 +176,12 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
 
       toast.success(t(isTurkish ? "reservation.codeSentSMS" : "reservation.codeSentEmail"));
       setStep("code");
-    } catch (error) {
-      toast.error(t("reservation.codeSendError"));
+    } catch (error: any) {
+      // Extract localized error message from backend response
+      const errorMessage = i18n.language === "tr" 
+        ? error?.message_TR || error?.message_EN || t("reservation.codeSendError")
+        : error?.message_EN || t("reservation.codeSendError");
+      toast.error(errorMessage);
     } finally {
       setIsSendingCode(false);
     }
@@ -223,11 +227,11 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
       toast.success(t("reservation.success"));
       navigateToReceipt(code);
     } catch (error: any) {
-      if (error?.message?.includes("INVALID_CODE")) {
-        toast.error(t("reservation.invalidCode"));
-      } else {
-        toast.error(t("reservation.error"));
-      }
+      // Extract localized error message from backend response
+      const errorMessage = i18n.language === "tr" 
+        ? error?.message_TR || error?.message_EN || (error?.message?.includes("INVALID_CODE") ? t("reservation.invalidCode") : t("reservation.error"))
+        : error?.message_EN || (error?.message?.includes("INVALID_CODE") ? t("reservation.invalidCode") : t("reservation.error"));
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
