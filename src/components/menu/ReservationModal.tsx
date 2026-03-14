@@ -160,7 +160,7 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
       const res = await createReservation({
         restaurantId: restaurant.restaurantId,
         fullName: formData.fullName,
-        phoneCountryCode: `+${require("react-phone-number-input").getCountryCallingCode(phoneCountry)}`,
+        phoneCountryCode: `+${getCountryCallingCode(phoneCountry)}`,
         phoneNumber: phoneSubscriber,
         email: formData.email,
         reservationDate: formData.date ? format(formData.date, "yyyy-MM-dd") : "",
