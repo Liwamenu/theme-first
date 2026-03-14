@@ -156,17 +156,21 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
   const handleSendCode = async () => {
     setIsSendingCode(true);
     try {
-      const apiUrl = isTurkish ? API_URLS.sendReservationCodeSMS : API_URLS.sendReservationCodeEmail;
-      
-      await apiFetch(apiUrl, {
-        method: "POST",
-        body: JSON.stringify({
-          restaurantId: restaurant.restaurantId,
-          phone: formData.phone,
-          email: formData.email,
-          language: i18n.language,
-        }),
+      const res = await createReservation({
+        restaurantId: restaurant.restaurantId,
+        fullName: formData.fullName,
+        phoneCountryCode: `+${require("react-phone-number-input").getCountryCallingCode(phoneCountry)}`,
+        phoneNumber: phoneSubscriber,
+        email: formData.email,
+        reservationDate: formData.date ? format(formData.date, "yyyy-MM-dd") : "",
+        reservationTime: formData.time + ":00",
+        guestCount: formData.guests,
+        specialNotes: formData.notes,
+        language: i18n.language,
       });
+      const data = getResponseData(res);
+      const id = data?.reservationId || data?.ReservationId || data?.id || data?.Id;
+      if (id) setReservationId(id);
 
       toast.success(t(isTurkish ? "reservation.codeSentSMS" : "reservation.codeSentEmail"));
       setStep("code");
