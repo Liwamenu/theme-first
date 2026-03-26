@@ -88,10 +88,12 @@ function EmptyMenuFallback() {
 
 export function ThemeRouter() {
   const { isLoading, error } = useInitializeRestaurant();
-  const { themeId, products } = useRestaurantStore((s) => ({
-    themeId: s.restaurantData.themeId,
-    products: s.restaurantData.products,
-  }));
+  const { themeId, products } = useRestaurantStore(
+    useShallow((s) => ({
+      themeId: s.restaurantData.themeId,
+      products: s.restaurantData.products,
+    }))
+  );
 
   // Initialize Firebase messaging once restaurant data is loaded
   useEffect(() => {
