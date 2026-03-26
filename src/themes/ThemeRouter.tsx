@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect } from "react";
+import { useShallow } from "zustand/react/shallow";
 import { useTranslation } from "react-i18next";
 import { useInitializeRestaurant, useRestaurantStore } from "@/hooks/useRestaurant";
 import { initializeFirebaseMessaging } from "@/hooks/useFirebaseMessaging";
@@ -87,10 +88,12 @@ function EmptyMenuFallback() {
 
 export function ThemeRouter() {
   const { isLoading, error } = useInitializeRestaurant();
-  const { themeId, products } = useRestaurantStore((s) => ({
-    themeId: s.restaurantData.themeId,
-    products: s.restaurantData.products,
-  }));
+  const { themeId, products } = useRestaurantStore(
+    useShallow((s) => ({
+      themeId: s.restaurantData.themeId,
+      products: s.restaurantData.products,
+    }))
+  );
 
   // Initialize Firebase messaging once restaurant data is loaded
   useEffect(() => {
