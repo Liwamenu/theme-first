@@ -33,10 +33,7 @@ export const API_URLS = {
 /**
  * Generic API fetch helper with JSON support.
  */
-export async function apiFetch<T = any>(
-  url: string,
-  options: RequestInit = {}
-): Promise<T> {
+export async function apiFetch<T = any>(url: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(url, {
     ...options,
     headers: {
@@ -49,10 +46,7 @@ export async function apiFetch<T = any>(
   const data = isJson ? await res.json() : await res.text();
 
   if (!res.ok) {
-    const msg =
-      typeof data === "string"
-        ? data
-        : data?.message || data?.Message || `Request failed (${res.status})`;
+    const msg = typeof data === "string" ? data : data?.message || data?.Message || `Request failed (${res.status})`;
     throw new Error(msg);
   }
 
@@ -75,11 +69,7 @@ export async function createOnlineOrder(payload: any) {
   });
 }
 
-export async function apiCallWaiter(payload: {
-  restaurantId: string;
-  tableNumber: number;
-  note?: string | null;
-}) {
+export async function apiCallWaiter(payload: { restaurantId: string; tableNumber: number; note?: string | null }) {
   return apiFetch(API_URLS.callWaiter, {
     method: "POST",
     body: JSON.stringify(payload),
@@ -93,19 +83,14 @@ export async function createReservation(payload: any) {
   });
 }
 
-export async function verifyReservation(payload: {
-  reservationId: string;
-  verificationCode: string;
-}) {
+export async function verifyReservation(payload: { reservationId: string; verificationCode: string }) {
   return apiFetch(API_URLS.verifyReservation, {
     method: "POST",
     body: JSON.stringify(payload),
   });
 }
 
-export async function resendReservationVerification(payload: {
-  reservationId: string;
-}) {
+export async function resendReservationVerification(payload: { reservationId: string }) {
   return apiFetch(API_URLS.resendReservationVerification, {
     method: "POST",
     body: JSON.stringify(payload),
@@ -123,7 +108,7 @@ export function getTenant(): string {
     hostname.endsWith(".lovableproject.com") ||
     hostname.endsWith(".lovable.app")
   ) {
-    return "addis";
+    return "demo1";
   }
 
   // Subdomain-based: addis.liwamenu.com → "addis"
@@ -138,7 +123,7 @@ export function getTenant(): string {
     return pathSegment;
   }
 
-  return "addis"; // fallback
+  return "demo1"; // fallback
 }
 
 // Helper to check if phone is Turkish based on the phone number
