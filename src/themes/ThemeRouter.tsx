@@ -87,7 +87,10 @@ function EmptyMenuFallback() {
 
 export function ThemeRouter() {
   const { isLoading, error } = useInitializeRestaurant();
-  const themeId = useRestaurantStore((s) => s.restaurantData.themeId);
+  const { themeId, products } = useRestaurantStore((s) => ({
+    themeId: s.restaurantData.themeId,
+    products: s.restaurantData.products,
+  }));
 
   // Initialize Firebase messaging once restaurant data is loaded
   useEffect(() => {
@@ -98,6 +101,7 @@ export function ThemeRouter() {
 
   if (isLoading) return <LoadingFallback />;
   if (error) return <ErrorFallback error={error} />;
+  if (!products || products.length === 0) return <EmptyMenuFallback />;
 
   const resolvedThemeId = themeId ?? DEFAULT_THEME_ID;
   const ThemeComponent = themeComponents[resolvedThemeId];
