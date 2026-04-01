@@ -56,7 +56,7 @@ export function Footer() {
           </div>
 
           <div className="flex justify-center gap-3 mt-6 flex-wrap">
-            {restaurant.isReservationLicenseActive && restaurant.isReservationActive && (
+            {restaurant.reservationSettings?.isActive && (
               <Button onClick={() => setIsReservationOpen(true)} variant="outline"
                 className="flex items-center gap-2 rounded-full bg-transparent border-background/30 text-background hover:bg-background/10">
                 <CalendarDays className="w-4 h-4" />
