@@ -45,7 +45,7 @@ export function Footer() {
           <div className="bg-background/10 rounded-2xl p-4 space-y-2 border border-background/20">
             {WorkingHours.map((wh: any) => (
               <div key={wh.Day} className="flex items-center justify-between text-sm">
-                <span className="text-background/70">{t(`days.${dayKeys[wh.Day]}`)}</span>
+                <span className="text-background/70">{t(`days.${dayKeys[wh.day]}`)}</span>
                 {wh.IsClosed ? (
                   <span className="text-secondary font-medium">{t("footer.closed")}</span>
                 ) : (
