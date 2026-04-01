@@ -77,6 +77,11 @@ export function useInitializeRestaurant() {
           }
 
           setRestaurantData(restaurantData);
+
+          // Set default language from restaurant's menuLang
+          if (restaurantData.menuLang) {
+            changeLanguage(restaurantData.menuLang.toLowerCase());
+          }
         }
       } catch (err: any) {
         if (!cancelled) {
