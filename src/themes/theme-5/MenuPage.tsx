@@ -64,6 +64,8 @@ export function MenuPage() {
     return 0;
   });
   const categoryRefs = useRef<Record<string, HTMLElement | null>>({});
+  const isAutoScrollingRef = useRef(false);
+  const autoScrollTimeoutRef = useRef<number | null>(null);
 
   // Auto-show announcement modal
   useEffect(() => {
@@ -111,16 +113,32 @@ export function MenuPage() {
     setWaiterCooldown(60);
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (autoScrollTimeoutRef.current !== null) {
+        window.clearTimeout(autoScrollTimeoutRef.current);
+      }
+    };
+  }, []);
+
   // Handle category scroll sync
   useEffect(() => {
     const handleScroll = throttle(() => {
-      const scrollPosition = window.scrollY + 200;
-      for (const category of categories) {
-        const element = categoryRefs.current[category.id];
+      if (isAutoScrollingRef.current) return;
+
+      const stickyOffset = isHeaderVisible ? 172 : 120;
+      const scrollPosition = window.scrollY + stickyOffset + 40;
+      const sectionIds = [
+        ...(campaignProducts.length > 0 && !searchQuery ? [CAMPAIGN_CATEGORY_ID] : []),
+        ...categories.map((category) => category.id),
+      ];
+
+      for (const sectionId of sectionIds) {
+        const element = categoryRefs.current[sectionId];
         if (element) {
           const { offsetTop, offsetHeight } = element;
           if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
-            setActiveCategory(category.id);
+            setActiveCategory(sectionId);
             break;
           }
         }
@@ -128,28 +146,39 @@ export function MenuPage() {
     }, 100);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [categories]);
+  }, [categories, campaignProducts.length, searchQuery, isHeaderVisible]);
 
   const CAMPAIGN_CATEGORY_ID = '__campaign__';
 
+  const getStickyOffset = useCallback(() => {
+    return isHeaderVisible ? 172 : 120;
+  }, [isHeaderVisible]);
+
+  const scrollToSection = useCallback((sectionId: string) => {
+    const element = categoryRefs.current[sectionId];
+
+    if (!element) return;
+
+    const stickyOffset = getStickyOffset();
+    const elementTop = element.getBoundingClientRect().top + window.scrollY;
+    const targetTop = Math.max(0, elementTop - stickyOffset);
+
+    if (autoScrollTimeoutRef.current !== null) {
+      window.clearTimeout(autoScrollTimeoutRef.current);
+    }
+
+    isAutoScrollingRef.current = true;
+    setActiveCategory(sectionId);
+    window.scrollTo({ top: targetTop, behavior: "smooth" });
+
+    autoScrollTimeoutRef.current = window.setTimeout(() => {
+      isAutoScrollingRef.current = false;
+    }, 650);
+  }, [getStickyOffset]);
+
   const scrollToCategory = useCallback((categoryId: string) => {
-    const stickyOffset = isHeaderVisible ? 170 : 120;
-    if (categoryId === CAMPAIGN_CATEGORY_ID) {
-      const element = categoryRefs.current[CAMPAIGN_CATEGORY_ID];
-      if (element) {
-        const elementPosition = element.offsetTop - stickyOffset;
-        window.scrollTo({ top: elementPosition, behavior: "smooth" });
-      }
-      setActiveCategory(CAMPAIGN_CATEGORY_ID);
-      return;
-    }
-    const element = categoryRefs.current[categoryId];
-    if (element) {
-      const elementPosition = element.offsetTop - stickyOffset;
-      window.scrollTo({ top: elementPosition, behavior: "smooth" });
-    }
-    setActiveCategory(categoryId);
-  }, [CAMPAIGN_CATEGORY_ID, isHeaderVisible]);
+    scrollToSection(categoryId === CAMPAIGN_CATEGORY_ID ? CAMPAIGN_CATEGORY_ID : categoryId);
+  }, [scrollToSection]);
 
   // Filter products by search
   const filteredCategories = useMemo(() => {
