@@ -246,7 +246,7 @@ export function MenuPage() {
     return (
       <div className="theme-4">
         <OrderReceipt
-          order={viewingOrder}
+          orderId={viewingOrder.id}
           onBack={handleBackToMenu}
           waiterCooldown={waiterCooldown}
           onWaiterSuccess={handleWaiterSuccess}
