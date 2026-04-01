@@ -43,7 +43,7 @@ export function Footer() {
         <div className="max-w-md mx-auto">
           <h3 className="font-semibold text-center mb-4 text-background/90">{t("footer.workingHours")}</h3>
           <div className="bg-background/10 rounded-2xl p-4 space-y-2 border border-background/20">
-            {WorkingHours.map((wh) => (
+            {WorkingHours.map((wh: any) => (
               <div key={wh.Day} className="flex items-center justify-between text-sm">
                 <span className="text-background/70">{t(`days.${dayKeys[wh.Day]}`)}</span>
                 {wh.IsClosed ? (
