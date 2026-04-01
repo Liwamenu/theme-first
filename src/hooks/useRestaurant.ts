@@ -2,6 +2,7 @@ import { useMemo, useEffect } from 'react';
 import { create } from 'zustand';
 import { restaurantData as initialRestaurantData } from '@/data/restaurant';
 import { RestaurantData, Product, WorkingHour } from '@/types/restaurant';
+import { changeLanguage } from '@/lib/i18n';
 import { USE_DUMMY_DATA, API_URLS, getTenant } from '@/lib/api';
 
 export interface Category {
@@ -76,6 +77,11 @@ export function useInitializeRestaurant() {
           }
 
           setRestaurantData(restaurantData);
+
+          // Set default language from restaurant's menuLang
+          if (restaurantData.menuLang) {
+            changeLanguage(restaurantData.menuLang.toLowerCase());
+          }
         }
       } catch (err: any) {
         if (!cancelled) {
