@@ -195,24 +195,32 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
                   {tag.maxSelected > 1 && <span className="text-xs text-muted-foreground">({t('product.maxSelection', { max: tag.maxSelected })})</span>}
                 </div>
                 <div className="space-y-2">
-                  {tag.orderTagItems.map((item) => (
-                    <button
-                      key={item.id}
-                      onClick={() => handleTagSelect(tag, item)}
-                      className={cn(
-                        'w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all',
-                        isTagItemSelected(tag.id, item.id) ? 'bg-primary/10 border-2 border-primary' : isShaking && isRequired && selectedCount < tag.minSelected ? 'bg-card border-2 border-secondary/50 animate-pulse' : 'bg-card border-2 border-transparent'
-                      )}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={cn('w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all', isTagItemSelected(tag.id, item.id) ? 'bg-primary border-primary' : isShaking && isRequired && selectedCount < tag.minSelected ? 'border-secondary' : 'border-muted-foreground/30')}>
-                          {isTagItemSelected(tag.id, item.id) && <Check className="w-3 h-3 text-primary-foreground" />}
+                  {tag.orderTagItems.map((item) => {
+                    const selected = isTagItemSelected(tag.id, item.id);
+                    const qty = getTagItemQuantity(tag.id, item.id);
+                    const showQtyControls = selected && item.maxQuantity > 1;
+                    return (
+                      <div key={item.id} className={cn('w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all',
+                        selected ? 'bg-primary/10 border-2 border-primary' : isShaking && isRequired && selectedCount < tag.minSelected ? 'bg-card border-2 border-secondary/50 animate-pulse' : 'bg-card border-2 border-transparent')}>
+                        <button onClick={() => handleTagSelect(tag, item)} className="flex items-center gap-3 flex-1">
+                          <div className={cn('w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all', selected ? 'bg-primary border-primary' : isShaking && isRequired && selectedCount < tag.minSelected ? 'border-secondary' : 'border-muted-foreground/30')}>
+                            {selected && <Check className="w-3 h-3 text-primary-foreground" />}
+                          </div>
+                          <span className="font-medium">{item.name}</span>
+                        </button>
+                        <div className="flex items-center gap-2">
+                          {showQtyControls && (
+                            <div className="flex items-center gap-1">
+                              <button onClick={() => handleTagItemQuantity(tag.id, item.id, -1)} className="w-7 h-7 rounded-full bg-muted flex items-center justify-center"><Minus className="w-3 h-3" /></button>
+                              <span className="w-6 text-center text-sm font-bold">{qty}</span>
+                              <button onClick={() => handleTagItemQuantity(tag.id, item.id, 1)} className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center"><Plus className="w-3 h-3" /></button>
+                            </div>
+                          )}
+                          {item.price > 0 && <span className="text-sm text-muted-foreground">+{formatPrice(item.price * (qty || 1))}</span>}
                         </div>
-                        <span className="font-medium">{item.name}</span>
                       </div>
-                      {item.price > 0 && <span className="text-sm text-muted-foreground">+{formatPrice(item.price)}</span>}
-                    </button>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             );
