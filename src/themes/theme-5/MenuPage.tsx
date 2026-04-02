@@ -36,6 +36,8 @@ function throttle<T extends (...args: unknown[]) => void>(fn: T, delay: number):
   }) as T;
 }
 
+const CAMPAIGN_CATEGORY_ID = "__campaign__";
+
 export function MenuPage() {
   const { t } = useTranslation();
   const {
@@ -157,7 +159,7 @@ export function MenuPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [categories, campaignProducts.length, searchQuery, isHeaderVisible]);
 
-  const CAMPAIGN_CATEGORY_ID = "__campaign__";
+  
 
   const getStickyOffset = useCallback(() => {
     return isHeaderVisible ? 172 : 120;
@@ -535,7 +537,7 @@ export function MenuPage() {
 
       {/* Floating Call Waiter Button */}
       {!isCartOpen && !selectedProduct && !showCallWaiter && !isCheckoutOpen && !showReservation && !showTableSelection && (
-        <div className="fixed top-[100px] right-4 z-50">
+        <div className="fixed top-[170px] right-4 z-40">
           <button
             onClick={handleOpenCallWaiterFloating}
             disabled={waiterCooldown > 0}
