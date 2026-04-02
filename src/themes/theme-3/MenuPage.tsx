@@ -161,6 +161,12 @@ export function MenuPage() {
   const handleDenySound = useCallback(() => { localStorage.setItem("soundPermission", "denied"); setShowSoundPermission(false); }, []);
   const handleCloseReservation = useCallback(() => setShowReservation(false), []);
 
+  const handleOpenCallWaiterFloating = useCallback(() => {
+    if (!isCurrentlyOpen) { toast.error(t('common.closedHours')); return; }
+    if (!restaurant.tableNumber) { setShowTableSelection(true); return; }
+    setShowCallWaiter(true);
+  }, [restaurant.tableNumber, isCurrentlyOpen, t]);
+
   if (currentView === "order" && viewingOrder) {
     return (
       <div className="theme-3">
