@@ -65,13 +65,35 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
     });
   };
 
+  const handleTagItemQuantity = (tagId: string, itemId: string, delta: number) => {
+    setSelectedTags(prev => {
+      const currentTagItems = prev[tagId] || [];
+      const itemIndex = currentTagItems.findIndex(t => t.itemId === itemId);
+      if (itemIndex < 0) return prev;
+      const current = currentTagItems[itemIndex];
+      const orderTag = selectedPortion.orderTags.find(t => t.id === tagId);
+      const orderTagItem = orderTag?.orderTagItems.find(i => i.id === itemId);
+      const maxQty = orderTagItem?.maxQuantity ?? 99;
+      const newQty = current.quantity + delta;
+      if (newQty < 1) return prev;
+      if (newQty > maxQty) {
+        toast.error(t('product.maxQuantityError', { name: current.itemName, max: maxQty }));
+        return prev;
+      }
+      return { ...prev, [tagId]: currentTagItems.map((t, i) => i === itemIndex ? { ...t, quantity: newQty } : t) };
+    });
+  };
+
   const isTagItemSelected = (tagId: string, itemId: string) => {
     return (selectedTags[tagId] || []).some(t => t.itemId === itemId);
   };
 
+  const getTagItemQuantity = (tagId: string, itemId: string) => (selectedTags[tagId] || []).find(t => t.itemId === itemId)?.quantity ?? 0;
+
   const validateTags = useCallback((): boolean => {
     for (const tag of selectedPortion.orderTags) {
-      const selectedCount = (selectedTags[tag.id] || []).length;
+      const currentTagItems = selectedTags[tag.id] || [];
+      const selectedCount = currentTagItems.length;
       if (tag.minSelected > 0 && selectedCount < tag.minSelected) {
         const tagElement = tagRefs.current[tag.id];
         if (tagElement) tagElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -79,6 +101,17 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
         setTimeout(() => setShakingTagId(null), 1500);
         toast.error(t('product.minSelectionError', { name: tag.name, min: tag.minSelected }));
         return false;
+      }
+      for (const selectedItem of currentTagItems) {
+        const orderTagItem = tag.orderTagItems.find(i => i.id === selectedItem.itemId);
+        if (orderTagItem && orderTagItem.minQuantity > 0 && selectedItem.quantity < orderTagItem.minQuantity) {
+          const tagElement = tagRefs.current[tag.id];
+          if (tagElement) tagElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          setShakingTagId(tag.id);
+          setTimeout(() => setShakingTagId(null), 1500);
+          toast.error(t('product.minQuantityError', { name: selectedItem.itemName, min: orderTagItem.minQuantity }));
+          return false;
+        }
       }
     }
     return true;
