@@ -17,6 +17,7 @@ import { ReservationModal } from "./ReservationModal";
 import { ChangeTableModal } from "./ChangeTableModal";
 import { AnnouncementModal } from "./AnnouncementModal";
 import { FlyingEmoji } from "./FlyingEmoji";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { useRestaurant } from "@/hooks/useRestaurant";
 import { useOrder } from "@/hooks/useOrder";
 import { useFlyingEmoji } from "@/hooks/useFlyingEmoji";
