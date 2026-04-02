@@ -17,7 +17,6 @@ import { ReservationModal } from "./ReservationModal";
 import { ChangeTableModal } from "./ChangeTableModal";
 import { AnnouncementModal } from "./AnnouncementModal";
 import { FlyingEmoji } from "./FlyingEmoji";
-import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { useRestaurant } from "@/hooks/useRestaurant";
 import { useOrder } from "@/hooks/useOrder";
 import { useFlyingEmoji } from "@/hooks/useFlyingEmoji";
@@ -39,7 +38,16 @@ function throttle<T extends (...args: unknown[]) => void>(fn: T, delay: number):
 
 export function MenuPage() {
   const { t } = useTranslation();
-  const { categories, recommendedProducts, campaignProducts, isRestaurantActive, isCurrentlyOpen, restaurant, formatPrice, setTableNumber } = useRestaurant();
+  const {
+    categories,
+    recommendedProducts,
+    campaignProducts,
+    isRestaurantActive,
+    isCurrentlyOpen,
+    restaurant,
+    formatPrice,
+    setTableNumber,
+  } = useRestaurant();
   const { currentOrder, orders, setCurrentOrder } = useOrder();
   const { isVisible: isFlyingEmojiVisible, startPosition: flyingEmojiPosition, hideFlyingEmoji } = useFlyingEmoji();
   const [activeCategory, setActiveCategory] = useState<string>(categories[0]?.id || "");
@@ -57,17 +65,13 @@ export function MenuPage() {
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [waiterCooldown, setWaiterCooldown] = useState(() => {
-    const savedEndTime = localStorage.getItem('waiterCooldownEnd');
+    const savedEndTime = localStorage.getItem("waiterCooldownEnd");
     if (savedEndTime) {
       const remaining = Math.ceil((parseInt(savedEndTime) - Date.now()) / 1000);
       return remaining > 0 ? remaining : 0;
     }
     return 0;
   });
-
-  const isAnyOverlayOpen = !!selectedProduct || isCartOpen || isCheckoutOpen || showCallWaiter || showReservation || showTableSelection || showSoundPermission || showAnnouncement;
-  useBodyScrollLock(isAnyOverlayOpen);
-
   const categoryRefs = useRef<Record<string, HTMLElement | null>>({});
   const isAutoScrollingRef = useRef(false);
   const autoScrollTimeoutRef = useRef<number | null>(null);
@@ -76,11 +80,11 @@ export function MenuPage() {
   useEffect(() => {
     const announcementSettings = restaurant.announcementSettings;
     if (!announcementSettings?.enabled) return;
-    const hasSeenAnnouncement = sessionStorage.getItem('hasSeenAnnouncement');
+    const hasSeenAnnouncement = sessionStorage.getItem("hasSeenAnnouncement");
     if (hasSeenAnnouncement) return;
     const timer = setTimeout(() => {
       setShowAnnouncement(true);
-      sessionStorage.setItem('hasSeenAnnouncement', 'true');
+      sessionStorage.setItem("hasSeenAnnouncement", "true");
     }, announcementSettings.delayMs);
     return () => clearTimeout(timer);
   }, [restaurant.announcementSettings]);
@@ -103,7 +107,7 @@ export function MenuPage() {
   // Waiter cooldown timer
   useEffect(() => {
     if (waiterCooldown <= 0) {
-      localStorage.removeItem('waiterCooldownEnd');
+      localStorage.removeItem("waiterCooldownEnd");
       return;
     }
     const timer = setInterval(() => {
@@ -114,7 +118,7 @@ export function MenuPage() {
 
   const handleWaiterSuccess = useCallback(() => {
     const endTime = Date.now() + 60 * 1000;
-    localStorage.setItem('waiterCooldownEnd', endTime.toString());
+    localStorage.setItem("waiterCooldownEnd", endTime.toString());
     setWaiterCooldown(60);
   }, []);
 
@@ -153,37 +157,43 @@ export function MenuPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [categories, campaignProducts.length, searchQuery, isHeaderVisible]);
 
-  const CAMPAIGN_CATEGORY_ID = '__campaign__';
+  const CAMPAIGN_CATEGORY_ID = "__campaign__";
 
   const getStickyOffset = useCallback(() => {
     return isHeaderVisible ? 172 : 120;
   }, [isHeaderVisible]);
 
-  const scrollToSection = useCallback((sectionId: string) => {
-    const element = categoryRefs.current[sectionId];
+  const scrollToSection = useCallback(
+    (sectionId: string) => {
+      const element = categoryRefs.current[sectionId];
 
-    if (!element) return;
+      if (!element) return;
 
-    const stickyOffset = getStickyOffset();
-    const elementTop = element.getBoundingClientRect().top + window.scrollY;
-    const targetTop = Math.max(0, elementTop - stickyOffset);
+      const stickyOffset = getStickyOffset();
+      const elementTop = element.getBoundingClientRect().top + window.scrollY;
+      const targetTop = Math.max(0, elementTop - stickyOffset);
 
-    if (autoScrollTimeoutRef.current !== null) {
-      window.clearTimeout(autoScrollTimeoutRef.current);
-    }
+      if (autoScrollTimeoutRef.current !== null) {
+        window.clearTimeout(autoScrollTimeoutRef.current);
+      }
 
-    isAutoScrollingRef.current = true;
-    setActiveCategory(sectionId);
-    window.scrollTo({ top: targetTop, behavior: "smooth" });
+      isAutoScrollingRef.current = true;
+      setActiveCategory(sectionId);
+      window.scrollTo({ top: targetTop, behavior: "smooth" });
 
-    autoScrollTimeoutRef.current = window.setTimeout(() => {
-      isAutoScrollingRef.current = false;
-    }, 650);
-  }, [getStickyOffset]);
+      autoScrollTimeoutRef.current = window.setTimeout(() => {
+        isAutoScrollingRef.current = false;
+      }, 650);
+    },
+    [getStickyOffset],
+  );
 
-  const scrollToCategory = useCallback((categoryId: string) => {
-    scrollToSection(categoryId === CAMPAIGN_CATEGORY_ID ? CAMPAIGN_CATEGORY_ID : categoryId);
-  }, [scrollToSection]);
+  const scrollToCategory = useCallback(
+    (categoryId: string) => {
+      scrollToSection(categoryId === CAMPAIGN_CATEGORY_ID ? CAMPAIGN_CATEGORY_ID : categoryId);
+    },
+    [scrollToSection],
+  );
 
   // Filter products by search
   const filteredCategories = useMemo(() => {
@@ -193,9 +203,7 @@ export function MenuPage() {
       .map((cat) => ({
         ...cat,
         products: cat.products.filter(
-          (p) =>
-            p.name.toLowerCase().includes(lowerQuery) ||
-            p.description.toLowerCase().includes(lowerQuery),
+          (p) => p.name.toLowerCase().includes(lowerQuery) || p.description.toLowerCase().includes(lowerQuery),
         ),
       }))
       .filter((cat) => cat.products.length > 0);
@@ -203,7 +211,7 @@ export function MenuPage() {
 
   const canOrder = isRestaurantActive && isCurrentlyOpen;
 
-  const handleOrderComplete = useCallback((order: Order, orderType: 'inPerson' | 'online') => {
+  const handleOrderComplete = useCallback((order: Order, orderType: "inPerson" | "online") => {
     setIsCheckoutOpen(false);
     setViewingOrder(order);
     setCurrentView("order");
@@ -246,7 +254,7 @@ export function MenuPage() {
 
   const handleOpenCallWaiter = useCallback(() => {
     if (!isCurrentlyOpen) {
-      toast.error(t('common.closedHours'));
+      toast.error(t("common.closedHours"));
       return;
     }
     setIsCartOpen(false);
@@ -259,7 +267,7 @@ export function MenuPage() {
 
   const handleOpenCallWaiterFloating = useCallback(() => {
     if (!isCurrentlyOpen) {
-      toast.error(t('common.closedHours'));
+      toast.error(t("common.closedHours"));
       return;
     }
     if (!restaurant.tableNumber) {
@@ -269,14 +277,17 @@ export function MenuPage() {
     setShowCallWaiter(true);
   }, [restaurant.tableNumber, isCurrentlyOpen, t]);
 
-  const handleTableSelected = useCallback((newTable: number) => {
-    setTableNumber(newTable);
-    toast.success(t('cart.tableChanged', { table: newTable }));
-    setShowTableSelection(false);
-    if (isCurrentlyOpen) {
-      setShowCallWaiter(true);
-    }
-  }, [setTableNumber, t, isCurrentlyOpen]);
+  const handleTableSelected = useCallback(
+    (newTable: number) => {
+      setTableNumber(newTable);
+      toast.success(t("cart.tableChanged", { table: newTable }));
+      setShowTableSelection(false);
+      if (isCurrentlyOpen) {
+        setShowCallWaiter(true);
+      }
+    },
+    [setTableNumber, t, isCurrentlyOpen],
+  );
 
   const handleShowSoundPermission = useCallback(() => {
     setShowSoundPermission(true);
@@ -315,11 +326,7 @@ export function MenuPage() {
   return (
     <div className="theme-5 min-h-screen bg-background">
       {/* Restaurant Header */}
-      <RestaurantHeader 
-        orders={orders}
-        onViewOrder={handleViewOrder}
-        isVisible={isHeaderVisible}
-      />
+      <RestaurantHeader orders={orders} onViewOrder={handleViewOrder} isVisible={isHeaderVisible} />
 
       {/* Category Tabs */}
       {!searchQuery && (
@@ -328,11 +335,15 @@ export function MenuPage() {
           activeCategory={activeCategory}
           onCategoryChange={scrollToCategory}
           isHeaderVisible={isHeaderVisible}
-          campaignTab={campaignProducts.length > 0 ? {
-            id: CAMPAIGN_CATEGORY_ID,
-            name: t('menu.campaignProducts'),
-            count: campaignProducts.length
-          } : null}
+          campaignTab={
+            campaignProducts.length > 0
+              ? {
+                  id: CAMPAIGN_CATEGORY_ID,
+                  name: t("menu.campaignProducts"),
+                  count: campaignProducts.length,
+                }
+              : null
+          }
         />
       )}
 
@@ -340,7 +351,7 @@ export function MenuPage() {
       {searchQuery !== null && (
         <div
           className="sticky z-30 bg-background/95 backdrop-blur-sm border-b border-border transition-all duration-300"
-          style={{ top: isHeaderVisible ? (searchQuery ? '52px' : '110px') : (searchQuery ? '0px' : '58px') }}
+          style={{ top: isHeaderVisible ? (searchQuery ? "52px" : "110px") : searchQuery ? "0px" : "58px" }}
         >
           <div className="max-w-[1220px] mx-auto px-4 py-2">
             <div className="relative">
@@ -386,14 +397,14 @@ export function MenuPage() {
       )}
 
       {/* Menu Content */}
-      <div className="pb-24">
+      <div className="pb-8">
         {/* Campaign Products Section */}
         {!searchQuery && campaignProducts.length > 0 && (
           <section ref={(el) => (categoryRefs.current[CAMPAIGN_CATEGORY_ID] = el)}>
             <div className="relative w-full h-[200px] lg:h-[250px] bg-primary flex items-center justify-center overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-b from-primary/90 to-primary" />
-              <h2 className="text-3xl md:text-5xl font-display font-bold text-primary-foreground tracking-wider uppercase z-10">
-                🔥 {t('menu.campaignProducts')}
+              <h2 className="text-center text-3xl md:text-5xl font-display font-bold text-primary-foreground tracking-wider uppercase z-10">
+                🔥 {t("menu.campaignProducts")}
               </h2>
             </div>
             <div className="max-w-[1220px] mx-auto px-7 max-sm:px-2">
@@ -494,18 +505,10 @@ export function MenuPage() {
       </AnimatePresence>
 
       {/* Sound Permission Modal */}
-      <SoundPermissionModal
-        isOpen={showSoundPermission}
-        onAllow={handleAllowSound}
-        onDeny={handleDenySound}
-      />
+      <SoundPermissionModal isOpen={showSoundPermission} onAllow={handleAllowSound} onDeny={handleDenySound} />
 
       {/* Call Waiter Modal */}
-      <CallWaiterModal 
-        isOpen={showCallWaiter} 
-        onClose={handleCloseCallWaiter} 
-        onSuccess={handleWaiterSuccess}
-      />
+      <CallWaiterModal isOpen={showCallWaiter} onClose={handleCloseCallWaiter} onSuccess={handleWaiterSuccess} />
 
       {/* Reservation Modal */}
       <ReservationModal isOpen={showReservation} onClose={handleCloseReservation} />
@@ -519,11 +522,7 @@ export function MenuPage() {
       />
 
       {/* Flying Emoji Animation */}
-      <FlyingEmoji
-        isVisible={isFlyingEmojiVisible}
-        startPosition={flyingEmojiPosition}
-        onComplete={hideFlyingEmoji}
-      />
+      <FlyingEmoji isVisible={isFlyingEmojiVisible} startPosition={flyingEmojiPosition} onComplete={hideFlyingEmoji} />
 
       {/* Announcement Modal */}
       {restaurant.announcementSettings?.enabled && restaurant.announcementSettings?.htmlContent && (
@@ -548,9 +547,7 @@ export function MenuPage() {
             aria-label={t("waiter.title")}
           >
             <Bell className="w-4 h-4" />
-            <span>
-              {waiterCooldown > 0 ? `${waiterCooldown}s` : t("waiter.button")}
-            </span>
+            <span>{waiterCooldown > 0 ? `${waiterCooldown}s` : t("waiter.button")}</span>
           </button>
         </div>
       )}
