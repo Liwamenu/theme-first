@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Facebook, Instagram, Youtube, MessageCircle, CalendarDays, Star, Heart } from "lucide-react";
+import { Facebook, Instagram, Youtube, MessageCircle, CalendarDays, Star } from "lucide-react";
 import { useRestaurant } from "@/hooks/useRestaurant";
 import { ReservationModal } from "./ReservationModal";
 import { SurveyModal } from "./SurveyModal";
@@ -70,10 +70,6 @@ export function Footer() {
         </div>
 
         <div className="mt-10 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 mb-4">
-            <Heart className="w-4 h-4 text-primary fill-primary" />
-            <span className="text-sm font-medium text-primary">Made with love</span>
-          </div>
           <p className="font-display font-semibold text-foreground text-lg mb-1">{restaurant.name}</p>
           {restaurant.slogan2 && <p className="text-primary italic mb-3">{restaurant.slogan2}</p>}
           <a href={`https://www.google.com/maps/search/?api=1&query=${restaurant.latitude},${restaurant.longitude}`} target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-primary transition-colors">
