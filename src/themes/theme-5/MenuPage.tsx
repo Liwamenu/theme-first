@@ -157,7 +157,7 @@ export function MenuPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [categories, campaignProducts.length, searchQuery, isHeaderVisible]);
 
-  const CAMPAIGN_CATEGORY_ID = "__campaign__";
+  
 
   const getStickyOffset = useCallback(() => {
     return isHeaderVisible ? 172 : 120;
