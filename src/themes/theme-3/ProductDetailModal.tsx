@@ -65,7 +65,28 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
     });
   };
 
+  const handleTagItemQuantity = (tagId: string, itemId: string, delta: number) => {
+    setSelectedTags(prev => {
+      const currentTagItems = prev[tagId] || [];
+      const itemIndex = currentTagItems.findIndex(t => t.itemId === itemId);
+      if (itemIndex < 0) return prev;
+      const current = currentTagItems[itemIndex];
+      const orderTag = selectedPortion.orderTags.find(t => t.id === tagId);
+      const orderTagItem = orderTag?.orderTagItems.find(i => i.id === itemId);
+      const maxQty = orderTagItem?.maxQuantity ?? 99;
+      const newQty = current.quantity + delta;
+      if (newQty < 1) return prev;
+      if (newQty > maxQty) {
+        toast.error(t('product.maxQuantityError', { name: current.itemName, max: maxQty }));
+        return prev;
+      }
+      return { ...prev, [tagId]: currentTagItems.map((t, i) => i === itemIndex ? { ...t, quantity: newQty } : t) };
+    });
+  };
+
   const isTagItemSelected = (tagId: string, itemId: string) => (selectedTags[tagId] || []).some(t => t.itemId === itemId);
+
+  const getTagItemQuantity = (tagId: string, itemId: string) => (selectedTags[tagId] || []).find(t => t.itemId === itemId)?.quantity ?? 0;
 
   const validateTags = useCallback((): boolean => {
     for (const tag of selectedPortion.orderTags) {
