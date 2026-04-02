@@ -245,7 +245,7 @@ export function MenuPage() {
       )}
 
       {/* Menu Categories - single column horizontal cards */}
-      <div className="container px-4 py-6">
+      <div className="container px-4 py-6 pb-24">
         {!searchQuery && campaignProducts.length > 0 && activeCategory === CAMPAIGN_CATEGORY_ID && (
           <section ref={(el) => (categoryRefs.current[CAMPAIGN_CATEGORY_ID] = el)} className="mb-8">
             <h2 className="font-display text-lg font-bold mb-4 flex items-center gap-2">
