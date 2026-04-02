@@ -37,10 +37,17 @@ export const CategoryTabs = memo(function CategoryTabs({ categories, activeCateg
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const activeElement = scrollRef.current?.querySelector(`[data-category="${activeCategory}"]`);
-    if (activeElement) {
-      activeElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-    }
+    const container = scrollRef.current;
+    const activeElement = container?.querySelector(`[data-category="${activeCategory}"]`) as HTMLElement | null;
+
+    if (!container || !activeElement) return;
+
+    const targetLeft = activeElement.offsetLeft - container.clientWidth / 2 + activeElement.clientWidth / 2;
+
+    container.scrollTo({
+      left: Math.max(0, targetLeft),
+      behavior: 'smooth',
+    });
   }, [activeCategory]);
 
   const handleClick = useCallback((categoryId: string) => {
