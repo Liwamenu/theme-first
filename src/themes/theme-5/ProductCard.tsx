@@ -1,6 +1,6 @@
 import { memo, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Plus } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import { Product, Portion } from "@/types/restaurant";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
