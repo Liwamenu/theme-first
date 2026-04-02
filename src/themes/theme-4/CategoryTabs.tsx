@@ -47,7 +47,7 @@ export const CategoryTabs = memo(function CategoryTabs({ categories, activeCateg
   }, [onCategoryChange]);
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-primary border-t border-primary-foreground/10 shadow-xl">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-xl">
       <div
         ref={scrollRef}
         className="flex overflow-x-auto hide-scrollbar"
@@ -59,16 +59,19 @@ export const CategoryTabs = memo(function CategoryTabs({ categories, activeCateg
             onClick={() => handleClick(campaignTab.id)}
             whileTap={{ scale: 0.9 }}
             className={cn(
-              'flex-1 min-w-[80px] flex flex-col items-center gap-1 py-3 px-2 transition-all duration-200',
+              'flex-shrink-0 min-w-[80px] flex flex-col items-center gap-1 py-3 px-3 transition-all duration-200 relative',
               activeCategory === campaignTab.id
                 ? 'text-accent'
-                : 'text-primary-foreground/60 hover:text-primary-foreground/80'
+                : 'text-muted-foreground hover:text-foreground'
             )}
           >
             <Flame className="w-5 h-5" />
             <span className="text-[10px] font-semibold uppercase tracking-wider truncate max-w-full">
               {campaignTab.name}
             </span>
+            {activeCategory === campaignTab.id && (
+              <motion.div layoutId="theme4-tab-indicator" className="absolute bottom-0 left-2 right-2 h-0.5 bg-accent rounded-full" />
+            )}
           </motion.button>
         )}
         
@@ -81,16 +84,19 @@ export const CategoryTabs = memo(function CategoryTabs({ categories, activeCateg
               onClick={() => handleClick(category.id)}
               whileTap={{ scale: 0.9 }}
               className={cn(
-                'flex-1 min-w-[80px] flex flex-col items-center gap-1 py-3 px-2 transition-all duration-200',
+                'flex-shrink-0 min-w-[80px] flex flex-col items-center gap-1 py-3 px-3 transition-all duration-200 relative',
                 activeCategory === category.id
                   ? 'text-accent'
-                  : 'text-primary-foreground/60 hover:text-primary-foreground/80'
+                  : 'text-muted-foreground hover:text-foreground'
               )}
             >
               <IconComponent className="w-5 h-5" />
               <span className="text-[10px] font-semibold uppercase tracking-wider truncate max-w-full">
                 {category.name}
               </span>
+              {activeCategory === category.id && (
+                <motion.div layoutId="theme4-tab-indicator" className="absolute bottom-0 left-2 right-2 h-0.5 bg-accent rounded-full" />
+              )}
             </motion.button>
           );
         })}
