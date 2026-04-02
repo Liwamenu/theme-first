@@ -212,7 +212,7 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: '100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="fixed left-[3px] right-[3px] bottom-[3px] z-50 max-h-[92vh] bg-card rounded-3xl flex flex-col"
+        className="fixed left-[3px] right-[3px] bottom-[3px] z-50 max-h-[80vh] bg-card rounded-3xl flex flex-col"
       >
         {/* Header Image */}
         <div className="relative h-56">
