@@ -62,7 +62,7 @@ export const AnnouncementModal = ({ isOpen, onClose, htmlContent }: Announcement
             <div className="relative max-h-[calc(85vh-80px)] overflow-y-auto p-6 pt-8">
               <div
                 className="announcement-content prose prose-sm dark:prose-invert max-w-none"
-                dangerouslySetInnerHTML={{ __html: htmlContent }}
+                dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
               />
             </div>
 
