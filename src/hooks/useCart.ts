@@ -1,5 +1,17 @@
 import { create } from 'zustand';
 import { CartItem, Product, Portion, SelectedTagItem } from '@/types/restaurant';
+import { useRestaurantStore } from '@/hooks/useRestaurant';
+
+// Shared helper to get the correct display price for a portion
+export function getPortionDisplayPrice(portion: Portion, isSpecialPriceActive: boolean): number {
+  if (isSpecialPriceActive && portion.specialPrice !== null) {
+    return portion.specialPrice;
+  }
+  if (portion.campaignPrice !== null) {
+    return portion.campaignPrice;
+  }
+  return portion.price;
+}
 
 interface CartState {
   items: CartItem[];
