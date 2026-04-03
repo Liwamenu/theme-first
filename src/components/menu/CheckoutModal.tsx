@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, MapPin, User, Phone, CreditCard, Banknote, AlertCircle, Loader2, Bell, Check, Home, ArrowLeft, FileText, QrCode } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useRestaurant, useRestaurantStore } from "@/hooks/useRestaurant";
-import { useCart } from "@/hooks/useCart";
+import { useCart, getPortionDisplayPrice } from "@/hooks/useCart";
 import { useLocation } from "@/hooks/useLocation";
 import { useOrder } from "@/hooks/useOrder";
 import { Button } from "@/components/ui/button";
@@ -226,13 +226,7 @@ export function CheckoutModal({
       restaurantId: restaurant.restaurantId,
       orderType: orderType!,
       items: items.map(item => {
-        const portion = item.portion;
-        let unitPrice = portion.price;
-        if (portion.specialPrice !== null) {
-          unitPrice = portion.specialPrice;
-        } else if (portion.campaignPrice !== null) {
-          unitPrice = portion.campaignPrice;
-        }
+        const unitPrice = getPortionDisplayPrice(item.portion, restaurant.isSpecialPriceActive);
         const tagTotal = item.selectedTags.reduce((sum, tag) => sum + tag.price * tag.quantity, 0);
         const itemTotal = (unitPrice + tagTotal) * item.quantity;
         return {

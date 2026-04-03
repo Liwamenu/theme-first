@@ -1,5 +1,17 @@
 import { create } from 'zustand';
 import { CartItem, Product, Portion, SelectedTagItem } from '@/types/restaurant';
+import { useRestaurantStore } from '@/hooks/useRestaurant';
+
+// Shared helper to get the correct display price for a portion
+export function getPortionDisplayPrice(portion: Portion, isSpecialPriceActive: boolean): number {
+  if (isSpecialPriceActive && portion.specialPrice !== null) {
+    return portion.specialPrice;
+  }
+  if (portion.campaignPrice !== null) {
+    return portion.campaignPrice;
+  }
+  return portion.price;
+}
 
 interface CartState {
   items: CartItem[];
@@ -89,15 +101,9 @@ export const useCart = create<CartState>((set, get) => ({
   
   getTotal: () => {
     const items = get().items;
+    const isSpecialPriceActive = useRestaurantStore.getState().restaurantData.isSpecialPriceActive;
     return items.reduce((total, item) => {
-      // Get the best price for this portion
-      const portion = item.portion;
-      let price = portion.price;
-      if (portion.specialPrice !== null) {
-        price = portion.specialPrice;
-      } else if (portion.campaignPrice !== null) {
-        price = portion.campaignPrice;
-      }
+      const price = getPortionDisplayPrice(item.portion, isSpecialPriceActive);
       
       // Add tag prices
       const tagTotal = item.selectedTags.reduce((sum, tag) => sum + (tag.price * tag.quantity), 0);
