@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, MapPin, User, Phone, CreditCard, Banknote, AlertCircle, Loader2, Bell, Check, Home, ArrowLeft, FileText, QrCode } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useRestaurant, useRestaurantStore } from "@/hooks/useRestaurant";
-import { useCart } from "@/hooks/useCart";
+import { useCart, getPortionDisplayPrice } from "@/hooks/useCart";
 import { useLocation } from "@/hooks/useLocation";
 import { useOrder } from "@/hooks/useOrder";
 import { Button } from "@/components/ui/button";
