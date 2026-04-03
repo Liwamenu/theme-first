@@ -205,7 +205,7 @@ export function MenuPage() {
       .map((cat) => ({
         ...cat,
         products: cat.products.filter(
-          (p) => p.name.toLowerCase().includes(lowerQuery) || p.description.toLowerCase().includes(lowerQuery),
+          (p) => (p.name || '').toLowerCase().includes(lowerQuery) || (p.description || '').toLowerCase().includes(lowerQuery),
         ),
       }))
       .filter((cat) => cat.products.length > 0);
