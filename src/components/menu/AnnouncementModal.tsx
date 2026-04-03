@@ -13,6 +13,7 @@ interface AnnouncementModalProps {
 
 export const AnnouncementModal = ({ isOpen, onClose, htmlContent }: AnnouncementModalProps) => {
   const { t } = useTranslation();
+  const sanitizedHtml = useMemo(() => DOMPurify.sanitize(htmlContent), [htmlContent]);
 
   // Prevent body scroll when modal is open
   useEffect(() => {
