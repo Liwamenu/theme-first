@@ -223,7 +223,8 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps) {
       });
       const data = getResponseData(res);
       const reservation = data?.reservation || data?.Reservation || data;
-      const code = reservation?.confirmationCode || reservation?.id || reservationId || `#${Math.floor(1000 + Math.random() * 9000)}`;
+      const fallbackCode = `#${Array.from(crypto.getRandomValues(new Uint8Array(4))).map(b => b.toString(36)).join('').slice(0, 8).toUpperCase()}`;
+      const code = reservation?.confirmationCode || reservation?.id || reservationId || fallbackCode;
 
       toast.success(t("reservation.success"));
       navigateToReceipt(code);
