@@ -64,7 +64,7 @@ export function MenuPage() {
   });
 
   const isAnyOverlayOpen = !!selectedProduct || isCartOpen || isCheckoutOpen || showCallWaiter || showReservation || showTableSelection || showSoundPermission || showAnnouncement;
-  useBodyScrollLock(isAnyOverlayOpen);
+  useBodyScrollLock(currentView === "menu" && isAnyOverlayOpen);
 
   const categoryRefs = useRef<Record<string, HTMLElement | null>>({});
 
