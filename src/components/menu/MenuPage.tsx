@@ -65,9 +65,9 @@ export function MenuPage() {
     return 0;
   });
 
-  // Lock body scroll when any overlay is open
+  // Lock body scroll only while the menu view is active and an overlay is open
   const isAnyOverlayOpen = !!selectedProduct || isCartOpen || isCheckoutOpen || showCallWaiter || showReservation || showTableSelection || showSoundPermission || showAnnouncement;
-  useBodyScrollLock(isAnyOverlayOpen);
+  useBodyScrollLock(currentView === "menu" && isAnyOverlayOpen);
 
   const categoryRefs = useRef<Record<string, HTMLElement | null>>({});
 
