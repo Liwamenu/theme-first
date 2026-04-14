@@ -47,7 +47,104 @@ const getStatusConfig = (
 
 const statusSteps: Order["status"][] = ["pending", "confirmed", "preparing", "ready", "delivered"];
 
-export function OrderReceipt({ orderId, onBack, waiterCooldown, onWaiterSuccess }: OrderReceiptProps) {
+// Zigzag status component with ref-based SVG lines
+function StatusZigzag({
+  statusSteps: steps,
+  statusConfig,
+  currentStepIndex,
+}: {
+  statusSteps: Order["status"][];
+  statusConfig: Record<Order["status"], { label: string; icon: React.ReactNode; color: string }>;
+  currentStepIndex: number;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const circleRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [lines, setLines] = useState<{ x1: number; y1: number; x2: number; y2: number }[]>([]);
+
+  const zigzagOrder = [0, 1, 2, 3, 4];
+
+  const updateLines = useCallback(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
+    const newLines: { x1: number; y1: number; x2: number; y2: number }[] = [];
+    for (let i = 0; i < zigzagOrder.length - 1; i++) {
+      const fromEl = circleRefs.current[zigzagOrder[i]];
+      const toEl = circleRefs.current[zigzagOrder[i + 1]];
+      if (fromEl && toEl) {
+        const fromRect = fromEl.getBoundingClientRect();
+        const toRect = toEl.getBoundingClientRect();
+        newLines.push({
+          x1: fromRect.left + fromRect.width / 2 - rect.left,
+          y1: fromRect.top + fromRect.height / 2 - rect.top,
+          x2: toRect.left + toRect.width / 2 - rect.left,
+          y2: toRect.top + toRect.height / 2 - rect.top,
+        });
+      }
+    }
+    setLines(newLines);
+  }, []);
+
+  useEffect(() => {
+    // Small delay to ensure layout is complete
+    const timer = setTimeout(updateLines, 50);
+    window.addEventListener("resize", updateLines);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("resize", updateLines);
+    };
+  }, [updateLines]);
+
+  const setCircleRef = (stepIndex: number) => (el: HTMLDivElement | null) => {
+    circleRefs.current[stepIndex] = el;
+  };
+
+  const renderStep = (step: Order["status"], stepIndex: number) => {
+    const isActive = stepIndex <= currentStepIndex;
+    const isCurrent = stepIndex === currentStepIndex;
+    const config = statusConfig[step];
+    return (
+      <div key={step} className="flex flex-col items-center">
+        <div
+          ref={setCircleRef(stepIndex)}
+          className={cn(
+            "w-12 h-12 rounded-full flex items-center justify-center transition-all",
+            isActive ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground",
+            isCurrent && "ring-4 ring-primary/20",
+          )}
+        >
+          {config.icon}
+        </div>
+        <span className={cn("text-xs mt-2 text-center leading-tight", isActive ? "text-foreground font-medium" : "text-muted-foreground")}>
+          {config.label}
+        </span>
+      </div>
+    );
+  };
+
+  return (
+    <div ref={containerRef} className="relative">
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
+        {lines.map((line, i) => (
+          <line key={i} x1={line.x1} y1={line.y1} x2={line.x2} y2={line.y2} className={cn(i < currentStepIndex ? "stroke-primary" : "stroke-secondary")} strokeWidth="3" />
+        ))}
+      </svg>
+      {/* Row 1: Pending(0), Preparing(2), Delivered(4) */}
+      <div className="relative grid grid-cols-3 z-10">
+        {renderStep(steps[0], 0)}
+        {renderStep(steps[2], 2)}
+        {renderStep(steps[4], 4)}
+      </div>
+      {/* Row 2: Confirmed(1), Ready(3) */}
+      <div className="relative grid grid-cols-2 z-10 mt-4 px-[16.67%]">
+        {renderStep(steps[1], 1)}
+        {renderStep(steps[3], 3)}
+      </div>
+    </div>
+  );
+}
+
+
   const { t } = useTranslation();
   const { restaurant, formatPrice, isCurrentlyOpen } = useRestaurant();
   const [showCallWaiterModal, setShowCallWaiterModal] = useState(false);
