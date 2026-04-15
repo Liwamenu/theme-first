@@ -1,37 +1,40 @@
 
 
 ## Problem
-Several hardcoded (untranslated) strings exist across the app, causing language inconsistency when the user switches languages.
+`tableNumber` is typed as `number` everywhere (types, store, API calls, modals), but in reality table identifiers can be text strings (e.g., "A1", "VIP-3", "Terrace"). This causes `parseInt` to discard non-numeric table IDs, and the QR scanner rejects valid table codes.
 
-## Found Issues
+## Scope of Change
+Change `tableNumber` from `number` to `string` across the entire codebase.
 
-1. **Order status labels in `OrderReceipt.tsx` (lines 37-44)** -- "Pending", "Accepted", "Preparing", "On The Way", "Delivered", "Cancelled" are hardcoded in English. Translation keys (`status.pending`, `status.confirmed`, etc.) already exist in all locale files but are not being used.
+## Files to Modify
 
-2. **"Order not found" in `OrderReceipt.tsx` (line 71)** -- Hardcoded English fallback text.
+### 1. Types — `src/types/restaurant.ts`
+- `RestaurantData.tableNumber`: `number` → `string`
+- `OrderPayload.tableNumber`: `number` → `string`
 
-3. **"Kapat" in `SurveyModal.tsx` (line 251)** -- Hardcoded Turkish word for "Close" in the screen-reader label instead of using `t("common.close")`.
+### 2. Store — `src/hooks/useRestaurant.ts`
+- `setTableNumber` signature: `(tableNumber: number)` → `(tableNumber: string)`
+- URL param parsing (lines 72-76): remove `parseInt`, use raw string value directly (just check it's non-empty)
 
-4. **"metre" fallback in `CheckoutModal.tsx` (line 161)** -- Uses `defaultValue: "metre"` but the `common.meters` key is missing from all locale files.
+### 3. API — `src/lib/api.ts`
+- `apiCallWaiter` payload type: `tableNumber: number` → `tableNumber: string`
 
-## Fix
+### 4. ChangeTableModal — `src/components/menu/ChangeTableModal.tsx` + all theme variants (themes 2-5)
+- Props: `onTableChange: (tableNumber: number)` → `(tableNumber: string)`, `currentTable?: number` → `string`
+- `extractTableNumber` return type: `number | null` → `string | null`, remove `parseInt` — just return the raw `tableNumber` param value
+- `scannedTable` state: `number | null` → `string | null`
+- Remove numeric validation (`!isNaN`, `> 0`)
 
-### 1. `src/components/menu/OrderReceipt.tsx`
-- Remove the static `STATUS_LABELS` object
-- Make `getStatusConfig` accept a `t` function and use `t("status.pending")`, `t("status.confirmed")`, `t("status.preparing")`, `t("status.ready")`, `t("status.delivered")`, `t("status.cancelled")` for labels
-- Replace `"Order not found"` with `t("errors.loadFailed")` or a new key
+### 5. CheckoutModal — `src/components/menu/CheckoutModal.tsx` + theme variants
+- `handleTableChange` parameter: `number` → `string`
+- Any numeric checks on `tableNumber` → truthy string checks
 
-### 2. `src/components/menu/SurveyModal.tsx`
-- Line 251: Replace `"Kapat"` with `{t("common.close")}`
+### 6. MenuPage files (base + themes 2-5)
+- `handleTableSelected` callback parameter: `number` → `string`
 
-### 3. `src/components/menu/CheckoutModal.tsx`
-- Line 161: Remove the `defaultValue` and add the `common.meters` key to all 11 locale files
+### 7. Dummy data — `src/data/restaurant.ts`
+- If `tableNumber` is set there, change from number to string (e.g., `"1"` instead of `1`)
 
-### 4. Add missing translation keys to all 11 locale files
-- Add `"meters"` key under `common` section in all locale files (tr, en, de, fr, it, es, ar, az, ru, el, zh)
-
-### Files to modify
-- `src/components/menu/OrderReceipt.tsx`
-- `src/components/menu/SurveyModal.tsx`
-- `src/components/menu/CheckoutModal.tsx`
-- All 11 `src/locales/*/translation.json` files (add `common.meters`)
+### Summary
+This is a type-widening refactor: `number` → `string` for `tableNumber` in ~15-20 files. No logic changes beyond removing `parseInt` calls and numeric validations. The QR scanner will accept any non-empty `tableNumber` query param value.
 
