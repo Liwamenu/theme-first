@@ -22,7 +22,7 @@ interface RestaurantStore {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   setInitialized: (initialized: boolean) => void;
-  setTableNumber: (tableNumber: number) => void;
+  setTableNumber: (tableNumber: string) => void;
 }
 
 export const useRestaurantStore = create<RestaurantStore>((set) => ({
@@ -35,7 +35,7 @@ export const useRestaurantStore = create<RestaurantStore>((set) => ({
   setLoading: (loading: boolean) => set({ isLoading: loading }),
   setError: (error: string | null) => set({ error, isLoading: false }),
   setInitialized: (initialized: boolean) => set({ isInitialized: initialized }),
-  setTableNumber: (tableNumber: number) =>
+  setTableNumber: (tableNumber: string) =>
     set((state) => ({
       restaurantData: { ...state.restaurantData, tableNumber },
     })),
@@ -69,11 +69,8 @@ export function useInitializeRestaurant() {
           // Extract tableNumber from URL query params on first load
           const urlParams = new URLSearchParams(window.location.search);
           const tableParam = urlParams.get('tableNumber');
-          if (tableParam) {
-            const tableNum = parseInt(tableParam, 10);
-            if (!isNaN(tableNum) && tableNum > 0) {
-              restaurantData.tableNumber = tableNum;
-            }
+          if (tableParam && tableParam.trim()) {
+            restaurantData.tableNumber = tableParam.trim();
           }
 
           setRestaurantData(restaurantData);
