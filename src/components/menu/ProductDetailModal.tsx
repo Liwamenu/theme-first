@@ -219,10 +219,17 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
           <img
             src={product.imageURL}
             alt={product.name}
+            width={800}
+            height={448}
+            loading="eager"
+            decoding="async"
+            // @ts-expect-error - fetchPriority is a valid HTML attribute
+            fetchpriority="high"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent" />
           <button
+            type="button"
             onClick={onClose}
             className="absolute top-4 right-4 w-10 h-10 rounded-full bg-red-100 backdrop-blur flex items-center justify-center shadow-lg"
           >
