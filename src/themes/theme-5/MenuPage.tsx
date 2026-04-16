@@ -87,7 +87,7 @@ export function MenuPage() {
     const timer = setTimeout(() => {
       setShowAnnouncement(true);
       sessionStorage.setItem("hasSeenAnnouncement", "true");
-    }, announcementSettings.delayMs);
+    }, announcementSettings.delayMs * 1000);
     return () => clearTimeout(timer);
   }, [restaurant.announcementSettings]);
 
